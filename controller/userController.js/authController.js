@@ -85,13 +85,16 @@ let authController = {
 
     AuthOTPSubmission: async (req, res, next) => {
 
-        let otp = req.body.otp;
+        let otp = req.body.otp_number;
         let email_id = req.body.email_id;
+
 
 
         try {
             let otpVerification = await userHelper.signUpOTPValidate(otp, email_id);
+            console.log(otpVerification);
             if (otpVerification.status) {
+                console.log("OTP Verified");
                 res.status(200).json({
                     status: true,
                     msg: "OTP Verification sucess",

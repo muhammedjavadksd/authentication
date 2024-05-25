@@ -68,6 +68,9 @@ let userHelper = {
             let userAuth = await userAuthModel.findOne({ email: email_id });
             if (userAuth) {
                 let { full_name, phone_number, email } = userAuth;
+                console.log(userAuth);
+                console.log(otp, email_id);
+                console.log("The auth is");
                 if (userAuth.otp == otp) {
                     let otpExpireTimer = userAuth.otp_timer;
                     let currentTime = new Date().getUTCMilliseconds()
