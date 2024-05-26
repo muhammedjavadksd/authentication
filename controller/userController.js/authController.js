@@ -28,7 +28,7 @@ let authController = {
                 let isUserExist = await userHelper.isUserExist(email_address, phone_number)
                 console.log("User exist : " + isUserExist);
                 if (isUserExist) {
-                    res.status(500).json({
+                    res.status(401).json({
                         "status": false,
                         "msg": "Email/Phone already exist",
                     })
@@ -114,6 +114,16 @@ let authController = {
             })
         }
     },
+
+    editAuthPhoneNumber: (req, res) => {
+
+        let newPhoneNumber = req.body.phone_number;
+        let oldNumber = req.body.old_number;
+
+        // try {
+
+        // }
+    }
 
 }
 
