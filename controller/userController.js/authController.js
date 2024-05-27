@@ -1,5 +1,6 @@
 const { AUTH_PROVIDERS, AUTH_PROVIDERS_DATA } = require("../../config/const");
 const { signUpUserValidation } = require("../../config/validation/validation");
+const authHelper = require("../../helper/authHelper");
 const userHelper = require("../../helper/userHelper");
 
 
@@ -129,15 +130,43 @@ let authController = {
         }
     },
 
-    editAuthPhoneNumber: (req, res) => {
+    editAuthPhoneNumber: async (req, res) => {
 
-        let newPhoneNumber = req.body.phone_number;
-        let oldNumber = req.body.old_number;
+        let newEmailID = req.body.email_id;
+        let oldEmailId = req.context.email_id;
 
-        // try {
+        try {
+            let editRequest = await authHelper.editAuthPhoneNumber(oldEmailId, newEmailID)
+            res.status(editRequest.status).json({
+                status: editRequest.status,
+                msg: editRequest.msg
+            })
+        } catch (e) {
+            console.log(e);
+            res.status(500).json({
+                status: false,
+                msg: "Something went wrong"
+            })
+        }
+    },
 
-        // }
+    resetOtpNumber: async (req, res) => {
+
+        let tokenEmail = req.context.email_id;
+
+        try {
+            let result = await authHelper.resendOtpNumer(tokenEmail);
+            return res.status(result.statusCode).json({ msg: result.msg, status: result.status });
+        } catch (e) {
+            res.status(500).json({
+                status: true,
+                msg: "Unauthorized request"
+            })
+        }
     }
+
+
+
 
 }
 

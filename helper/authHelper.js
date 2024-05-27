@@ -1,7 +1,12 @@
+const COMMUNICATION_PROVIDER = require("../communication/notification/notification_service");
+const constant_data = require("../config/const");
 const userAuth = require("../db/models/userAuth");
+const utilHelper = require("./utilHelper");
 
 
 let authHelper = {
+
+
     signUpOTPValidate: async (otp, email_id) => {
         try {
             let userAuth = await userAuthModel.findOne({ email: email_id }).sort({ id: -1 })
@@ -89,7 +94,7 @@ let authHelper = {
                 COMMUNICATION_PROVIDER.signInOTPSender({
                     otp: otpNumber,
                     email: userAuth.email,
-                    full_name: userAuth.full_name
+                    full_name: userAuth.first_name + userAuth.last_name
                 })
                 return {
                     statusCode: 200,
@@ -109,7 +114,7 @@ let authHelper = {
     // editAuthPhoneNumber: async (newNumber, oldNumber) => {
     //     try {
 
-    //         let fetchUser = await userAuth.findOne({ phone_number: oldNumber });
+    //         let fetchUser = await userAuth.findOne({ email: oldNumber });
     //         if (fetchUser) {
     //             if (!fetchUser.account_started) {
 
@@ -119,6 +124,87 @@ let authHelper = {
 
     //     }
     // }
+
+    resendOtpNumer: async (email_id) => {
+
+        try {
+            let getUser = await userAuth.findOne({ email: email_id });
+            if (getUser) {
+                let otpNumber = utilHelper.generateAnOTP(6);
+                let otpExpireTime = constant_data.MINIMUM_OTP_TIMER;
+
+                getUser.otp = otpNumber;
+                getUser.otp_timer = otpExpireTime;
+                await getUser.save()
+                COMMUNICATION_PROVIDER.signInOTPSender({
+                    otp: otpNumber,
+                    email: email_id,
+                    full_name: getUser.first_name + " " + getUser.last_name
+                })
+                return {
+                    statusCode: 200,
+                    status: true,
+                    msg: "OTP Has been sent "
+                }
+            } else {
+                return {
+                    statusCode: 401,
+                    status: false,
+                    msg: "Unauthorized request"
+                }
+            }
+        } catch (e) {
+            console.log(e);
+            return {
+                statusCode: 500,
+                status: false,
+                msg: "Something went wrong"
+            }
+        }
+
+    },
+
+    editAuthPhoneNumber: async function (oldEmailId, newEmailID) {
+
+        console.log("The old email id is : " + oldEmailId);
+
+        let otpNumber = utilHelper.generateAnOTP(6);
+        let otpExpireTime = constant_data.MINIMUM_OTP_TIMER;
+
+        try {
+            let getUser = await userAuth.findOne({ email: oldEmailId });
+            if (getUser && !getUser.account_started) {
+                getUser.email = newEmailID;
+                getUser.otp = otpNumber;
+                getUser.otp_timer = otpExpireTime;
+                getUser.save()
+
+                COMMUNICATION_PROVIDER.signInOTPSender({
+                    otp: otpNumber,
+                    email: newEmailID,
+                    full_name: getUser.first_name + getUser.last_name
+                })
+
+
+                return {
+                    status: 200,
+                    msg: "Email id has been updated",
+                }
+            } else {
+                return {
+                    status: 401,
+                    msg: "The email address you entered does not exist",
+                }
+            }
+
+        } catch (e) {
+            console.log(e);
+            return {
+                status: 500,
+                msg: "Something went wrong",
+            }
+        }
+    }
 }
 
 module.exports = authHelper;
