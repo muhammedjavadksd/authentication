@@ -38,6 +38,9 @@ let authHelper = {
                             userAuth.account_started = true
                         }
 
+                        console.log("Updated user");
+                        console.log(userAuth);
+
                         await userAuth.save()
 
                         return {
@@ -135,7 +138,9 @@ let authHelper = {
                 let otpNumber = utilHelper.generateAnOTP(6);
                 let otpExpireTime = constant_data.MINIMUM_OTP_TIMER;
 
+                console.log("User ID : " + getUser.id);
                 let updateToken = await this.resetToken(getUser.id)
+                console.log("D : " + updateToken);
                 if (updateToken) {
                     getUser.otp = otpNumber;
                     getUser.otp_timer = otpExpireTime;
@@ -187,12 +192,15 @@ let authHelper = {
         try {
             let getUser = await userAuth.findOne({ email: oldEmailId });
             if (getUser && !getUser.account_started) {
-                let newToken = tokenHelper.createJWTToken({ email_id: getUser.email, type: OTP_TYPE.SIGN_UP_OTP })
+                let newToken = await tokenHelper.createJWTToken({ email_id: newEmailID, type: OTP_TYPE.SIGN_UP_OTP })
                 getUser.email = newEmailID;
                 getUser.otp = otpNumber;
                 getUser.otp_timer = otpExpireTime;
                 getUser.jwtToken = newToken
                 getUser.save()
+
+
+                console.log("OTP will send to new email id" + newEmailID);
 
                 COMMUNICATION_PROVIDER.signInOTPSender({
                     otp: otpNumber,
@@ -227,14 +235,16 @@ let authHelper = {
         try {
             let findUser = await userAuth.findById(userId)
             if (findUser) {
-                let newToken = tokenHelper.createJWTToken({ email_id: findUser.email, type: OTP_TYPE.SIGN_UP_OTP })
+                let newToken = await tokenHelper.createJWTToken({ email_id: findUser.email, type: OTP_TYPE.SIGN_UP_OTP })
                 findUser.jwtToken = newToken;
                 await findUser.save()
                 return newToken
             } else {
+                console.log("Do not found the user");
                 return null;
             }
         } catch (e) {
+            console.log(e);
             return null;
         }
     }

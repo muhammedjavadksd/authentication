@@ -7,8 +7,9 @@ let authMiddleware = {
     isValidSignUpTrying: async (req, res, next) => {
         let headers = req.headers;
         console.log("The header is : 123");
+
+        console.log(req.headers);
         if (headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
-            console.log(req.headers);
             if (!req.context) {
                 req.context = {}
             }
@@ -17,11 +18,10 @@ let authMiddleware = {
             let checkValidity = await tokenHelper.checkTokenValidity(token)
             if (checkValidity) {
                 console.log('Decode jwt is : ');
-                let decodePayload = decodeJwt.payload;
-                console.log(decodeJwt);
-                if (decodePayload?.email_id && decodePayload.type == OTP_TYPE.SIGN_UP_OTP) {
-                    req.context.email_id = decodePayload?.email_id;
-                    console.log("Requested phone number is", decodePayload?.email_id);
+
+                if (checkValidity?.email_id && checkValidity.type == OTP_TYPE.SIGN_UP_OTP) {
+                    req.context.email_id = checkValidity?.email_id;
+                    console.log("Requested phone number is", checkValidity?.email_id);
                     next()
                 } else {
                     res.status(401).json({
