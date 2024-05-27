@@ -3,6 +3,8 @@ const COMMUNICATION_PROVIDER = require("../communication/notification/notificati
 const utilHelper = require("./utilHelper")
 let jwt = require("jsonwebtoken");
 const constant_data = require("../config/const");
+const tokenHelper = require("./tokenHelper");
+const { OTP_TYPE } = require("../../notification/config/const_data");
 
 let userHelper = {
 
@@ -41,12 +43,12 @@ let userHelper = {
             let otpNumber = utilHelper.generateAnOTP(6);
             let expireTime = constant_data.MINIMUM_OTP_TIMER;
 
-            console.log(location);
+            let jwtToken = await tokenHelper.createJWTToken({ email_id: email, type: OTP_TYPE.SIGN_UP_OTP })
 
             new userAuthModel({
-                first_name, last_name, phone_number, email, auth_id, auth_provider, otp_timer: expireTime, otp: otpNumber, location
+                first_name, last_name, phone_number, email, auth_id, auth_provider, otp_timer: expireTime, otp: otpNumber, location, jwtToken: jwtToken
             }).save().then((data) => {
-                resolve()
+                resolve({ token: jwtToken })
 
                 let communicationData = {
                     otp: otpNumber,
