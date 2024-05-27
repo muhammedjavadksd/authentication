@@ -14,14 +14,21 @@ let authMiddleware = {
             }
             let token = req.headers.authorization.split(' ')[1]
             req.context.auth_token = token;
-            let decodeJwt = await tokenHelper.decodeJWTToken(token)
-            console.log('Decode jwt is : ');
-            let decodePayload = decodeJwt.payload;
-            console.log(decodeJwt);
-            if (decodePayload?.email_id && decodePayload.type == OTP_TYPE.SIGN_UP_OTP) {
-                req.context.email_id = decodePayload?.email_id;
-                console.log("Requested phone number is", decodePayload?.email_id);
-                next()
+            let checkValidity = await tokenHelper.checkTokenValidity(token)
+            if (checkValidity) {
+                console.log('Decode jwt is : ');
+                let decodePayload = decodeJwt.payload;
+                console.log(decodeJwt);
+                if (decodePayload?.email_id && decodePayload.type == OTP_TYPE.SIGN_UP_OTP) {
+                    req.context.email_id = decodePayload?.email_id;
+                    console.log("Requested phone number is", decodePayload?.email_id);
+                    next()
+                } else {
+                    res.status(401).json({
+                        status: false,
+                        msg: "Authorization is failed"
+                    })
+                }
             } else {
                 res.status(401).json({
                     status: false,

@@ -20,6 +20,16 @@ let tokenHelper = {
         } catch (e) {
             return null;
         }
+    },
+
+    checkTokenValidity: async (token) => {
+        try {
+            let checkValidity = await jwt.verify(token, process.env.JWT_SECRET);
+            console.log("Token validity is : " + checkValidity);
+            return checkValidity
+        } catch (e) {
+            return false
+        }
     }
 }
 

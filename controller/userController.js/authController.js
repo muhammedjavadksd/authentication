@@ -139,6 +139,7 @@ let authController = {
             let editRequest = await authHelper.editAuthPhoneNumber(oldEmailId, newEmailID)
             res.status(editRequest.status).json({
                 status: editRequest.status,
+                token: editRequest.token,
                 msg: editRequest.msg
             })
         } catch (e) {
@@ -156,7 +157,7 @@ let authController = {
 
         try {
             let result = await authHelper.resendOtpNumer(tokenEmail);
-            return res.status(result.statusCode).json({ msg: result.msg, status: result.status });
+            return res.status(result.statusCode).json({ msg: result.msg, status: result.status, token: result.token });
         } catch (e) {
             res.status(500).json({
                 status: true,

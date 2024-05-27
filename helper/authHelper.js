@@ -1,6 +1,8 @@
+const { OTP_TYPE } = require("../../notification/config/const_data");
 const COMMUNICATION_PROVIDER = require("../communication/notification/notification_service");
 const constant_data = require("../config/const");
 const userAuth = require("../db/models/userAuth");
+const tokenHelper = require("./tokenHelper");
 const utilHelper = require("./utilHelper");
 
 
@@ -125,7 +127,7 @@ let authHelper = {
     //     }
     // }
 
-    resendOtpNumer: async (email_id) => {
+    resendOtpNumer: async function (email_id) {
 
         try {
             let getUser = await userAuth.findOne({ email: email_id });
@@ -133,19 +135,30 @@ let authHelper = {
                 let otpNumber = utilHelper.generateAnOTP(6);
                 let otpExpireTime = constant_data.MINIMUM_OTP_TIMER;
 
-                getUser.otp = otpNumber;
-                getUser.otp_timer = otpExpireTime;
-                await getUser.save()
-                COMMUNICATION_PROVIDER.signInOTPSender({
-                    otp: otpNumber,
-                    email: email_id,
-                    full_name: getUser.first_name + " " + getUser.last_name
-                })
-                return {
-                    statusCode: 200,
-                    status: true,
-                    msg: "OTP Has been sent "
+                let updateToken = await this.resetToken(getUser.id)
+                if (updateToken) {
+                    getUser.otp = otpNumber;
+                    getUser.otp_timer = otpExpireTime;
+                    await getUser.save()
+                    COMMUNICATION_PROVIDER.signInOTPSender({
+                        otp: otpNumber,
+                        email: email_id,
+                        full_name: getUser.first_name + " " + getUser.last_name
+                    })
+                    return {
+                        statusCode: 200,
+                        status: true,
+                        token: updateToken,
+                        msg: "OTP Has been sent "
+                    }
+                } else {
+                    return {
+                        statusCode: 500,
+                        status: false,
+                        msg: "Something went wrong"
+                    }
                 }
+
             } else {
                 return {
                     statusCode: 401,
@@ -174,9 +187,11 @@ let authHelper = {
         try {
             let getUser = await userAuth.findOne({ email: oldEmailId });
             if (getUser && !getUser.account_started) {
+                let newToken = tokenHelper.createJWTToken({ email_id: getUser.email, type: OTP_TYPE.SIGN_UP_OTP })
                 getUser.email = newEmailID;
                 getUser.otp = otpNumber;
                 getUser.otp_timer = otpExpireTime;
+                getUser.jwtToken = newToken
                 getUser.save()
 
                 COMMUNICATION_PROVIDER.signInOTPSender({
@@ -189,6 +204,7 @@ let authHelper = {
                 return {
                     status: 200,
                     msg: "Email id has been updated",
+                    token: newToken
                 }
             } else {
                 return {
@@ -203,6 +219,23 @@ let authHelper = {
                 status: 500,
                 msg: "Something went wrong",
             }
+        }
+    },
+
+    resetToken: async (userId) => {
+
+        try {
+            let findUser = await userAuth.findById(userId)
+            if (findUser) {
+                let newToken = tokenHelper.createJWTToken({ email_id: findUser.email, type: OTP_TYPE.SIGN_UP_OTP })
+                findUser.jwtToken = newToken;
+                await findUser.save()
+                return newToken
+            } else {
+                return null;
+            }
+        } catch (e) {
+            return null;
         }
     }
 }
