@@ -80,6 +80,48 @@ let authAdminHelper = {
                 msg: "Internal Server Error"
             }
         }
+    },
+
+
+    resetPassword: async (token, password) => {
+        let isTokenValid = await tokenHelper.checkTokenValidity(token)
+
+
+        if (isTokenValid) {
+
+            let email_id = isTokenValid.email
+            let findAdmin = await AdminAuthModel.findOne({ email_address: email_id })
+            if (findAdmin) {
+                let newPassword = await bcrypt.hash(password, process.env.BCRYPT_SALTROUND);
+                if (newPassword) {
+                    findAdmin.password = newPassword;
+                    await findAdmin.save();
+                    return {
+                        status: true,
+                        statusCode: 200,
+                        msg: "Password has been updated"
+                    }
+                } else {
+                    return {
+                        status: false,
+                        statusCode: 500,
+                        msg: "Internal Server Error"
+                    }
+                }
+            } else {
+                return {
+                    status: false,
+                    statusCode: 401,
+                    msg: "Invalid Token ID"
+                }
+            }
+        } else {
+            return {
+                status: false,
+                statusCode: 401,
+                msg: "Token time has been expired"
+            }
+        }
     }
 }
 

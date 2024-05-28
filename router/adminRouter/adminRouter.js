@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post("/sign_in", authMiddleware.isAdminLogged, authController.signUpController)
 router.post("/forget_password", authMiddleware.isAdminLogged, authController.forgetPasswordController)
-router.post("/reset_password", authMiddleware.isAdminLogged, authController.signUpController)
+router.post("/reset_password/:token", authMiddleware.isAdminLogged, authController.adminPasswordReset)
 
 
 module.exports = router;

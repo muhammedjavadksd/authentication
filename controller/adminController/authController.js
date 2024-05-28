@@ -1,4 +1,6 @@
+const AdminAuthModel = require("../../db/models/adminAuth");
 const authAdminHelper = require("../../helper/authAdminHelper");
+const tokenHelper = require("../../helper/tokenHelper");
 
 
 let authController = {
@@ -22,6 +24,8 @@ let authController = {
                 msg: "Internal Server Error",
             })
         }
+
+
     },
 
     forgetPasswordController: async (req, res) => {
@@ -34,6 +38,36 @@ let authController = {
             console.log(e);
             res.status(500).json({ status: false, msg: "Internal Server Error" })
         }
+    },
+
+
+    adminPasswordReset: async (req, res) => {
+
+        try {
+
+            let token = req.params.token;
+            console.log("The token is : " + token);
+
+            let password = req.body.password;
+            if (password) {
+                let resetPassword = await authAdminHelper.resetPassword(token, password);
+                res.status(resetPassword.statusCode).json({
+                    status: resetPassword.status,
+                    msg: resetPassword.msg,
+                })
+            } else {
+                res.status(401).json({
+                    status: false,
+                    msg: "Please provide a password",
+                })
+            }
+        } catch (e) {
+            res.status(500).json({
+                status: false,
+                msg: "Internal Servor Error",
+            })
+        }
+
     }
 }
 
