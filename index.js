@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 
 
 
-app.use(logger("combined"))
+app.use(logger("common"))
 app.use("/", userRouter)
 
 

@@ -38,7 +38,7 @@ let userAuthSchema = {
     },
     jwtToken: {
         type: String,
-        required: false
+        required: true
     },
     account_started: {
         type: Boolean,
