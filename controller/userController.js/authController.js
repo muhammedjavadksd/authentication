@@ -110,8 +110,9 @@ let authController = {
                     res.status(200).json({
                         status: true,
                         msg: "OTP Verification sucess",
-                        jwt: otpVerification.jwt
-
+                        jwt: otpVerification.jwt,
+                        name: otpVerification.name,
+                        email: otpVerification.email
                     })
                 } else {
                     res.status(401).json({

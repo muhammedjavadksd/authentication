@@ -12,6 +12,7 @@ const constant_data = {
         CREDENTIAL: "CREDENTIAL"
     },
     OTP_EXPIRE_TIME: 1800000,
+    USERAUTH_EXPIRE_TIME: 2700000000,
     OTP_TYPE: {
         SIGN_UP_OTP: "SIGN_UP_OTP",
         SIGN_IN_OTP: "SIGN_IN_OTP"

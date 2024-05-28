@@ -31,7 +31,7 @@ let authHelper = {
 
                         let jwtToken = await tokenHelper.createJWTToken({
                             full_name, phone_number, email
-                        })
+                        }, constant_data.USERAUTH_EXPIRE_TIME)
 
                         // let jwtToken = await jwt.sign(, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '1d' })
 
@@ -49,7 +49,9 @@ let authHelper = {
                         return {
                             status: true,
                             msg: "OTP Verified Success",
-                            jwt: jwtToken
+                            jwt: jwtToken,
+                            name: getUser.first_name,
+                            email: getUser.email
                         }
                     }
                 } else {
@@ -89,7 +91,7 @@ let authHelper = {
             let otpNumber = utilHelper.generateAnOTP(6);
             let otpExpireTime = constant_data.MINIMUM_OTP_TIMER;
 
-            let token = await tokenHelper.createJWTToken({ email_id: userAuth.email, type: constant_data.OTP_TYPE.SIGN_IN_OTP })
+            let token = await tokenHelper.createJWTToken({ email_id: userAuth.email, type: constant_data.OTP_TYPE.SIGN_IN_OTP }, constant_data.OTP_EXPIRE_TIME)
 
             userAuth.otp = otpNumber;
             userAuth.otp_timer = otpExpireTime;
@@ -193,7 +195,7 @@ let authHelper = {
         try {
             let getUser = await userAuth.findOne({ email: oldEmailId });
             if (getUser && !getUser.account_started) {
-                let newToken = await tokenHelper.createJWTToken({ email_id: newEmailID, type: constant_data.OTP_TYPE.SIGN_UP_OTP })
+                let newToken = await tokenHelper.createJWTToken({ email_id: newEmailID, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.OTP_EXPIRE_TIME)
                 getUser.email = newEmailID;
                 getUser.otp = otpNumber;
                 getUser.otp_timer = otpExpireTime;
@@ -236,7 +238,7 @@ let authHelper = {
         try {
             let findUser = await userAuth.findById(userId)
             if (findUser) {
-                let newToken = await tokenHelper.createJWTToken({ email_id: findUser.email, type: constant_data.OTP_TYPE.SIGN_UP_OTP })
+                let newToken = await tokenHelper.createJWTToken({ email_id: findUser.email, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.OTP_EXPIRE_TIME)
                 findUser.jwtToken = newToken;
                 await findUser.save()
                 return newToken
