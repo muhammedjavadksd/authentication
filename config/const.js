@@ -17,6 +17,9 @@ const constant_data = {
         SIGN_UP_OTP: "SIGN_UP_OTP",
         SIGN_IN_OTP: "SIGN_IN_OTP"
     },
+    MAIL_TYPE: {
+        ADMIN_PASSWORD_REST: "ADMIN_PASSWORD_REST"
+    }
 }
 
 module.exports = constant_data;

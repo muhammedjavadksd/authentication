@@ -1,6 +1,6 @@
 const { AUTH_PROVIDERS, AUTH_PROVIDERS_DATA } = require("../../config/const");
 const { signUpUserValidation } = require("../../config/validation/validation");
-const authHelper = require("../../helper/authHelper");
+const authHelper = require("../../helper/authUserHelper");
 const userHelper = require("../../helper/userHelper");
 
 
