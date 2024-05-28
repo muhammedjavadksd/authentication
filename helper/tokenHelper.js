@@ -1,11 +1,12 @@
 
-let jwt = require("jsonwebtoken")
-const const_data = require("../../notification/config/const_data")
+let jwt = require("jsonwebtoken");
+const constant_data = require("../config/const");
+// const const_data = require("../../notification/config/const_data")
 let tokenHelper = {
 
     createJWTToken: async (payload = {}) => {
         try {
-            let jwtToken = await jwt.sign(payload, process.env.JWT_SECRET, { algorithm: "HS256", expiresIn: const_data.OTP_EXPIRE_TIME });
+            let jwtToken = await jwt.sign(payload, process.env.JWT_SECRET, { algorithm: "HS256", expiresIn: constant_data.OTP_EXPIRE_TIME });
             console.log("The jwt token is");
             return jwtToken
         } catch (e) {

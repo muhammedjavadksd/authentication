@@ -1,4 +1,5 @@
-const { OTP_TYPE } = require("../../notification/config/const_data");
+// const { OTP_TYPE } = require("../../notification/config/const_data");
+const { OTP_TYPE } = require("../config/const");
 const tokenHelper = require("../helper/tokenHelper");
 
 
@@ -19,7 +20,7 @@ let authMiddleware = {
             if (checkValidity) {
                 console.log('Decode jwt is : ');
 
-                if (checkValidity?.email_id && checkValidity.type == OTP_TYPE.SIGN_UP_OTP) {
+                if (checkValidity?.email_id && (checkValidity.type == OTP_TYPE.SIGN_UP_OTP || checkValidity.type == OTP_TYPE.SIGN_IN_OTP)) {
                     req.context.email_id = checkValidity?.email_id;
                     console.log("Requested phone number is", checkValidity?.email_id);
                     next()
@@ -42,6 +43,8 @@ let authMiddleware = {
             })
         }
     },
+
+
 
     isUserLogged: (req, res, next) => {
         next()

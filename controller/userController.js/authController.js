@@ -65,19 +65,22 @@ let authController = {
     },
 
     signInController: async (req, res, next) => {
-        let phone = req.body.phone
+        let email = req.body.email
+
+        console.log("Checking email id is  : " + email);
 
         try {
-            let userSign = await userHelper.userSignInHelper(phone);
+            let userSign = await authHelper.userSignInHelper(email);
 
 
             if (userSign.status) {
-                res.status(200).json({
+                res.status(userSign.statusCode).json({
                     "status": true,
-                    "msg": "OTP has been sent"
+                    "msg": "OTP has been sent",
+                    "token": userSign.token
                 })
             } else {
-                res.status(500).json({
+                res.status(userSign.statusCode).json({
                     "status": false,
                     "msg": userSign.msg
                 })
@@ -100,7 +103,7 @@ let authController = {
         let email_id = req.context?.email_id;
         if (email_id) {
             try {
-                let otpVerification = await userHelper.signUpOTPValidate(otp, email_id);
+                let otpVerification = await authHelper.AuthOTPValidate(otp, email_id);
                 console.log(otpVerification);
                 if (otpVerification.status) {
                     console.log("OTP Verified");
@@ -118,13 +121,13 @@ let authController = {
                 }
             } catch (e) {
                 res.status(500).json({
-                    status: true,
+                    status: false,
                     msg: "Something went wrong"
                 })
             }
         } else {
             res.status(401).json({
-                status: true,
+                status: false,
                 msg: "Unauthorized access"
             })
         }

@@ -1,24 +1,26 @@
-const { OTP_TYPE } = require("../../notification/config/const_data");
+// const { OTP_TYPE } = require("../../notification/config/const_data");
 const COMMUNICATION_PROVIDER = require("../communication/notification/notification_service");
 const constant_data = require("../config/const");
 const userAuth = require("../db/models/userAuth");
+// const userAuth = require("../db/models/userAuth");
 const tokenHelper = require("./tokenHelper");
+const userHelper = require("./userHelper");
 const utilHelper = require("./utilHelper");
 
 
 let authHelper = {
 
 
-    signUpOTPValidate: async (otp, email_id) => {
+    AuthOTPValidate: async (otp, email_id) => {
         try {
-            let userAuth = await userAuthModel.findOne({ email: email_id }).sort({ id: -1 })
-            if (userAuth) {
-                let { full_name, phone_number, email } = userAuth;
-                console.log(userAuth);
+            let getUser = await userAuth.findOne({ email: email_id }).sort({ id: -1 })
+            if (getUser) {
+                let { full_name, phone_number, email } = getUser;
+                console.log(getUser);
                 console.log(otp, email_id);
                 console.log("The auth is");
-                if (userAuth.otp == otp) {
-                    let otpExpireTimer = userAuth.otp_timer;
+                if (getUser.otp == otp) {
+                    let otpExpireTimer = getUser.otp_timer;
                     let currentTime = new Date().getUTCMilliseconds()
                     if (currentTime > otpExpireTimer) {
                         return {
@@ -27,21 +29,22 @@ let authHelper = {
                         }
                     } else {
 
-
-                        let jwtToken = await jwt.sign({
+                        let jwtToken = await tokenHelper.createJWTToken({
                             full_name, phone_number, email
-                        }, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '1d' })
+                        })
 
-                        userAuth.jwtToken = jwtToken;
+                        // let jwtToken = await jwt.sign(, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '1d' })
 
-                        if (!userAuth.account_started) {
-                            userAuth.account_started = true
+                        getUser.jwtToken = jwtToken;
+
+                        if (!getUser.account_started) {
+                            getUser.account_started = true
                         }
 
                         console.log("Updated user");
-                        console.log(userAuth);
+                        console.log(getUser);
 
-                        await userAuth.save()
+                        await getUser.save()
 
                         return {
                             status: true,
@@ -70,10 +73,10 @@ let authHelper = {
         }
     },
 
-    userSignInHelper: async function (phone) {
+    userSignInHelper: async function (email) {
         try {
 
-            let userAuth = await userHelper.isUserExist(null, phone)
+            let userAuth = await userHelper.isUserExist(email, null)
 
             if (!userAuth) {
                 return {
@@ -83,30 +86,28 @@ let authHelper = {
                 }
             }
 
-            if (!userAuth.account_started) {
-                return {
-                    statusCode: 401,
-                    status: false,
-                    msg: "User not found"
-                }
-            } else {
-                let otpNumber = utilHelper.generateAnOTP(6);
-                let otpExpireTime = constant_data.MINIMUM_OTP_TIMER;
+            let otpNumber = utilHelper.generateAnOTP(6);
+            let otpExpireTime = constant_data.MINIMUM_OTP_TIMER;
 
-                userAuth.otp = otpNumber;
-                userAuth.otp_timer = otpExpireTime;
-                await userAuth.save()
-                COMMUNICATION_PROVIDER.signInOTPSender({
-                    otp: otpNumber,
-                    email: userAuth.email,
-                    full_name: userAuth.first_name + userAuth.last_name
-                })
-                return {
-                    statusCode: 200,
-                    status: true,
-                    msg: "OTP Has been sent "
-                }
+            let token = await tokenHelper.createJWTToken({ email_id: userAuth.email, type: constant_data.OTP_TYPE.SIGN_IN_OTP })
+
+            userAuth.otp = otpNumber;
+            userAuth.otp_timer = otpExpireTime;
+            userAuth.jwtToken = token;
+
+            await userAuth.save()
+            COMMUNICATION_PROVIDER.signInOTPSender({
+                otp: otpNumber,
+                email: userAuth.email,
+                full_name: userAuth.first_name + userAuth.last_name
+            })
+            return {
+                statusCode: 200,
+                status: true,
+                msg: "OTP Has been sent ",
+                token
             }
+
         } catch (e) {
             return {
                 statusCode: 500,
@@ -192,7 +193,7 @@ let authHelper = {
         try {
             let getUser = await userAuth.findOne({ email: oldEmailId });
             if (getUser && !getUser.account_started) {
-                let newToken = await tokenHelper.createJWTToken({ email_id: newEmailID, type: OTP_TYPE.SIGN_UP_OTP })
+                let newToken = await tokenHelper.createJWTToken({ email_id: newEmailID, type: constant_data.OTP_TYPE.SIGN_UP_OTP })
                 getUser.email = newEmailID;
                 getUser.otp = otpNumber;
                 getUser.otp_timer = otpExpireTime;
@@ -235,7 +236,7 @@ let authHelper = {
         try {
             let findUser = await userAuth.findById(userId)
             if (findUser) {
-                let newToken = await tokenHelper.createJWTToken({ email_id: findUser.email, type: OTP_TYPE.SIGN_UP_OTP })
+                let newToken = await tokenHelper.createJWTToken({ email_id: findUser.email, type: constant_data.OTP_TYPE.SIGN_UP_OTP })
                 findUser.jwtToken = newToken;
                 await findUser.save()
                 return newToken
