@@ -103,7 +103,7 @@ let authController = {
         let email_id = req.context?.email_id;
         if (email_id) {
             try {
-                let otpVerification = await authHelper.AuthOTPValidate(otp, email_id);
+                let otpVerification = await authHelper.AuthOTPValidate(otp, email_id, token);
                 console.log(otpVerification);
                 if (otpVerification.status) {
                     console.log("OTP Verified");

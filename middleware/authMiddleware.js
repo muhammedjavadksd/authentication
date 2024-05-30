@@ -22,6 +22,7 @@ let authMiddleware = {
 
                 if (checkValidity?.email_id && (checkValidity.type == OTP_TYPE.SIGN_UP_OTP || checkValidity.type == OTP_TYPE.SIGN_IN_OTP)) {
                     req.context.email_id = checkValidity?.email_id;
+                    req.context.token = token;
                     console.log("Requested phone number is", checkValidity?.email_id);
                     next()
                 } else {

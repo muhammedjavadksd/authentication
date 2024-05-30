@@ -103,21 +103,33 @@ let authAdminHelper = {
 
             let email_id = isTokenValid.email
             let findAdmin = await AdminAuthModel.findOne({ email_address: email_id })
+            console.log("Admin token : " + token);
+            console.log("Org admin token : " + findAdmin.token);
             if (findAdmin) {
-                let newPassword = await bcrypt.hash(password, Number(process.env.BCRYPT_SALTROUND));
-                if (newPassword) {
-                    findAdmin.password = newPassword;
-                    await findAdmin.save();
-                    return {
-                        status: true,
-                        statusCode: 200,
-                        msg: "Password has been updated"
+                if (findAdmin.token == token) {
+                    let newPassword = await bcrypt.hash(password, Number(process.env.BCRYPT_SALTROUND));
+
+                    if (newPassword) {
+                        findAdmin.password = newPassword;
+                        findAdmin.token = "";
+                        await findAdmin.save();
+                        return {
+                            status: true,
+                            statusCode: 200,
+                            msg: "Password has been updated"
+                        }
+                    } else {
+                        return {
+                            status: false,
+                            statusCode: 500,
+                            msg: "Internal Server Error"
+                        }
                     }
                 } else {
                     return {
                         status: false,
-                        statusCode: 500,
-                        msg: "Internal Server Error"
+                        statusCode: 401,
+                        msg: "Invalid Token"
                     }
                 }
             } else {
