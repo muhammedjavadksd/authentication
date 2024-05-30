@@ -4,6 +4,7 @@ const AdminAuthModel = require("../db/models/adminAuth");
 const COMMUNICATION_PROVIDER = require("../communication/notification/notification_service");
 const tokenHelper = require("./tokenHelper");
 const { MAIL_TYPE } = require("../config/const");
+const constant_data = require("../config/const");
 let authAdminHelper = {
 
     signInHelper: async (email, password) => {
@@ -12,18 +13,25 @@ let authAdminHelper = {
             let findAdmin = await AdminAuthModel.findOne({ email_address: email });
             if (findAdmin) {
 
+                console.log("Got admin");
+
                 let adminPassword = findAdmin.password;
+                console.log("Admin password" + adminPassword);
                 let comparePassword = await bcrypt.compare(password, adminPassword);
-                if (comparePassword) {
+                let token = await tokenHelper.createJWTToken({ email: findAdmin.email_address, type: constant_data.JWT_FOR.ADMIN_AUTH }, constant_data.OTP_EXPIRE_TIME)
+
+                if (comparePassword && token) {
                     console.log("Creditials was right");
                     return {
                         statusCode: 200,
                         status: true,
                         msg: "Admin auth success",
                         email: email,
-                        name: findAdmin.name
+                        name: findAdmin.name,
+                        token
                     }
                 } else {
+                    console.log("Creditial is wrong");
                     return {
                         statusCode: 401,
                         status: false,
@@ -51,8 +59,11 @@ let authAdminHelper = {
 
         try {
             let findAdmin = await AdminAuthModel.findOne({ email_address: email });
-            let token = await tokenHelper.createJWTToken({ email, type: MAIL_TYPE.ADMIN_PASSWORD_REST })
+            let token = await tokenHelper.createJWTToken({ email, type: MAIL_TYPE.ADMIN_PASSWORD_REST }, constant_data.OTP_EXPIRE_TIME)
+            console.log(findAdmin);
+            console.log(token);
             if (findAdmin && token) {
+
 
                 findAdmin.token = token;
                 await findAdmin.save();
@@ -74,6 +85,7 @@ let authAdminHelper = {
                 }
             }
         } catch (e) {
+            console.log(e);
             return {
                 status: false,
                 statusCode: 500,
@@ -92,7 +104,7 @@ let authAdminHelper = {
             let email_id = isTokenValid.email
             let findAdmin = await AdminAuthModel.findOne({ email_address: email_id })
             if (findAdmin) {
-                let newPassword = await bcrypt.hash(password, process.env.BCRYPT_SALTROUND);
+                let newPassword = await bcrypt.hash(password, Number(process.env.BCRYPT_SALTROUND));
                 if (newPassword) {
                     findAdmin.password = newPassword;
                     await findAdmin.save();

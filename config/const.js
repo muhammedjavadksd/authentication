@@ -19,6 +19,9 @@ const constant_data = {
     },
     MAIL_TYPE: {
         ADMIN_PASSWORD_REST: "ADMIN_PASSWORD_REST"
+    },
+    JWT_FOR: {
+        ADMIN_AUTH: "ADMIN_AUTH"
     }
 }
 

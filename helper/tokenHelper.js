@@ -10,6 +10,7 @@ let tokenHelper = {
             console.log("The jwt token is");
             return jwtToken
         } catch (e) {
+            console.log(e);
             return null;
         }
     },

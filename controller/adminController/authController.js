@@ -5,19 +5,30 @@ const tokenHelper = require("../../helper/tokenHelper");
 
 let authController = {
 
-    signUpController: async (req, res, next) => {
+    signInController: async (req, res, next) => {
 
         let email_address = req.body.email_address;
         let password = req.body.password;
 
+        console.log(email_address);
+        console.log(password);
+
         try {
             let adminAuthAttempt = await authAdminHelper.signInHelper(email_address, password)
-            res.status(adminAuthAttempt.statusCode).json({
+            console.log("The response is");
+            console.log(adminAuthAttempt);
+            console.log("The status code :" + adminAuthAttempt.statusCode);
+
+            let response = {
                 status: adminAuthAttempt.status,
                 msg: adminAuthAttempt.msg,
                 email: adminAuthAttempt.email,
-                name: adminAuthAttempt.name
-            })
+                name: adminAuthAttempt.name,
+                token: adminAuthAttempt.token
+            }
+
+            res.status(adminAuthAttempt.statusCode).json(response)
+
         } catch (e) {
             res.status(500).json({
                 status: false,
@@ -45,11 +56,16 @@ let authController = {
 
         try {
 
-            let token = req.params.token;
+            // let token = req.params.token;
+            let headers = req.headers;
+            let token = headers?.token;
+            console.log(req.headers);
+
             console.log("The token is : " + token);
 
             let password = req.body.password;
-            if (password) {
+
+            if (password && token) {
                 let resetPassword = await authAdminHelper.resetPassword(token, password);
                 res.status(resetPassword.statusCode).json({
                     status: resetPassword.status,
@@ -62,6 +78,7 @@ let authController = {
                 })
             }
         } catch (e) {
+            console.log(e);
             res.status(500).json({
                 status: false,
                 msg: "Internal Servor Error",
