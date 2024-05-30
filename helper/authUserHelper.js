@@ -11,53 +11,61 @@ const utilHelper = require("./utilHelper");
 let authHelper = {
 
 
-    AuthOTPValidate: async (otp, email_id) => {
+    AuthOTPValidate: async (otp, email_id, token) => {
         try {
             let getUser = await userAuth.findOne({ email: email_id }).sort({ id: -1 })
             if (getUser) {
-                let { full_name, phone_number, email } = getUser;
-                console.log(getUser);
-                console.log(otp, email_id);
-                console.log("The auth is");
-                if (getUser.otp == otp) {
-                    let otpExpireTimer = getUser.otp_timer;
-                    let currentTime = new Date().getUTCMilliseconds()
-                    if (currentTime > otpExpireTimer) {
-                        return {
-                            status: false,
-                            msg: "OTP TIME Expired"
-                        }
-                    } else {
-
-                        let jwtToken = await tokenHelper.createJWTToken({
-                            full_name, phone_number, email
-                        }, constant_data.USERAUTH_EXPIRE_TIME)
-
-                        // let jwtToken = await jwt.sign(, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '1d' })
-
-                        getUser.jwtToken = jwtToken;
-
-                        if (!getUser.account_started) {
-                            getUser.account_started = true
-                        }
-
-                        console.log("Updated user");
-                        console.log(getUser);
-
-                        await getUser.save()
-
-                        return {
-                            status: true,
-                            msg: "OTP Verified Success",
-                            jwt: jwtToken,
-                            name: getUser.first_name,
-                            email: getUser.email
-                        }
-                    }
-                } else {
+                if (getUser.jwtToken != token) {
                     return {
                         status: false,
-                        msg: "Incorrect OTP"
+                        msg: "Invalid Token"
+                    }
+                } else {
+                    let { full_name, phone_number, email } = getUser;
+                    console.log(getUser);
+                    console.log(otp, email_id);
+                    console.log("The auth is");
+                    if (getUser.otp == otp) {
+                        let otpExpireTimer = getUser.otp_timer;
+                        let currentTime = new Date().getUTCMilliseconds()
+                        if (currentTime > otpExpireTimer) {
+                            return {
+                                status: false,
+                                msg: "OTP TIME Expired"
+                            }
+                        } else {
+
+                            let jwtToken = await tokenHelper.createJWTToken({
+                                full_name, phone_number, email
+                            }, constant_data.USERAUTH_EXPIRE_TIME)
+
+                            // let jwtToken = await jwt.sign(, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '1d' })
+
+                            getUser.jwtToken = jwtToken;
+
+                            if (!getUser.account_started) {
+                                getUser.account_started = true
+                            }
+
+                            console.log("Updated user");
+                            console.log(getUser);
+
+
+                            await getUser.save()
+
+                            return {
+                                status: true,
+                                msg: "OTP Verified Success",
+                                jwt: jwtToken,
+                                name: getUser.first_name,
+                                email: getUser.email
+                            }
+                        }
+                    } else {
+                        return {
+                            status: false,
+                            msg: "Incorrect OTP"
+                        }
                     }
                 }
             } else {

@@ -2,7 +2,7 @@
 
 const express = require("express");
 const authMiddleware = require("../../middleware/authMiddleware");
-const authController = require("../../controller/userController.js/authController");
+const authController = require("../../controller/userController/authController");
 const router = express.Router();
 
 // GET METHOD

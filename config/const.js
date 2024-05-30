@@ -17,6 +17,12 @@ const constant_data = {
         SIGN_UP_OTP: "SIGN_UP_OTP",
         SIGN_IN_OTP: "SIGN_IN_OTP"
     },
+    MAIL_TYPE: {
+        ADMIN_PASSWORD_REST: "ADMIN_PASSWORD_REST"
+    },
+    JWT_FOR: {
+        ADMIN_AUTH: "ADMIN_AUTH"
+    }
 }
 
 module.exports = constant_data;

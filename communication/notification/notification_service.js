@@ -41,6 +41,20 @@ let COMMUNICATION_PROVIDER = {
             console.log(e)
             console.log("Message Senting Failed")
         }
+    },
+
+
+    adminForgetPasswordEmail: async function (data) {
+
+        try {
+            let NOTIFICAION_QUEUE = process.env.ADMIN_FORGETPASSWORD_EMAIL;
+            let channel = await this.notificationConnection(NOTIFICAION_QUEUE)
+            channel.sendToQueue(NOTIFICAION_QUEUE, Buffer.from(JSON.stringify(data)))
+            console.log("Notification for admin password reset");
+        } catch (e) {
+            console.log(e)
+            console.log("Message Senting Failed")
+        }
     }
 }
 
