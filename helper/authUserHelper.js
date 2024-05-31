@@ -14,6 +14,8 @@ let authHelper = {
     AuthOTPValidate: async (otp, email_id, token) => {
         try {
             let getUser = await userAuth.findOne({ email: email_id }).sort({ id: -1 })
+            console.log("The token is : " + token);
+            console.log("User token is : " + getUser.jwtToken);
             if (getUser) {
                 if (getUser.jwtToken != token) {
                     return {
@@ -85,6 +87,8 @@ let authHelper = {
 
     userSignInHelper: async function (email) {
         try {
+
+            console.log("Reached here");
 
             let userAuth = await userHelper.isUserExist(email, null)
 

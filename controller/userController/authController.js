@@ -67,7 +67,7 @@ let authController = {
     signInController: async (req, res, next) => {
         let email = req.body.email
 
-        console.log("Checking email id is  : " + email);
+        console.log("Checking email id is  a : " + email);
 
         try {
             let userSign = await authHelper.userSignInHelper(email);
@@ -101,6 +101,11 @@ let authController = {
         console.log("The context is");
         console.log(req.context);
         let email_id = req.context?.email_id;
+        let token = req.context.token;
+        console.log("Requets OTP is");
+        console.log(otp);
+        console.log("Requested email is ");
+        console.log(email_id);
         if (email_id) {
             try {
                 let otpVerification = await authHelper.AuthOTPValidate(otp, email_id, token);
