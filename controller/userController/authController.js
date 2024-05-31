@@ -34,6 +34,7 @@ let authController = {
                         "msg": "Email/Phone already exist",
                     })
                 } else {
+
                     userHelper.insertNewUser(first_name, last_name, phone_number, email_address, auth_id, auth_provider, location).then((jwtData) => {
                         console.log("The token is :");
                         console.log(jwtData.token);
