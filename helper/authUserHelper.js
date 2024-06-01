@@ -1,5 +1,6 @@
 // const { OTP_TYPE } = require("../../notification/config/const_data");
 const COMMUNICATION_PROVIDER = require("../communication/notification/notification_service");
+const PROFILE_COMMUNICATION_PROVIDER = require("../communication/profile/profile_service");
 const constant_data = require("../config/const");
 const userAuth = require("../db/models/userAuth");
 // const userAuth = require("../db/models/userAuth");
@@ -14,6 +15,8 @@ let authHelper = {
     AuthOTPValidate: async (otp, email_id, token) => {
         try {
             let getUser = await userAuth.findOne({ email: email_id }).sort({ id: -1 })
+            console.log("The token is : " + token);
+            console.log("User token is : " + getUser.jwtToken);
             if (getUser) {
                 if (getUser.jwtToken != token) {
                     return {
@@ -21,7 +24,7 @@ let authHelper = {
                         msg: "Invalid Token"
                     }
                 } else {
-                    let { full_name, phone_number, email } = getUser;
+                    let { first_name, last_name, id, phone_number, email } = getUser;
                     console.log(getUser);
                     console.log(otp, email_id);
                     console.log("The auth is");
@@ -36,7 +39,7 @@ let authHelper = {
                         } else {
 
                             let jwtToken = await tokenHelper.createJWTToken({
-                                full_name, phone_number, email
+                                phone_number, email, first_name, last_name, id
                             }, constant_data.USERAUTH_EXPIRE_TIME)
 
                             // let jwtToken = await jwt.sign(, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '1d' })
@@ -50,6 +53,8 @@ let authHelper = {
                             console.log("Updated user");
                             console.log(getUser);
 
+                            PROFILE_COMMUNICATION_PROVIDER.authDataTransfer(getUser.first_name, getUser.last_name, getUser.email, getUser.location, getUser.phone_number, getUser.id)
+
 
                             await getUser.save()
 
@@ -57,8 +62,10 @@ let authHelper = {
                                 status: true,
                                 msg: "OTP Verified Success",
                                 jwt: jwtToken,
-                                name: getUser.first_name,
-                                email: getUser.email
+                                first_name: getUser.first_name,
+                                last_name: getUser.last_name,
+                                email: getUser.email,
+                                phone: getUser.phone_number,
                             }
                         }
                     } else {
@@ -85,6 +92,8 @@ let authHelper = {
 
     userSignInHelper: async function (email) {
         try {
+
+            console.log("Reached here");
 
             let userAuth = await userHelper.isUserExist(email, null)
 

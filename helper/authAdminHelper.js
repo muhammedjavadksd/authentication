@@ -107,7 +107,17 @@ let authAdminHelper = {
             console.log("Org admin token : " + findAdmin.token);
             if (findAdmin) {
                 if (findAdmin.token == token) {
+
                     let newPassword = await bcrypt.hash(password, Number(process.env.BCRYPT_SALTROUND));
+                    let comparePassword = await bcrypt.compare(password, findAdmin.password)
+
+                    if (comparePassword) {
+                        return {
+                            status: false,
+                            statusCode: 400,
+                            msg: "New password cannot be the same as the last used password."
+                        }
+                    }
 
                     if (newPassword) {
                         findAdmin.password = newPassword;

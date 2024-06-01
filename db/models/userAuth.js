@@ -4,6 +4,10 @@ const mongo = require("mongoose");
 const { default: mongoose } = require("mongoose");
 
 let userAuthSchema = {
+    user_id: {
+        type: String,
+        required: true
+    },
     phone_number: {
         type: Number,
         required: true

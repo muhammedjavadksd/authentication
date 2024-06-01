@@ -1,3 +1,4 @@
+const PROFILE_COMMUNICATION_PROVIDER = require("../../communication/profile/profile_service");
 const { AUTH_PROVIDERS, AUTH_PROVIDERS_DATA } = require("../../config/const");
 const { signUpUserValidation } = require("../../config/validation/validation");
 const authHelper = require("../../helper/authUserHelper");
@@ -34,6 +35,7 @@ let authController = {
                         "msg": "Email/Phone already exist",
                     })
                 } else {
+
                     userHelper.insertNewUser(first_name, last_name, phone_number, email_address, auth_id, auth_provider, location).then((jwtData) => {
                         console.log("The token is :");
                         console.log(jwtData.token);
@@ -67,7 +69,7 @@ let authController = {
     signInController: async (req, res, next) => {
         let email = req.body.email
 
-        console.log("Checking email id is  : " + email);
+        console.log("Checking email id is  a : " + email);
 
         try {
             let userSign = await authHelper.userSignInHelper(email);
@@ -101,18 +103,27 @@ let authController = {
         console.log("The context is");
         console.log(req.context);
         let email_id = req.context?.email_id;
+        let token = req.context.token;
+        console.log("Requets OTP is");
+        console.log(otp);
+        console.log("Requested email is ");
+        console.log(email_id);
         if (email_id) {
             try {
                 let otpVerification = await authHelper.AuthOTPValidate(otp, email_id, token);
                 console.log(otpVerification);
+                console.log("The token is :");
+                console.log(otpVerification.jwt);
                 if (otpVerification.status) {
                     console.log("OTP Verified");
                     res.status(200).json({
                         status: true,
                         msg: "OTP Verification sucess",
                         jwt: otpVerification.jwt,
-                        name: otpVerification.name,
-                        email: otpVerification.email
+                        first_name: otpVerification.first_name,
+                        last_name: otpVerification.last_name,
+                        email: otpVerification.email,
+                        phone: otpVerification.phone
                     })
                 } else {
                     res.status(401).json({

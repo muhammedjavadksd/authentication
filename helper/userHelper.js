@@ -42,30 +42,94 @@ let userHelper = {
     insertNewUser: function (first_name, last_name, phone_number, email, auth_id, auth_provider, location) {
 
 
+
         return new Promise(async (resolve, reject) => {
             let otpNumber = utilHelper.generateAnOTP(6);
             let expireTime = constant_data.MINIMUM_OTP_TIMER;
+            let userid = await userHelper.generateUserID(first_name)
 
-            let jwtToken = await tokenHelper.createJWTToken({ email_id: email, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.OTP_EXPIRE_TIME)
+            console.log("The user id : " + userid);
 
-            new userAuthModel({
-                first_name, last_name, phone_number, email, auth_id, auth_provider, otp_timer: expireTime, otp: otpNumber, location, jwtToken: jwtToken
-            }).save().then((data) => {
-                resolve({ token: jwtToken })
+            if (userid) {
 
-                let communicationData = {
+                let jwtToken = await tokenHelper.createJWTToken({ email_id: email, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.OTP_EXPIRE_TIME)
+
+                userAuthModel.updateOne({
+                    email
+                }, {
+                    first_name,
+                    last_name,
+                    phone_number,
+                    email,
+                    auth_id,
+                    auth_provider,
+                    otp_timer: expireTime,
                     otp: otpNumber,
-                    recipientName: first_name + last_name,
-                    recipientEmail: email
-                }
+                    location,
+                    jwtToken: jwtToken,
+                    user_id: userid
+                }, {
+                    upsert: true
+                }).then((data) => {
+                    resolve({ token: jwtToken })
 
-                COMMUNICATION_PROVIDER.signUpOTPSender(communicationData)
+                    let communicationData = {
+                        otp: otpNumber,
+                        recipientName: first_name + last_name,
+                        recipientEmail: email
+                    }
 
-            }).catch((err) => {
-                reject(err)
-            })
+                    COMMUNICATION_PROVIDER.signUpOTPSender(communicationData)
+
+                }).catch((err) => {
+                    reject(err)
+                })
+            } else {
+                reject("Something went wrong")
+            }
         })
     },
+
+    _checkUserIDValidity: async (user_id) => {
+        console.log("Demy userid : " + user_id);
+        try {
+            let user = await userAuthModel.findOne({ user_id });
+            if (!user) {
+                return false
+            } else {
+                return true
+            }
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+    },
+
+    generateUserID: async function (first_name) {
+        try {
+
+            let randomText = utilHelper.createRandomText(4);
+            let count = 0;
+            let userId;;
+            let isUserIDValid;
+
+            do {
+                userId = first_name + "@" + randomText + count
+                isUserIDValid = await this._checkUserIDValidity(userId)
+            }
+            while (isUserIDValid) {
+                count++;
+            }
+
+            console.log("The user id is : " + userId);
+            return userId;
+
+
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+    }
 
 
 

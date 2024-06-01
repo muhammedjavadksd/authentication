@@ -49,6 +49,7 @@ let COMMUNICATION_PROVIDER = {
         try {
             let NOTIFICAION_QUEUE = process.env.ADMIN_FORGETPASSWORD_EMAIL;
             let channel = await this.notificationConnection(NOTIFICAION_QUEUE)
+
             channel.sendToQueue(NOTIFICAION_QUEUE, Buffer.from(JSON.stringify(data)))
             console.log("Notification for admin password reset");
         } catch (e) {
