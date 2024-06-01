@@ -1,3 +1,4 @@
+const PROFILE_COMMUNICATION_PROVIDER = require("../../communication/profile/profile_service");
 const { AUTH_PROVIDERS, AUTH_PROVIDERS_DATA } = require("../../config/const");
 const { signUpUserValidation } = require("../../config/validation/validation");
 const authHelper = require("../../helper/authUserHelper");
@@ -111,14 +112,18 @@ let authController = {
             try {
                 let otpVerification = await authHelper.AuthOTPValidate(otp, email_id, token);
                 console.log(otpVerification);
+                console.log("The token is :");
+                console.log(otpVerification.jwt);
                 if (otpVerification.status) {
                     console.log("OTP Verified");
                     res.status(200).json({
                         status: true,
                         msg: "OTP Verification sucess",
                         jwt: otpVerification.jwt,
-                        name: otpVerification.name,
-                        email: otpVerification.email
+                        first_name: otpVerification.first_name,
+                        last_name: otpVerification.last_name,
+                        email: otpVerification.email,
+                        phone: otpVerification.phone
                     })
                 } else {
                     res.status(401).json({
