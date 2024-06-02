@@ -1,7 +1,7 @@
 
 const bcrypt = require("bcrypt");
 const AdminAuthModel = require("../db/models/adminAuth");
-const COMMUNICATION_PROVIDER = require("../communication/notification/notification_service");
+const COMMUNICATION_PROVIDER = require("../communication/Provider/notification/notification_service");
 const tokenHelper = require("./tokenHelper");
 const { MAIL_TYPE } = require("../config/const");
 const constant_data = require("../config/const");

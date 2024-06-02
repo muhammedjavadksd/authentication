@@ -1,5 +1,5 @@
 const userAuthModel = require("../db/models/userAuth");
-const COMMUNICATION_PROVIDER = require("../communication/notification/notification_service");
+const COMMUNICATION_PROVIDER = require("../communication/Provider/notification/notification_service");
 const utilHelper = require("./utilHelper")
 let jwt = require("jsonwebtoken");
 const constant_data = require("../config/const");

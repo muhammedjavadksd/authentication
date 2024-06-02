@@ -1,4 +1,4 @@
-const PROFILE_COMMUNICATION_PROVIDER = require("../../communication/profile/profile_service");
+const PROFILE_COMMUNICATION_PROVIDER = require("../../communication/Provider/profile/profile_service");
 const { AUTH_PROVIDERS, AUTH_PROVIDERS_DATA } = require("../../config/const");
 const { signUpUserValidation } = require("../../config/validation/validation");
 const authHelper = require("../../helper/authUserHelper");

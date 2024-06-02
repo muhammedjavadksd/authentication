@@ -12,7 +12,8 @@ const authenticationDbConnection = require("./db/config/connection");
 const userRouter = require("./router/userRouter/userRouter")
 const adminRouter = require("./router/adminRouter/adminRouter")
 const logger = require("morgan")
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
+const BulkConsumer = require("./communication/BulkConsumer");
 
 
 app.use((req, res, next) => {
@@ -20,6 +21,7 @@ app.use((req, res, next) => {
     next()
 })
 
+BulkConsumer()
 
 app.use(logger("common"))
 app.use("/", userRouter)
