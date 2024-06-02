@@ -1,6 +1,6 @@
 // const { OTP_TYPE } = require("../../notification/config/const_data");
-const COMMUNICATION_PROVIDER = require("../communication/notification/notification_service");
-const PROFILE_COMMUNICATION_PROVIDER = require("../communication/profile/profile_service");
+const COMMUNICATION_PROVIDER = require("../communication/Provider/notification/notification_service");
+const PROFILE_COMMUNICATION_PROVIDER = require("../communication/Provider/profile/profile_service");
 const constant_data = require("../config/const");
 const userAuth = require("../db/models/userAuth");
 // const userAuth = require("../db/models/userAuth");
@@ -266,6 +266,35 @@ let authHelper = {
         } catch (e) {
             console.log(e);
             return null;
+        }
+    },
+
+
+    updateUserProfile: async (data, user_id) => {
+        try {
+
+            let findUser = await userAuth.findById(user_id);
+            if (findUser) {
+                let mergedData = { ...findUser.toObject(), ...data }
+
+                Object.assign(findUser, mergedData);
+                findUser.save();
+                return {
+                    status: true,
+                    msg: "User updated success"
+                }
+            } else {
+                return {
+                    status: false,
+                    msg: "Authentication failed"
+                }
+            }
+        } catch (e) {
+            console.log(e);
+            return {
+                status: false,
+                msg: "Something went wrong"
+            }
         }
     }
 }
