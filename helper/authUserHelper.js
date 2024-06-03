@@ -271,11 +271,15 @@ let authHelper = {
 
 
     updateUserProfile: async (data, user_id) => {
+        console.log("Work here");
         try {
 
             let findUser = await userAuth.findById(user_id);
             if (findUser) {
                 let mergedData = { ...findUser.toObject(), ...data }
+
+                console.log("New data is");
+                console.log(mergedData);
 
                 Object.assign(findUser, mergedData);
                 findUser.save();
