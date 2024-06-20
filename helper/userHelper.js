@@ -45,7 +45,7 @@ let userHelper = {
 
         return new Promise(async (resolve, reject) => {
             let otpNumber = utilHelper.generateAnOTP(6);
-            let expireTime = constant_data.MINIMUM_OTP_TIMER;
+            let expireTime = constant_data.MINIMUM_OTP_TIMER();
             let userid = await userHelper.generateUserID(first_name)
 
             console.log("The user id : " + userid);
