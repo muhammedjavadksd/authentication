@@ -96,6 +96,8 @@ let authHelper = {
             console.log("Reached here");
 
             let userAuth = await userHelper.isUserExist(email, null)
+            console.log("The user is:");
+            console.log(userAuth);
 
             if (!userAuth) {
                 return {
@@ -106,7 +108,7 @@ let authHelper = {
             }
 
             let otpNumber = utilHelper.generateAnOTP(6);
-            let otpExpireTime = constant_data.MINIMUM_OTP_TIMER;
+            let otpExpireTime = constant_data.MINIMUM_OTP_TIMER();
 
             let token = await tokenHelper.createJWTToken({ email_id: userAuth.email, type: constant_data.OTP_TYPE.SIGN_IN_OTP }, constant_data.OTP_EXPIRE_TIME)
 
@@ -156,7 +158,7 @@ let authHelper = {
             let getUser = await userAuth.findOne({ email: email_id });
             if (getUser) {
                 let otpNumber = utilHelper.generateAnOTP(6);
-                let otpExpireTime = constant_data.MINIMUM_OTP_TIMER;
+                let otpExpireTime = constant_data.MINIMUM_OTP_TIMER();
 
                 console.log("User ID : " + getUser.id);
                 let updateToken = await this.resetToken(getUser.id)
@@ -207,7 +209,7 @@ let authHelper = {
         console.log("The old email id is : " + oldEmailId);
 
         let otpNumber = utilHelper.generateAnOTP(6);
-        let otpExpireTime = constant_data.MINIMUM_OTP_TIMER;
+        let otpExpireTime = constant_data.MINIMUM_OTP_TIMER();
 
         try {
             let getUser = await userAuth.findOne({ email: oldEmailId });
@@ -271,11 +273,15 @@ let authHelper = {
 
 
     updateUserProfile: async (data, user_id) => {
+        console.log("Work here");
         try {
 
             let findUser = await userAuth.findById(user_id);
             if (findUser) {
                 let mergedData = { ...findUser.toObject(), ...data }
+
+                console.log("New data is");
+                console.log(mergedData);
 
                 Object.assign(findUser, mergedData);
                 findUser.save();

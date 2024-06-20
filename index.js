@@ -21,6 +21,7 @@ app.use((req, res, next) => {
     next()
 })
 
+dotenv.config("./.env");
 BulkConsumer()
 
 app.use(logger("common"))
@@ -28,7 +29,6 @@ app.use("/", userRouter)
 app.use("/admin", adminRouter)
 
 //Config
-dotenv.config("./.env");
 authenticationDbConnection()
 
 //const
