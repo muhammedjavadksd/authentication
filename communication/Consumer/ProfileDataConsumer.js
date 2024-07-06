@@ -19,7 +19,7 @@ let ProfielDataConsumer = {
 
 
         let queueName = process.env.AUTH_DATA_UPDATE_QUEUE;
-        let channel = await this._getChannel();
+        let channel = await this._getChannel(queueName);
         console.log(queueName);
         if (channel) {
 

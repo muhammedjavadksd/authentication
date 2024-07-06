@@ -48,12 +48,12 @@ let authHelper = {
 
                             if (!getUser.account_started) {
                                 getUser.account_started = true
+                                PROFILE_COMMUNICATION_PROVIDER.authDataTransfer(getUser.first_name, getUser.last_name, getUser.email, getUser.location, getUser.phone_number, getUser.id, getUser.user_id)
                             }
 
                             console.log("Updated user");
                             console.log(getUser);
 
-                            PROFILE_COMMUNICATION_PROVIDER.authDataTransfer(getUser.first_name, getUser.last_name, getUser.email, getUser.location, getUser.phone_number, getUser.id)
 
 
                             await getUser.save()
@@ -278,6 +278,8 @@ let authHelper = {
 
             let findUser = await userAuth.findById(user_id);
             if (findUser) {
+                console.log(findUser.toObject());
+                console.log(data);
                 let mergedData = { ...findUser.toObject(), ...data }
 
                 console.log("New data is");
