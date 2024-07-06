@@ -21,6 +21,11 @@ let utilHelper = {
         }
 
         return result;
+    },
+
+
+    organizationFileName: (file_name, type) => {
+        return type + file_name
     }
 }
 

@@ -15,7 +15,7 @@ let PROFILE_COMMUNICATION_PROVIDER = {
         }
     },
 
-    authDataTransfer: async function (first_name, last_name, email, location, phone_number, user_id) {
+    authDataTransfer: async function (first_name, last_name, email, location, phone_number, user_id, profile_id) {
         try {
             let queueName = process.env.AUTH_TRANSFER;
             let authTransferConnection = await this.authTransferConnection(queueName);
@@ -29,7 +29,8 @@ let PROFILE_COMMUNICATION_PROVIDER = {
                     email,
                     location,
                     phone_number,
-                    user_id
+                    user_id,
+                    profile_id
                 })))
                 console.log("Auth data has been transfered");
             } else {
