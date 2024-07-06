@@ -18,7 +18,7 @@ let authAdminHelper = {
                 let adminPassword = findAdmin.password;
                 console.log("Admin password" + adminPassword);
                 let comparePassword = await bcrypt.compare(password, adminPassword);
-                let token = await tokenHelper.createJWTToken({ email: findAdmin.email_address, type: constant_data.JWT_FOR.ADMIN_AUTH }, constant_data.OTP_EXPIRE_TIME)
+                let token = await tokenHelper.createJWTToken({ email: findAdmin.email_address, type: constant_data.JWT_FOR.ADMIN_AUTH }, constant_data.USERAUTH_EXPIRE_TIME)
 
                 if (comparePassword && token) {
                     console.log("Creditials was right");
