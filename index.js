@@ -3,10 +3,13 @@
 const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
+const bodyparser = require("body-parser")
 
 //middleware
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+// app.use(express.json())
+// app.use(express.urlencoded({ extended: true }))
+app.use(bodyparser.json())
+app.use(bodyparser.urlencoded({ extended: true }))
 
 const authenticationDbConnection = require("./db/config/connection");
 const userRouter = require("./router/userRouter/userRouter")
@@ -14,6 +17,7 @@ const adminRouter = require("./router/adminRouter/adminRouter")
 const logger = require("morgan")
 const bcrypt = require("bcrypt");
 const BulkConsumer = require("./communication/BulkConsumer");
+const organizationRouter = require("./router/organization/organizationRouter");
 
 
 app.use((req, res, next) => {
@@ -25,8 +29,10 @@ dotenv.config("./.env");
 BulkConsumer()
 
 app.use(logger("common"))
+
 app.use("/", userRouter)
 app.use("/admin", adminRouter)
+app.use("/organization", organizationRouter)
 
 //Config
 authenticationDbConnection()
