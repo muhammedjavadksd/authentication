@@ -1,12 +1,9 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
 // const { required } = require("joi");
 // const { default: mongoose } = require("mongoose");
-const mongoose_1 = __importDefault(require("mongoose"));
-let OrganizationAuthModel = new mongoose_1.default.Schema({
+import mongoose from "mongoose";
+
+
+let OrganizationAuthModel: mongoose.Schema = new mongoose.Schema({
     name: {
         required: true,
         type: String
@@ -63,6 +60,8 @@ let OrganizationAuthModel = new mongoose_1.default.Schema({
         type: String,
         required: false
     }
-});
-let OrganizationAuth = mongoose_1.default.model("organization", OrganizationAuthModel, "organization");
-exports.default = OrganizationAuth;
+})
+
+let OrganizationAuth = mongoose.model("organization", OrganizationAuthModel, "organization");
+
+export default OrganizationAuth;
