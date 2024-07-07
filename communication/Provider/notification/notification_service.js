@@ -1,76 +1,106 @@
-
-const amqplib = require("amqplib");
-
-
-let COMMUNICATION_PROVIDER = {
-
-    notificationConnection: async (QUEUE) => {
-
-        let connection = await amqplib.connect("amqp://localhost");
-        let channel = await connection.createChannel();
-
-        await channel.assertQueue(QUEUE);
-        return channel
-    },
-
-
-    signInOTPSender: async function (data) {
-        try {
-
-            let NOTIFICAION_QUEUE = process.env.USER_SIGN_IN_NOTIFICATION
-            let channel = await this.notificationConnection(NOTIFICAION_QUEUE)
-            channel.sendToQueue(NOTIFICAION_QUEUE, Buffer.from(JSON.stringify(data)))
-            console.log("Sign in OTP has been sent")
-        } catch (e) {
-            console.log(e)
-        }
-    },
-
-
-    signUpOTPSender: async function (data) {
-
-
-        try {
-            let NOTIFICAION_QUEUE = process.env.USER_SIGN_UP_NOTIFICATION
-            let channel = await this.notificationConnection(NOTIFICAION_QUEUE)
-            channel.sendToQueue(NOTIFICAION_QUEUE, Buffer.from(JSON.stringify(data)))
-
-            console.log("Notification  communication has been sented")
-        } catch (e) {
-
-            console.log(e)
-            console.log("Message Senting Failed")
-        }
-    },
-
-
-    adminForgetPasswordEmail: async function (data) {
-
-        try {
-            let NOTIFICAION_QUEUE = process.env.ADMIN_FORGETPASSWORD_EMAIL;
-            let channel = await this.notificationConnection(NOTIFICAION_QUEUE)
-
-            channel.sendToQueue(NOTIFICAION_QUEUE, Buffer.from(JSON.stringify(data)))
-            console.log("Notification for admin password reset");
-        } catch (e) {
-            console.log(e)
-            console.log("Message Senting Failed")
-        }
-    },
-
-    organizationForgetPasswordEmail: async function (data) {
-
-        try {
-            let NOTIFICAION_QUEUE = process.env.ORGANIZATION_FORGETPASSWORD_EMAIL;
-            let channel = await this.notificationConnection(NOTIFICAION_QUEUE)
-
-            channel.sendToQueue(NOTIFICAION_QUEUE, Buffer.from(JSON.stringify(data)))
-            console.log("Notification for organization password reset");
-        } catch (e) {
-            console.log(e)
-            console.log("Message Senting Failed")
-        }
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
     }
-}
-
-module.exports = COMMUNICATION_PROVIDER
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const amqplib = __importStar(require("amqplib"));
+const COMMUNICATION_PROVIDER = {
+    notificationConnection: (QUEUE) => __awaiter(void 0, void 0, void 0, function* () {
+        const connection = yield amqplib.connect("amqp://localhost");
+        const channel = yield connection.createChannel();
+        yield channel.assertQueue(QUEUE);
+        return channel;
+    }),
+    signInOTPSender: function (data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const NOTIFICATION_QUEUE = process.env.USER_SIGN_IN_NOTIFICATION;
+                const channel = yield this.notificationConnection(NOTIFICATION_QUEUE);
+                channel.sendToQueue(NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
+                return true;
+            }
+            catch (e) {
+                console.log(e);
+                return false;
+            }
+        });
+    },
+    signUpOTPSender: function (data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const NOTIFICATION_QUEUE = process.env.USER_SIGN_UP_NOTIFICATION;
+                const channel = yield this.notificationConnection(NOTIFICATION_QUEUE);
+                channel.sendToQueue(NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
+                console.log("Notification communication has been sent");
+                return true;
+            }
+            catch (e) {
+                console.log(e);
+                console.log("Message Sending Failed");
+                return false;
+            }
+        });
+    },
+    adminForgetPasswordEmail: function (data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const NOTIFICATION_QUEUE = process.env.ADMIN_FORGETPASSWORD_EMAIL;
+                const channel = yield this.notificationConnection(NOTIFICATION_QUEUE);
+                channel.sendToQueue(NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
+                console.log("Notification for admin password reset");
+                return true;
+            }
+            catch (e) {
+                console.log(e);
+                console.log("Message Sending Failed");
+                return false;
+            }
+        });
+    },
+    organizationForgetPasswordEmail: function (data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const NOTIFICATION_QUEUE = process.env.ORGANIZATION_FORGETPASSWORD_EMAIL;
+                const channel = yield this.notificationConnection(NOTIFICATION_QUEUE);
+                channel.sendToQueue(NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
+                console.log("Notification for organization password reset");
+                return true;
+            }
+            catch (e) {
+                console.log(e);
+                console.log("Message Sending Failed");
+                return false;
+            }
+        });
+    }
+};
+exports.default = COMMUNICATION_PROVIDER;
