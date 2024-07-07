@@ -1,140 +1,139 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+// import { COMMUNICATION_PROVIDER } from '../communication/Provider/notification/notification_service';
+const notification_service_1 = __importDefault(require("../communication/Provider/notification/notification_service"));
+// import { constant_data } from '../config/const';
+const const_1 = __importDefault(require("../config/const"));
+const tokenHelper_1 = __importDefault(require("./tokenHelper"));
+const utilHelper_1 = __importDefault(require("./utilHelper"));
 const userAuthModel = require("../db/models/userAuth");
-const COMMUNICATION_PROVIDER = require("../communication/Provider/notification/notification_service");
-const utilHelper = require("./utilHelper")
-let jwt = require("jsonwebtoken");
-const constant_data = require("../config/const");
-const tokenHelper = require("./tokenHelper");
-// const { OTP_TYPE } = require("../../notification/config/const_data");
-
-let userHelper = {
-
-
-    isUserExist: async function (email_id, phone_number) {
-        console.log("Checking data");
-        console.log(email_id, phone_number);
-        try {
-            let user = await userAuthModel.findOne({
-                $or: [
-                    { email: email_id },
-                    { phone_number: phone_number }
-                ]
-            });
-
-            console.log("The user is : ");
-            console.log(user);
-
-
-
-            if (user) {
-                if (user.account_started == true) return user;
-                else return false;
-            } else {
+const userHelper = {
+    isUserExist: function (email_id, phone_number) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if ((email_id == null || email_id == "") && (phone_number == null && phone_number == "")) {
                 return false;
             }
-
-
-        } catch (e) {
-            console.log(e);
-            return null;
-        }
-    },
-
-    insertNewUser: function (first_name, last_name, phone_number, email, auth_id, auth_provider, location) {
-
-
-
-        return new Promise(async (resolve, reject) => {
-            let otpNumber = utilHelper.generateAnOTP(6);
-            let expireTime = constant_data.MINIMUM_OTP_TIMER();
-            let userid = await userHelper.generateUserID(first_name)
-
-            console.log("The user id : " + userid);
-
-            if (userid) {
-
-                let jwtToken = await tokenHelper.createJWTToken({ email_id: email, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.OTP_EXPIRE_TIME)
-
-                userAuthModel.updateOne({
-                    email
-                }, {
-                    first_name,
-                    last_name,
-                    phone_number,
-                    email,
-                    auth_id,
-                    auth_provider,
-                    otp_timer: expireTime,
-                    otp: otpNumber,
-                    location,
-                    jwtToken: jwtToken,
-                    user_id: userid
-                }, {
-                    upsert: true
-                }).then((data) => {
-                    resolve({ token: jwtToken })
-
-                    let communicationData = {
-                        otp: otpNumber,
-                        recipientName: first_name + last_name,
-                        recipientEmail: email
-                    }
-
-                    COMMUNICATION_PROVIDER.signUpOTPSender(communicationData)
-
-                }).catch((err) => {
-                    reject(err)
-                })
-            } else {
-                reject("Something went wrong")
+            console.log("Checking data");
+            console.log(email_id, phone_number);
+            try {
+                let user = yield userAuthModel.findOne({
+                    $or: [
+                        { email: email_id },
+                        { phone_number: phone_number }
+                    ]
+                });
+                console.log("The user is : ");
+                console.log(user);
+                if (user) {
+                    if (user.account_started == true)
+                        return user;
+                    else
+                        return false;
+                }
+                else {
+                    return false;
+                }
             }
-        })
+            catch (e) {
+                console.log(e);
+                return null;
+            }
+        });
     },
-
-    _checkUserIDValidity: async (user_id) => {
+    insertNewUser: function (first_name, last_name, phone_number, email, auth_id, auth_provider, location) {
+        return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+            let otpNumber = utilHelper_1.default.generateAnOTP(6);
+            let expireTime = const_1.default.MINIMUM_OTP_TIMER();
+            let userid = yield userHelper.generateUserID(first_name);
+            console.log("The user id : " + userid);
+            if (userid) {
+                let jwtToken = yield tokenHelper_1.default.createJWTToken({ email_id: email, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
+                if (jwtToken) {
+                    userAuthModel.updateOne({
+                        email
+                    }, {
+                        first_name,
+                        last_name,
+                        phone_number,
+                        email,
+                        auth_id,
+                        auth_provider,
+                        otp_timer: expireTime,
+                        otp: otpNumber,
+                        location,
+                        jwtToken: jwtToken,
+                        user_id: userid
+                    }, {
+                        upsert: true
+                    }).then((data) => {
+                        resolve({ token: jwtToken });
+                        let communicationData = {
+                            otp: otpNumber,
+                            recipientName: first_name + last_name,
+                            recipientEmail: email
+                        };
+                        notification_service_1.default.signUpOTPSender(communicationData);
+                    }).catch((err) => {
+                        reject(err);
+                    });
+                }
+                else {
+                    reject("Something went wrong");
+                }
+            }
+            else {
+                reject("Something went wrong");
+            }
+        }));
+    },
+    _checkUserIDValidity: (user_id) => __awaiter(void 0, void 0, void 0, function* () {
         console.log("Demy userid : " + user_id);
         try {
-            let user = await userAuthModel.findOne({ user_id });
+            let user = yield userAuthModel.findOne({ user_id });
             if (!user) {
-                return false
-            } else {
-                return true
+                return false;
             }
-        } catch (e) {
+            else {
+                return true;
+            }
+        }
+        catch (e) {
             console.log(e);
             return false;
         }
-    },
-
-    generateUserID: async function (first_name) {
-        try {
-
-            let randomText = utilHelper.createRandomText(4);
-            let count = 0;
-            let userId;;
-            let isUserIDValid;
-
-            do {
-                userId = first_name + "@" + randomText + count
-                isUserIDValid = await this._checkUserIDValidity(userId)
+    }),
+    generateUserID: function (first_name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let randomText = utilHelper_1.default.createRandomText(4);
+                let count = 0;
+                let userId;
+                let isUserIDValid;
+                do {
+                    userId = first_name + "@" + randomText + count;
+                    isUserIDValid = yield this._checkUserIDValidity(userId);
+                    count++;
+                } while (isUserIDValid);
+                console.log("The user id is : " + userId);
+                return userId;
             }
-            while (isUserIDValid) {
-                count++;
+            catch (e) {
+                console.log(e);
+                return false;
             }
-
-            console.log("The user id is : " + userId);
-            return userId;
-
-
-        } catch (e) {
-            console.log(e);
-            return false;
-        }
+        });
     }
-
-
-
-
-}
-
-
-module.exports = userHelper;
+};
+exports.default = userHelper;
