@@ -1,13 +1,10 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
+
 // const constant_data = require("../../config/const");
-const const_1 = __importDefault(require("../../config/const"));
+import constant_data from "../../config/const";
 // const mongo = require("mongoose");
-const mongoose_1 = __importDefault(require("mongoose"));
+import mongoose from "mongoose";
 // const { default: mongoose } = require("mongoose");
+
 const userAuthSchema = {
     user_id: {
         type: String,
@@ -35,7 +32,7 @@ const userAuthSchema = {
     auth_provider: {
         type: String,
         required: true,
-        enum: const_1.default.AUTH_PROVIDERS
+        enum: constant_data.AUTH_PROVIDERS
     },
     first_name: {
         type: String,
@@ -56,16 +53,19 @@ const userAuthSchema = {
     location: {
         type: {
             latitude: {
-                type: mongoose_1.default.Types.Decimal128,
+                type: mongoose.Types.Decimal128,
                 required: true
             },
             longitude: {
-                type: mongoose_1.default.Types.Decimal128,
+                type: mongoose.Types.Decimal128,
                 required: true
             }
         },
         required: false
     }
-};
-const userAuthModel = new mongoose_1.default.Schema(userAuthSchema);
-exports.default = mongoose_1.default.model("user", userAuthModel, "user");
+}
+
+
+const userAuthModel = new mongoose.Schema(userAuthSchema);
+
+export default mongoose.model("user", userAuthModel, "user")
