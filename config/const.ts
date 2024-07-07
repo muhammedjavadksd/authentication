@@ -1,11 +1,12 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const constant_data = {
+import { ConstantData } from "./Datas/InterFace";
+
+const constant_data: ConstantData = {
+
     AUTH_PROVIDERS: [
         'GOOGLE', 'FACEBOOK', 'CREDENTIAL'
     ],
     MINIMUM_OTP_TIMER: () => {
-        return Date.now() + 1800000;
+        return Date.now() + 1800000
     },
     BLOOD_GROUP: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
     AUTH_PROVIDERS_DATA: {
@@ -26,6 +27,8 @@ const constant_data = {
     JWT_FOR: {
         ADMIN_AUTH: "ADMIN_AUTH"
     }
-};
-exports.default = constant_data;
+}
+
+
+export default constant_data
 // module.exports = constant_data;
