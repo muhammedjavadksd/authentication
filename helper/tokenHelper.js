@@ -1,39 +1,66 @@
-
-let jwt = require("jsonwebtoken");
-const constant_data = require("../config/const");
-// const const_data = require("../../notification/config/const_data")
-let tokenHelper = {
-
-    createJWTToken: async (payload = {}, timer) => {
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const jwt = __importStar(require("jsonwebtoken"));
+const tokenHelper = {
+    createJWTToken: (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (payload = {}, timer) {
         try {
-            let jwtToken = await jwt.sign(payload, process.env.JWT_SECRET, { algorithm: "HS256", expiresIn: timer });
-            console.log("The jwt token is");
-            return jwtToken
-        } catch (e) {
+            const jwtToken = yield jwt.sign(payload, process.env.JWT_SECRET, { algorithm: "HS256", expiresIn: timer });
+            return jwtToken;
+        }
+        catch (e) {
             console.log(e);
             return null;
         }
-    },
-
-    decodeJWTToken: async (jwttoken) => {
+    }),
+    decodeJWTToken: (jwttoken) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            let decode = await jwt.decode(jwttoken, { complete: true });
-            return decode
-        } catch (e) {
+            const decode = yield jwt.decode(jwttoken, { complete: true });
+            return decode;
+        }
+        catch (e) {
             return null;
         }
-    },
-
-    checkTokenValidity: async (token) => {
+    }),
+    checkTokenValidity: (token) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            let checkValidity = await jwt.verify(token, process.env.JWT_SECRET);
-            console.log("Token validity is : ");
-            console.log(checkValidity);
-            return checkValidity
-        } catch (e) {
-            return false
+            const checkValidity = yield jwt.verify(token, process.env.JWT_SECRET);
+            return checkValidity;
         }
-    }
-}
-
-module.exports = tokenHelper
+        catch (e) {
+            return false;
+        }
+    })
+};
+exports.default = tokenHelper;
