@@ -1,60 +1,32 @@
-
-//Imports
-const express = require("express");
-const app = express();
-const dotenv = require("dotenv");
-const bodyparser = require("body-parser")
-
-//middleware
-// app.use(express.json())
-// app.use(express.urlencoded({ extended: true }))
-app.use(bodyparser.json())
-app.use(bodyparser.urlencoded({ extended: true }))
-
-const authenticationDbConnection = require("./db/config/connection");
-const userRouter = require("./router/userRouter/userRouter")
-const adminRouter = require("./router/adminRouter/adminRouter")
-const logger = require("morgan")
-const bcrypt = require("bcrypt");
-const BulkConsumer = require("./communication/BulkConsumer");
-const organizationRouter = require("./router/organization/organizationRouter");
-
-
-app.use((req, res, next) => {
-    console.log("Request came");
-    next()
-})
-
-dotenv.config("./.env");
-BulkConsumer()
-
-app.use(logger("common"))
-
-app.use("/", userRouter)
-app.use("/admin", adminRouter)
-app.use("/organization", organizationRouter)
-
-//Config
-authenticationDbConnection()
-
-//const
-const PORT = process.env.PORT || 7002
-
-
-// function createbcrypatPassword(plainPassword) {
-//     console.log(process.env.BCRYPT_SALTROUND);
-//     // const salt = bcrypt.genSaltSync(process.env.BCRYPT_SALTROUND);
-
-//     bcrypt.compare(plainPassword, "$2b$10$ff.vnqbHKZpgUsRzsN0Pau.FJsfULwxPm7hFgTAMcwB7eKpXqgx0e").then((password) => {
-//         console.log(password);
-//     }).catch((err) => {
-//         console.log(err);
-//     })
-// }
-
-
-// createbcrypatPassword("adminpro")
-
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const dotenv_1 = __importDefault(require("dotenv"));
+const body_parser_1 = __importDefault(require("body-parser"));
+const connection_1 = __importDefault(require("./db/config/connection"));
+const userRouter_1 = __importDefault(require("./router/userRouter/userRouter"));
+// import adminRouter from "./router/adminRouter/adminRouter";
+// adminRouter
+const adminRouter_1 = __importDefault(require("./router/adminRouter/adminRouter"));
+const morgan_1 = __importDefault(require("morgan"));
+// import bcrypt from "bcrypt";
+// import BulkConsumer from "./communication/BulkConsumer";
+const BulkDataConsumer_1 = __importDefault(require("./communication/BulkDataConsumer"));
+const organizationRouter_1 = __importDefault(require("./router/organization/organizationRouter"));
+const app = (0, express_1.default)();
+app.use(body_parser_1.default.json());
+app.use(body_parser_1.default.urlencoded({ extended: true }));
+dotenv_1.default.config();
+(0, BulkDataConsumer_1.default)();
+app.use((0, morgan_1.default)("common"));
+app.use("/", userRouter_1.default);
+app.use("/admin", adminRouter_1.default);
+app.use("/organization", organizationRouter_1.default);
+(0, connection_1.default)();
+const PORT = parseInt(process.env.PORT) || 7002;
 app.listen(PORT, () => {
-    console.log("Auth Service started at Port : " + PORT)
-})
+    console.log("Auth Service started at Port : " + PORT);
+});
