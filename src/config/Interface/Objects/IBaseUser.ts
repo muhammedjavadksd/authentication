@@ -1,3 +1,5 @@
+import { locationTypeInterFace } from "../IModel/IUserAuthModel"
+
 interface IBaseUser {
     first_name: string
     last_name: string
@@ -5,7 +7,7 @@ interface IBaseUser {
     email: string
     auth_id: string
     auth_provider: string
-    location: string
+    location?: locationTypeInterFace
     user_id?: string
     profile_id?: string
 }

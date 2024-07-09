@@ -12,6 +12,7 @@ interface IUserAuthenticationRepo {
     isUserExist(email_address: string, phone_number: number): Promise<boolean>
     findUser(id: string | null, email: string | null | undefined, phone: number | null | undefined): Promise<boolean | IUserModelDocument>
     updateUser(newAuthUser: IUserModelDocument): Promise<boolean>
+    updateToken(userId: string): Promise<string | null>
 }
 
 
@@ -141,7 +142,6 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
             return false
         }
     }
-
 
     // updateUser: ((newAuthUser: IUserModelDocument) => {}) | undefined
 

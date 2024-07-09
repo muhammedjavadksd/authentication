@@ -1,11 +1,17 @@
-interface UtilHelper {
+interface IUtilHelper {
     generateAnOTP: (length: number) => number;
     createRandomText: (length: number) => string;
     organizationFileName: (file_name: string, type: string) => string;
     isFalsyValue: (data: any) => boolean
+    OTPValidator: (otp_number: number, db_otp_number: number, expire_time: number) => IOTPValidationResponse
 }
 
-const utilHelper: UtilHelper = {
+interface IOTPValidationResponse {
+    status: boolean
+    msg?: string
+}
+
+const utilHelper: IUtilHelper = {
     generateAnOTP: (length: number): number => {
         const min = Math.pow(10, length - 1);
         const max = Math.pow(10, length) - 1;
@@ -32,6 +38,20 @@ const utilHelper: UtilHelper = {
 
     isFalsyValue: (data: any) => {
         return data == "" || data == null || data == undefined
+    },
+
+
+    OTPValidator: (otp_number: number, db_otp_number: number, expire_time: number): IOTPValidationResponse => {
+        if (otp_number == db_otp_number) {
+            let currentTime = Date.now();
+            if (currentTime > expire_time) {
+                return { status: true, msg: "OTP verified" }
+            } else {
+                return { status: false, msg: "OTP has been expired" }
+            }
+        } else {
+            return { status: false, msg: "Incorrect OTP Number" }
+        }
     }
 };
 

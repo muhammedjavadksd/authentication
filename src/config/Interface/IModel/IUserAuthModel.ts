@@ -18,7 +18,8 @@ interface IUserModelDocument extends Document {
     last_name: string;
     jwtToken: string;
     account_started?: boolean;
-    location?: locationTypeInterFace
+    location?: locationTypeInterFace,
 }
 
 export default IUserModelDocument
+export { locationTypeInterFace }

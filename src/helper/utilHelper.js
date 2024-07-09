@@ -21,6 +21,20 @@ const utilHelper = {
     },
     isFalsyValue: (data) => {
         return data == "" || data == null || data == undefined;
+    },
+    OTPValidator: (otp_number, db_otp_number, expire_time) => {
+        if (otp_number == db_otp_number) {
+            let currentTime = Date.now();
+            if (currentTime > expire_time) {
+                return { status: true, msg: "OTP verified" };
+            }
+            else {
+                return { status: false, msg: "OTP has been expired" };
+            }
+        }
+        else {
+            return { status: false, msg: "Incorrect OTP Number" };
+        }
     }
 };
 exports.default = utilHelper;
