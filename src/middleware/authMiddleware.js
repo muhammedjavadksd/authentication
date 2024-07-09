@@ -18,12 +18,17 @@ const tokenHelper_1 = __importDefault(require("../helper/token/tokenHelper"));
 let { OTP_TYPE } = const_1.default;
 class AuthMiddleware {
     constructor() {
+        this.isAdminLogged = this.isAdminLogged.bind(this);
+        this.isOrganizationLogged = this.isOrganizationLogged.bind(this);
+        this.isUserLogged = this.isUserLogged.bind(this);
+        this.isValidSignUpAttempt = this.isValidSignUpAttempt.bind(this);
         this.tokenHelpers = new tokenHelper_1.default();
     }
     isValidSignUpAttempt(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             const headers = req.headers;
             const token = utilHelper_1.default.getTokenFromHeader(headers['authorization']);
+            console.log(token);
             if (token) {
                 if (!req.context) {
                     req.context = {};

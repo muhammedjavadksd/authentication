@@ -30,13 +30,12 @@ const Joi = __importStar(require("joi"));
 const const_1 = __importDefault(require("../const"));
 const { AUTH_PROVIDERS, BLOOD_GROUP } = const_1.default;
 const signUpUserValidation = Joi.object({
-    phone_number: Joi.number().integer().min(9).max(10).required(),
+    phone_number: Joi.string().length(10).required(),
     email_address: Joi.string().email().required(),
-    auth_id: Joi.string(),
     first_name: Joi.string().required(),
     auth_provider: Joi.string().valid(...AUTH_PROVIDERS).required(),
     last_name: Joi.string().required(),
-    location: Joi.array().length(2).required(),
+    location: Joi.required(),
     blood_group: Joi.string().valid(...BLOOD_GROUP)
 });
 exports.default = signUpUserValidation;

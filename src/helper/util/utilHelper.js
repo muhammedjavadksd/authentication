@@ -25,7 +25,8 @@ const utilHelper = {
     OTPValidator: (otp_number, db_otp_number, expire_time) => {
         if (otp_number == db_otp_number) {
             let currentTime = Date.now();
-            if (currentTime > expire_time) {
+            console.log(expire_time, currentTime);
+            if (currentTime < expire_time) {
                 return { status: true, msg: "OTP verified" };
             }
             else {
@@ -39,7 +40,7 @@ const utilHelper = {
     getTokenFromHeader: (headers) => {
         const splitAuth = headers === null || headers === void 0 ? void 0 : headers.split(" ");
         if (splitAuth && splitAuth[0] == "Bearer") {
-            const token = splitAuth[0];
+            const token = splitAuth[1];
             if (token) {
                 return token;
             }

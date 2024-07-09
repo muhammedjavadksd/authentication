@@ -18,6 +18,14 @@ class UserAuthServices implements IUserAuthService {
     private TokenHelpers;
 
     constructor() {
+
+        this.signInHelper = this.signInHelper.bind(this)
+        this.authOTPValidate = this.authOTPValidate.bind(this)
+        this.editAuthEmailID = this.editAuthEmailID.bind(this)
+        this.resendOtpNumer = this.resendOtpNumer.bind(this)
+        this._checkUserIDValidity = this._checkUserIDValidity.bind(this)
+        this.generateUserID = this.generateUserID.bind(this)
+
         this.UserAuthRepo = new UserAuthenticationRepo()
         this.TokenHelpers = new TokenHelper();
     }
@@ -26,6 +34,14 @@ class UserAuthServices implements IUserAuthService {
         try {
             const userAuth: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, email, null);
             if (userAuth) {
+
+                if (!userAuth.account_started) {
+                    return {
+                        statusCode: 400,
+                        status: false,
+                        msg: "Email id not found",
+                    }
+                }
 
                 const otpNumber: number = utilHelper.generateAnOTP(6);
                 const otpExpireTime: number = constant_data.MINIMUM_OTP_TIMER();
@@ -69,6 +85,7 @@ class UserAuthServices implements IUserAuthService {
                 }
             }
         } catch (e) {
+            console.log(e);
             return {
                 statusCode: 500,
                 status: false,
@@ -148,7 +165,7 @@ class UserAuthServices implements IUserAuthService {
             return {
                 status: true,
                 msg: "OTP Verified Success",
-                data: { UserJwtInterFace: userJwtData },
+                data: userJwtData,
                 statusCode: 200
             }
 

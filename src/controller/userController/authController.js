@@ -19,6 +19,11 @@ const UserAuthServices_1 = __importDefault(require("../../services/UserAuthServi
 let { AUTH_PROVIDERS_DATA } = const_1.default;
 class UserAuthController {
     constructor() {
+        this.signUpController = this.signUpController.bind(this);
+        this.signInController = this.signInController.bind(this);
+        this.AuthOTPSubmission = this.AuthOTPSubmission.bind(this);
+        this.editAuthPhoneNumber = this.editAuthPhoneNumber.bind(this);
+        this.resetOtpNumber = this.resetOtpNumber.bind(this);
         this.UserAuthRepo = new UserAuthentication_1.default();
         this.UserAuthService = new UserAuthServices_1.default();
     }
@@ -36,7 +41,6 @@ class UserAuthController {
                 const { error, value } = validation_1.default.validate({
                     phone_number,
                     email_address,
-                    auth_id,
                     blood_group,
                     auth_provider,
                     first_name,
@@ -51,8 +55,9 @@ class UserAuthController {
                     res.status(500).json({ response });
                 }
                 else {
+                    console.log(this);
                     const isUserExist = yield this.UserAuthRepo.findUser(null, email_address, Number(phone_number));
-                    if (isUserExist) {
+                    if (isUserExist && isUserExist.account_started) {
                         let response = {
                             status: false,
                             msg: 'Email/Phone already exist',
@@ -77,6 +82,7 @@ class UserAuthController {
                             };
                             res.status(200).json(successResponse);
                         }).catch((err) => {
+                            console.log(err);
                             let response = {
                                 status: false,
                                 msg: "Something went wrong"
@@ -87,6 +93,7 @@ class UserAuthController {
                 }
             }
             catch (e) {
+                console.log(e);
                 let response = {
                     status: false,
                     msg: "Something went wrong"
@@ -120,6 +127,7 @@ class UserAuthController {
                 }
             }
             catch (e) {
+                console.log(e);
                 const response = {
                     status: false,
                     msg: 'Something went wrong',
@@ -139,16 +147,19 @@ class UserAuthController {
                     const otpVerification = yield this.UserAuthService.authOTPValidate(otp, email_id, token);
                     if (otpVerification.status) {
                         let responseData = otpVerification.data;
+                        console.log(otpVerification.data);
+                        const otpResponse = {
+                            jwt: responseData['jwt'],
+                            first_name: responseData['first_name'],
+                            last_name: responseData['last_name'],
+                            email: responseData['email'],
+                            phone: responseData['phone'],
+                        };
+                        console.log(otpResponse);
                         res.status(200).json({
                             status: true,
-                            msg: 'OTP Verification sucess',
-                            data: {
-                                jwt: responseData.jwt,
-                                first_name: responseData.first_name,
-                                last_name: responseData.last_name,
-                                email: responseData.email,
-                                phone: responseData.phone,
-                            }
+                            msg: 'OTP Verification success',
+                            data: otpResponse
                         });
                     }
                     else {

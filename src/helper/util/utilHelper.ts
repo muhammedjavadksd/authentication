@@ -34,9 +34,11 @@ const utilHelper: IUtilHelper = {
 
 
     OTPValidator: (otp_number: number, db_otp_number: number, expire_time: number): IOTPValidationResponse => {
+
         if (otp_number == db_otp_number) {
             let currentTime = Date.now();
-            if (currentTime > expire_time) {
+            console.log(expire_time, currentTime);
+            if (currentTime < expire_time) {
                 return { status: true, msg: "OTP verified" }
             } else {
                 return { status: false, msg: "OTP has been expired" }
@@ -49,7 +51,7 @@ const utilHelper: IUtilHelper = {
     getTokenFromHeader: (headers: Request['headers']['authorization']): string | false => {
         const splitAuth = headers?.split(" ");
         if (splitAuth && splitAuth[0] == "Bearer") {
-            const token: string | undefined = splitAuth[0];
+            const token: string | undefined = splitAuth[1];
             if (token) {
                 return token
             }

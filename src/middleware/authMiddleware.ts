@@ -14,12 +14,18 @@ class AuthMiddleware implements IAuthMiddleware {
     private readonly tokenHelpers;
 
     constructor() {
+        this.isAdminLogged = this.isAdminLogged.bind(this)
+        this.isOrganizationLogged = this.isOrganizationLogged.bind(this)
+        this.isUserLogged = this.isUserLogged.bind(this)
+        this.isValidSignUpAttempt = this.isValidSignUpAttempt.bind(this)
         this.tokenHelpers = new TokenHelper();
     }
 
     async isValidSignUpAttempt(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
         const headers: CustomRequest['headers'] = req.headers;
         const token: string | false = utilHelper.getTokenFromHeader(headers['authorization'])
+        console.log(token);
+
 
         if (token) {
             if (!req.context) {

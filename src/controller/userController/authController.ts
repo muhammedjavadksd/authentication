@@ -6,6 +6,7 @@ import IUserAuthController from '../../config/Interface/IController/IUserAuthCon
 import UserAuthenticationRepo from '../../repositories/UserRepo/UserAuthentication';
 import IBaseUser from '../../config/Interface/Objects/IBaseUser';
 import UserAuthServices from '../../services/UserAuthService/UserAuthServices';
+import IUserModelDocument from '../../config/Interface/IModel/UserAuthModel/IUserAuthModel';
 
 
 let { AUTH_PROVIDERS_DATA } = const_data;
@@ -16,6 +17,12 @@ class UserAuthController implements IUserAuthController {
     private readonly UserAuthService
 
     constructor() {
+        this.signUpController = this.signUpController.bind(this)
+        this.signInController = this.signInController.bind(this)
+        this.AuthOTPSubmission = this.AuthOTPSubmission.bind(this)
+        this.editAuthPhoneNumber = this.editAuthPhoneNumber.bind(this)
+        this.resetOtpNumber = this.resetOtpNumber.bind(this)
+
         this.UserAuthRepo = new UserAuthenticationRepo();
         this.UserAuthService = new UserAuthServices();
     }
@@ -35,7 +42,6 @@ class UserAuthController implements IUserAuthController {
             const { error, value } = signUpUserValidation.validate({
                 phone_number,
                 email_address,
-                auth_id,
                 blood_group,
                 auth_provider,
                 first_name,
@@ -50,8 +56,9 @@ class UserAuthController implements IUserAuthController {
                 }
                 res.status(500).json({ response });
             } else {
-                const isUserExist = await this.UserAuthRepo.findUser(null, email_address, Number(phone_number))
-                if (isUserExist) {
+                console.log(this);
+                const isUserExist: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, email_address, Number(phone_number))
+                if (isUserExist && isUserExist.account_started) {
                     let response: ControllerResponseInterFace = {
                         status: false,
                         msg: 'Email/Phone already exist',
@@ -76,6 +83,7 @@ class UserAuthController implements IUserAuthController {
                         };
                         res.status(200).json(successResponse);
                     }).catch((err) => {
+                        console.log(err);
                         let response: ControllerResponseInterFace = {
                             status: false,
                             msg: "Something went wrong"
@@ -85,6 +93,8 @@ class UserAuthController implements IUserAuthController {
                 }
             }
         } catch (e) {
+            console.log(e);
+
             let response: ControllerResponseInterFace = {
                 status: false,
                 msg: "Something went wrong"
@@ -116,6 +126,7 @@ class UserAuthController implements IUserAuthController {
                 res.status(userSign.statusCode).json(response);
             }
         } catch (e) {
+            console.log(e);
             const response: ControllerResponseInterFace = {
                 status: false,
                 msg: 'Something went wrong',
@@ -135,17 +146,24 @@ class UserAuthController implements IUserAuthController {
 
                 if (otpVerification.status) {
                     let responseData: UserJwtInterFace = otpVerification.data;
+                    console.log(otpVerification.data);
+
+                    const otpResponse = {
+                        jwt: responseData['jwt'],
+                        first_name: responseData['first_name'],
+                        last_name: responseData['last_name'],
+                        email: responseData['email'],
+                        phone: responseData['phone'],
+                    } as UserJwtInterFace
+
+                    console.log(otpResponse);
+
                     res.status(200).json({
                         status: true,
-                        msg: 'OTP Verification sucess',
-                        data: {
-                            jwt: responseData.jwt,
-                            first_name: responseData.first_name,
-                            last_name: responseData.last_name,
-                            email: responseData.email,
-                            phone: responseData.phone,
-                        } as UserJwtInterFace
+                        msg: 'OTP Verification success',
+                        data: otpResponse
                     } as ControllerResponseInterFace);
+
                 } else {
                     res.status(401).json({
                         status: false,

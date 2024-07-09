@@ -20,6 +20,12 @@ const profile_service_1 = __importDefault(require("../../communication/Provider/
 const tokenHelper_1 = __importDefault(require("../../helper/token/tokenHelper"));
 class UserAuthServices {
     constructor() {
+        this.signInHelper = this.signInHelper.bind(this);
+        this.authOTPValidate = this.authOTPValidate.bind(this);
+        this.editAuthEmailID = this.editAuthEmailID.bind(this);
+        this.resendOtpNumer = this.resendOtpNumer.bind(this);
+        this._checkUserIDValidity = this._checkUserIDValidity.bind(this);
+        this.generateUserID = this.generateUserID.bind(this);
         this.UserAuthRepo = new UserAuthentication_1.default();
         this.TokenHelpers = new tokenHelper_1.default();
     }
@@ -28,6 +34,13 @@ class UserAuthServices {
             try {
                 const userAuth = yield this.UserAuthRepo.findUser(null, email, null);
                 if (userAuth) {
+                    if (!userAuth.account_started) {
+                        return {
+                            statusCode: 400,
+                            status: false,
+                            msg: "Email id not found",
+                        };
+                    }
                     const otpNumber = utilHelper_1.default.generateAnOTP(6);
                     const otpExpireTime = const_1.default.MINIMUM_OTP_TIMER();
                     const token = yield this.TokenHelpers.generateJWtToken({ email_id: userAuth['email'], type: const_1.default.OTP_TYPE.SIGN_IN_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
@@ -70,6 +83,7 @@ class UserAuthServices {
                 }
             }
             catch (e) {
+                console.log(e);
                 return {
                     statusCode: 500,
                     status: false,
@@ -138,7 +152,7 @@ class UserAuthServices {
                 return {
                     status: true,
                     msg: "OTP Verified Success",
-                    data: { UserJwtInterFace: userJwtData },
+                    data: userJwtData,
                     statusCode: 200
                 };
             }

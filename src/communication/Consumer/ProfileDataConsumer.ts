@@ -1,5 +1,4 @@
-// let amqplib = require("amqplib");
-import amqplib, { Channel, Connection } from 'amqplib';
+import amqplib from 'amqplib';
 import UserAuthenticationRepo from '../../repositories/UserRepo/UserAuthentication';
 import mongoose from 'mongoose';
 

@@ -78,7 +78,6 @@ class UserAuthenticationRepo {
                                 auth_provider: baseUSER['auth_provider'],
                                 otp_timer: expireTime,
                                 otp: otpNumber,
-                                location,
                                 jwtToken: jwtToken,
                                 user_id: userid
                             }
