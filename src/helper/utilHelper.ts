@@ -2,6 +2,7 @@ interface UtilHelper {
     generateAnOTP: (length: number) => number;
     createRandomText: (length: number) => string;
     organizationFileName: (file_name: string, type: string) => string;
+    isFalsyValue: (data: any) => boolean
 }
 
 const utilHelper: UtilHelper = {
@@ -27,6 +28,10 @@ const utilHelper: UtilHelper = {
 
     organizationFileName: (file_name: string, type: string): string => {
         return type + file_name;
+    },
+
+    isFalsyValue: (data: any) => {
+        return data == "" || data == null || data == undefined
     }
 };
 

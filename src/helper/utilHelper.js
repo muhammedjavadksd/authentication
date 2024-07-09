@@ -18,6 +18,9 @@ const utilHelper = {
     },
     organizationFileName: (file_name, type) => {
         return type + file_name;
+    },
+    isFalsyValue: (data) => {
+        return data == "" || data == null || data == undefined;
     }
 };
 exports.default = utilHelper;
