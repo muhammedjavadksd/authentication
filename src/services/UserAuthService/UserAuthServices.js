@@ -170,8 +170,10 @@ class UserAuthServices {
             const otpNumber = utilHelper_1.default.generateAnOTP(6);
             const otpExpireTime = const_1.default.MINIMUM_OTP_TIMER();
             try {
-                const getUser = yield this.UserAuthRepo.findUser(null, newEmailID, null);
-                if (getUser && !getUser.account_started) {
+                const getUser = yield this.UserAuthRepo.findUser(null, oldEmailId, null);
+                // console.log(getUser);
+                // console.log(oldEmailId);
+                if (getUser) {
                     const newToken = yield this.TokenHelpers.generateJWtToken({ email_id: newEmailID, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
                     if (newToken) {
                         getUser.email = newEmailID;
@@ -213,6 +215,7 @@ class UserAuthServices {
                 }
             }
             catch (e) {
+                console.log(e);
                 return {
                     statusCode: 500,
                     status: false,

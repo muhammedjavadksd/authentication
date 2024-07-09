@@ -20,6 +20,12 @@ const tokenHelper_1 = __importDefault(require("../../helper/token/tokenHelper"))
 const UserAuthServices_1 = __importDefault(require("../../services/UserAuthService/UserAuthServices"));
 class UserAuthenticationRepo {
     constructor() {
+        this.findByUserId = this.findByUserId.bind(this);
+        this.findUser = this.findUser.bind(this);
+        this.insertNewUser = this.insertNewUser.bind(this);
+        this.isUserExist = this.isUserExist.bind(this);
+        this.updateUser = this.updateUser.bind(this);
+        this.updateUserById = this.updateUserById.bind(this);
         this.UserAuthCollection = userAuth_1.default;
         this.tokenHelpers = new tokenHelper_1.default();
     }

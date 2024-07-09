@@ -20,6 +20,12 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
     private readonly tokenHelpers;
 
     constructor() {
+        this.findByUserId = this.findByUserId.bind(this)
+        this.findUser = this.findUser.bind(this)
+        this.insertNewUser = this.insertNewUser.bind(this)
+        this.isUserExist = this.isUserExist.bind(this)
+        this.updateUser = this.updateUser.bind(this)
+        this.updateUserById = this.updateUserById.bind(this)
         this.UserAuthCollection = userAuth;
         this.tokenHelpers = new TokenHelper()
     }

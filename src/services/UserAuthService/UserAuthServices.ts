@@ -184,8 +184,12 @@ class UserAuthServices implements IUserAuthService {
         const otpExpireTime: number = constant_data.MINIMUM_OTP_TIMER();
 
         try {
-            const getUser: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, newEmailID, null);
-            if (getUser && !getUser.account_started) {
+            const getUser: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, oldEmailId, null);
+            // console.log(getUser);
+            // console.log(oldEmailId);
+
+
+            if (getUser) {
                 const newToken: string | null = await this.TokenHelpers.generateJWtToken({ email_id: newEmailID, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.OTP_EXPIRE_TIME.toString())
                 if (newToken) {
                     getUser.email = newEmailID;
@@ -225,6 +229,7 @@ class UserAuthServices implements IUserAuthService {
                 }
             }
         } catch (e) {
+            console.log(e);
             return {
                 statusCode: 500,
                 status: false,

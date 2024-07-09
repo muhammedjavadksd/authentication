@@ -11,6 +11,9 @@ class AdminController implements IAdminController {
     private AdminServices;
 
     constructor() {
+        this.signInController = this.signInController.bind(this)
+        this.forgetPasswordController = this.forgetPasswordController.bind(this)
+        this.adminPasswordReset = this.adminPasswordReset.bind(this)
         this.AdminServices = new AdminAuthService();
     }
 
@@ -19,8 +22,12 @@ class AdminController implements IAdminController {
         const email_address: string = req.body.email_address;
         const password: string = req.body.password;
 
+
+
+
         try {
             const adminAuthAttempt: HelperFunctionResponse = await this.AdminServices.signIn(email_address, password)
+
             if (adminAuthAttempt.status) {
                 const helperData: AdminJwtInterFace | null | undefined = adminAuthAttempt.data;
 
@@ -40,8 +47,16 @@ class AdminController implements IAdminController {
                         status: adminAuthAttempt.status,
                         msg: adminAuthAttempt.msg,
                     }
+                    console.log(adminAuthAttempt.msg);
+
                     res.status(adminAuthAttempt.statusCode).json(response)
                 }
+            } else {
+                const response: ControllerResponseInterFace = {
+                    status: false,
+                    msg: adminAuthAttempt.msg,
+                }
+                res.status(adminAuthAttempt.statusCode).json(response)
             }
         } catch (e) {
             const response: ControllerResponseInterFace = {

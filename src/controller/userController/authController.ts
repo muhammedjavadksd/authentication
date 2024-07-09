@@ -192,6 +192,7 @@ class UserAuthController implements IUserAuthController {
 
             const oldEmailId: string = requestContext.email_id;
 
+
             try {
                 const editRequest: HelperFunctionResponse = await this.UserAuthService.editAuthEmailID(oldEmailId, newEmailID);
                 if (editRequest.status) {

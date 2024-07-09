@@ -28,13 +28,13 @@ class AuthMiddleware {
         return __awaiter(this, void 0, void 0, function* () {
             const headers = req.headers;
             const token = utilHelper_1.default.getTokenFromHeader(headers['authorization']);
-            console.log(token);
             if (token) {
                 if (!req.context) {
                     req.context = {};
                 }
                 req.context.auth_token = token;
                 const checkValidity = yield this.tokenHelpers.checkTokenValidity(token);
+                console.log(checkValidity);
                 if (checkValidity) {
                     if (typeof checkValidity == "object") {
                         if (checkValidity.email_id) {

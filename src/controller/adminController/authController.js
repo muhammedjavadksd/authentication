@@ -16,6 +16,9 @@ const AdminAuthService_1 = __importDefault(require("../../services/AdminAuthServ
 const utilHelper_1 = __importDefault(require("../../helper/util/utilHelper"));
 class AdminController {
     constructor() {
+        this.signInController = this.signInController.bind(this);
+        this.forgetPasswordController = this.forgetPasswordController.bind(this);
+        this.adminPasswordReset = this.adminPasswordReset.bind(this);
         this.AdminServices = new AdminAuthService_1.default();
     }
     signInController(req, res, next) {
@@ -43,8 +46,16 @@ class AdminController {
                             status: adminAuthAttempt.status,
                             msg: adminAuthAttempt.msg,
                         };
+                        console.log(adminAuthAttempt.msg);
                         res.status(adminAuthAttempt.statusCode).json(response);
                     }
+                }
+                else {
+                    const response = {
+                        status: false,
+                        msg: adminAuthAttempt.msg,
+                    };
+                    res.status(adminAuthAttempt.statusCode).json(response);
                 }
             }
             catch (e) {

@@ -14,6 +14,7 @@ class AuthMiddleware implements IAuthMiddleware {
     private readonly tokenHelpers;
 
     constructor() {
+
         this.isAdminLogged = this.isAdminLogged.bind(this)
         this.isOrganizationLogged = this.isOrganizationLogged.bind(this)
         this.isUserLogged = this.isUserLogged.bind(this)
@@ -22,9 +23,12 @@ class AuthMiddleware implements IAuthMiddleware {
     }
 
     async isValidSignUpAttempt(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+
+
+
         const headers: CustomRequest['headers'] = req.headers;
         const token: string | false = utilHelper.getTokenFromHeader(headers['authorization'])
-        console.log(token);
+
 
 
         if (token) {
@@ -34,6 +38,9 @@ class AuthMiddleware implements IAuthMiddleware {
             req.context.auth_token = token;
 
             const checkValidity: JwtPayload | string | boolean = await this.tokenHelpers.checkTokenValidity(token);
+            console.log(checkValidity);
+
+
 
             if (checkValidity) {
                 if (typeof checkValidity == "object") {

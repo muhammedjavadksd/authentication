@@ -6,6 +6,9 @@ const router: Router = express.Router();
 const AuthController = new UserAuthController()
 const UserMiddleware = new AuthMiddleware()
 
+
+
+
 // POST METHOD 
 router.post("/sign_up", AuthController.signUpController);
 router.post("/sign_in", AuthController.signInController);
