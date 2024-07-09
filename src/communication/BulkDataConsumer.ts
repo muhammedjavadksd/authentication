@@ -3,6 +3,14 @@ import ProfielDataConsumer from "./Consumer/ProfileDataConsumer"
 
 
 
-export default function bulkConsumer(): void {
-    ProfielDataConsumer.authProfileUpdation()
+async function bulkConsumer(): Promise<void> {
+
+    const profileDataConsumer = new ProfielDataConsumer()
+
+    await profileDataConsumer._init_();
+    profileDataConsumer.authProfileUpdation()
+
 }
+
+
+export default bulkConsumer()
