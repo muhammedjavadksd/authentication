@@ -42,13 +42,18 @@ const authOrganizationHelper = {
                     id: getData.id
                 };
                 const jwtToken = yield tokenHelper_1.default.createJWTToken(organizationJwtPayload, const_1.default.USERAUTH_EXPIRE_TIME.toString());
-                getData.token = jwtToken;
-                yield getData.save();
-                if (comparePassword) {
-                    return { status: true, data: { token: jwtToken }, msg: "Sign in success", statusCode: 200 };
+                if (jwtToken) {
+                    getData.token = jwtToken;
+                    yield getData.save();
+                    if (comparePassword) {
+                        return { status: true, data: { token: jwtToken }, msg: "Sign in success", statusCode: 200 };
+                    }
+                    else {
+                        return { status: false, msg: "Incorrect Password", statusCode: 401 };
+                    }
                 }
                 else {
-                    return { status: false, msg: "Incorrect Password", statusCode: 401 };
+                    return { status: false, msg: "Internal server error", statusCode: 500 };
                 }
             }
             else {

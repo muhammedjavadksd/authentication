@@ -28,14 +28,12 @@ const userHelper = {
             console.log("Checking data");
             console.log(email_id, phone_number);
             try {
-                let user = yield userAuthModel.findOne({
+                const user = yield userAuthModel.findOne({
                     $or: [
                         { email: email_id },
                         { phone_number: phone_number }
                     ]
                 });
-                console.log("The user is : ");
-                console.log(user);
                 if (user) {
                     if (user.account_started == true)
                         return user;
@@ -54,12 +52,12 @@ const userHelper = {
     },
     insertNewUser: function (first_name, last_name, phone_number, email, auth_id, auth_provider, location) {
         return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-            let otpNumber = utilHelper_1.default.generateAnOTP(6);
-            let expireTime = const_1.default.MINIMUM_OTP_TIMER();
-            let userid = yield userHelper.generateUserID(first_name);
+            const otpNumber = utilHelper_1.default.generateAnOTP(6);
+            const expireTime = const_1.default.MINIMUM_OTP_TIMER();
+            const userid = yield userHelper.generateUserID(first_name);
             console.log("The user id : " + userid);
             if (userid) {
-                let jwtToken = yield tokenHelper_1.default.createJWTToken({ email_id: email, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
+                const jwtToken = yield tokenHelper_1.default.createJWTToken({ email_id: email, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
                 if (jwtToken) {
                     userAuthModel.updateOne({
                         email
@@ -99,9 +97,8 @@ const userHelper = {
         }));
     },
     _checkUserIDValidity: (user_id) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log("Demy userid : " + user_id);
         try {
-            let user = yield userAuthModel.findOne({ user_id });
+            const user = yield userAuthModel.findOne({ user_id });
             if (!user) {
                 return false;
             }
@@ -117,7 +114,7 @@ const userHelper = {
     generateUserID: function (first_name) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let randomText = utilHelper_1.default.createRandomText(4);
+                const randomText = utilHelper_1.default.createRandomText(4);
                 let count = 0;
                 let userId;
                 let isUserIDValid;

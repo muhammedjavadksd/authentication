@@ -12,26 +12,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// const bcrypt = require("bcrypt");
 const bcrypt_1 = __importDefault(require("bcrypt"));
-// const AdminAuthModel = require("../db/models/adminAuth");
 const adminAuth_1 = __importDefault(require("../db/models/adminAuth"));
-// const COMMUNICATION_PROVIDER = require("../communication/Provider/notification/notification_service");
 const notification_service_1 = __importDefault(require("../communication/Provider/notification/notification_service"));
-// const tokenHelper = require("./tokenHelper");
 const tokenHelper_1 = __importDefault(require("./tokenHelper"));
-// const { MAIL_TYPE } = require("../config/const");
 const const_1 = __importDefault(require("../config/const"));
 let authAdminHelper = {
     signInHelper: (email, password) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            let findAdmin = yield adminAuth_1.default.findOne({ email_address: email });
+            const findAdmin = yield adminAuth_1.default.findOne({ email_address: email });
             if (findAdmin) {
-                console.log("Got admin");
-                let adminPassword = findAdmin.password;
+                const adminPassword = findAdmin.password;
                 if (adminPassword) {
-                    let comparePassword = yield bcrypt_1.default.compare(password, adminPassword);
-                    let token = yield tokenHelper_1.default.createJWTToken({ email: findAdmin.email_address, type: const_1.default.JWT_FOR.ADMIN_AUTH }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
+                    const comparePassword = yield bcrypt_1.default.compare(password, adminPassword);
+                    const token = yield tokenHelper_1.default.createJWTToken({ email: findAdmin.email_address, type: const_1.default.JWT_FOR.ADMIN_AUTH }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
                     if (comparePassword && token) {
                         return {
                             statusCode: 200,
@@ -80,8 +74,8 @@ let authAdminHelper = {
     }),
     forgetPasswordHelpers: (email) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            let findAdmin = yield adminAuth_1.default.findOne({ email_address: email });
-            let token = yield tokenHelper_1.default.createJWTToken({ email, type: const_1.default.MAIL_TYPE.ADMIN_PASSWORD_REST }, const_1.default.OTP_EXPIRE_TIME.toString());
+            const findAdmin = yield adminAuth_1.default.findOne({ email_address: email });
+            const token = yield tokenHelper_1.default.createJWTToken({ email, type: const_1.default.MAIL_TYPE.ADMIN_PASSWORD_REST }, const_1.default.OTP_EXPIRE_TIME.toString());
             if (findAdmin && token) {
                 findAdmin.token = token;
                 yield findAdmin.save();
@@ -114,15 +108,15 @@ let authAdminHelper = {
         }
     }),
     resetPassword: (token, password) => __awaiter(void 0, void 0, void 0, function* () {
-        let isTokenValid = yield tokenHelper_1.default.checkTokenValidity(token);
+        const isTokenValid = yield tokenHelper_1.default.checkTokenValidity(token);
         if (isTokenValid) {
             if (typeof isTokenValid == "object") {
-                let email_id = isTokenValid.email;
-                let findAdmin = yield adminAuth_1.default.findOne({ email_address: email_id });
+                const email_id = isTokenValid.email;
+                const findAdmin = yield adminAuth_1.default.findOne({ email_address: email_id });
                 if (findAdmin && findAdmin.pasword) {
                     if (findAdmin.token == token) {
-                        let newPassword = yield bcrypt_1.default.hash(password, Number(process.env.BCRYPT_SALTROUND));
-                        let comparePassword = yield bcrypt_1.default.compare(password, findAdmin.password);
+                        const newPassword = yield bcrypt_1.default.hash(password, Number(process.env.BCRYPT_SALTROUND));
+                        const comparePassword = yield bcrypt_1.default.compare(password, findAdmin.password);
                         if (comparePassword) {
                             return {
                                 status: false,

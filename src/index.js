@@ -8,12 +8,8 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const connection_1 = __importDefault(require("./db/config/connection"));
 const userRouter_1 = __importDefault(require("./router/userRouter/userRouter"));
-// import adminRouter from "./router/adminRouter/adminRouter";
-// adminRouter
 const adminRouter_1 = __importDefault(require("./router/adminRouter/adminRouter"));
 const morgan_1 = __importDefault(require("morgan"));
-// import bcrypt from "bcrypt";
-// import BulkConsumer from "./communication/BulkConsumer";
 const BulkDataConsumer_1 = __importDefault(require("./communication/BulkDataConsumer"));
 const organizationRouter_1 = __importDefault(require("./router/organization/organizationRouter"));
 const app = (0, express_1.default)();

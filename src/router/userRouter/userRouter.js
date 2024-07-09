@@ -7,12 +7,12 @@ const express_1 = __importDefault(require("express"));
 const authMiddleware_1 = __importDefault(require("../../middleware/authMiddleware"));
 const authController_1 = __importDefault(require("../../controller/userController/authController"));
 const router = express_1.default.Router();
-// GET METHOD
+const AuthController = new authController_1.default();
 // POST METHOD 
-router.post("/sign_up", authController_1.default.signUpController);
-router.post("/sign_in", authController_1.default.signInController);
-router.post("/auth_otp_submission", authMiddleware_1.default.isValidSignUpTrying, authController_1.default.AuthOTPSubmission);
-router.post("/resend_otp", authMiddleware_1.default.isValidSignUpTrying, authController_1.default.resetOtpNumber);
+router.post("/sign_up", AuthController.signUpController);
+router.post("/sign_in", AuthController.signInController);
+router.post("/auth_otp_submission", authMiddleware_1.default.isValidSignUpTrying, AuthController.AuthOTPSubmission);
+router.post("/resend_otp", authMiddleware_1.default.isValidSignUpTrying, AuthController.resetOtpNumber);
 //PUT METHOD
-router.put("/edit_auth_phone", authMiddleware_1.default.isValidSignUpTrying, authController_1.default.editAuthPhoneNumber);
+router.put("/edit_auth_phone", authMiddleware_1.default.isValidSignUpTrying, AuthController.editAuthPhoneNumber);
 exports.default = router;

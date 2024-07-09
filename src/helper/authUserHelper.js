@@ -12,20 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// import { OTP_TYPE } from "../../notification/config/const_data";
 const const_1 = __importDefault(require("../config/const"));
-// import COMMUNICATION_PROVIDER from "../communication/Provider/notification/notification_service";
 const notification_service_1 = __importDefault(require("../communication/Provider/notification/notification_service"));
 const profile_service_1 = __importDefault(require("../communication/Provider/profile/profile_service"));
-// import constant_data from "../config/const";
-// import userAuth, { UserAuth } from "../db/models/userAuth";
 const userAuth_1 = __importDefault(require("../db/models/userAuth"));
 const tokenHelper_1 = __importDefault(require("./tokenHelper"));
-// import userHelper from "./userHelper";
 const userHelper_1 = __importDefault(require("./userHelper"));
-// import utilHelper from "./utilHelper";
 const utilHelper_1 = __importDefault(require("./utilHelper"));
-let { OTP_TYPE } = const_1.default;
 let authHelper = {
     AuthOTPValidate: (otp, email_id, token) => __awaiter(void 0, void 0, void 0, function* () {
         try {
@@ -39,10 +32,10 @@ let authHelper = {
                     };
                 }
                 else {
-                    let { first_name, last_name, _id, phone_number, email } = getUser;
-                    console.log(getUser);
-                    console.log(otp, email_id);
-                    console.log("The auth is");
+                    const first_name = getUser.first_name;
+                    const last_name = getUser.last_name;
+                    const _id = getUser._id;
+                    const phone_number = getUser.phone_number;
                     if (getUser.otp == otp) {
                         const otpExpireTimer = getUser.otp_timer;
                         const currentTime = new Date().getUTCMilliseconds();
@@ -55,7 +48,10 @@ let authHelper = {
                         }
                         else {
                             const jwtToken = yield tokenHelper_1.default.createJWTToken({
-                                phone_number, email, first_name, last_name, _id
+                                email: email_id,
+                                first_name: first_name,
+                                last_name: last_name,
+                                phone: phone_number
                             }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
                             if (jwtToken) {
                                 getUser.jwtToken = jwtToken;
@@ -115,7 +111,7 @@ let authHelper = {
     userSignInHelper: function (email) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let userAuth = yield userHelper_1.default.isUserExist(email);
+                const userAuth = yield userHelper_1.default.isUserExist(email);
                 if (!userAuth) {
                     return {
                         statusCode: 401,
@@ -123,9 +119,9 @@ let authHelper = {
                         msg: "User not found"
                     };
                 }
-                let otpNumber = utilHelper_1.default.generateAnOTP(6);
-                let otpExpireTime = const_1.default.MINIMUM_OTP_TIMER();
-                let token = yield tokenHelper_1.default.createJWTToken({ email_id: userAuth.email, type: const_1.default.OTP_TYPE.SIGN_IN_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
+                const otpNumber = utilHelper_1.default.generateAnOTP(6);
+                const otpExpireTime = const_1.default.MINIMUM_OTP_TIMER();
+                const token = yield tokenHelper_1.default.createJWTToken({ email_id: userAuth.email, type: const_1.default.OTP_TYPE.SIGN_IN_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
                 if (token) {
                     userAuth.otp = otpNumber;
                     userAuth.otp_timer = otpExpireTime;
@@ -162,24 +158,14 @@ let authHelper = {
             }
         });
     },
-    // editAuthPhoneNumber: async (newNumber: string, oldNumber: string) => {
-    //     try {
-    //         let fetchUser = await userAuth.findOne({ email: oldNumber });
-    //         if (fetchUser) {
-    //             if (!fetchUser.account_started) {
-    //             }
-    //         }
-    //     } catch (e) {
-    //     }
-    // }
     resendOtpNumer: function (email_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let getUser = yield userAuth_1.default.findOne({ email: email_id });
+                const getUser = yield userAuth_1.default.findOne({ email: email_id });
                 if (getUser) {
-                    let otpNumber = utilHelper_1.default.generateAnOTP(6);
-                    let otpExpireTime = const_1.default.MINIMUM_OTP_TIMER();
-                    let updateToken = yield this.resetToken(getUser.id);
+                    const otpNumber = utilHelper_1.default.generateAnOTP(6);
+                    const otpExpireTime = const_1.default.MINIMUM_OTP_TIMER();
+                    const updateToken = yield this.resetToken(getUser.id);
                     if (updateToken) {
                         getUser.otp = otpNumber;
                         getUser.otp_timer = otpExpireTime;
@@ -227,12 +213,12 @@ let authHelper = {
     editAuthPhoneNumber: function (oldEmailId, newEmailID) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log("The old email id is : " + oldEmailId);
-            let otpNumber = utilHelper_1.default.generateAnOTP(6);
-            let otpExpireTime = const_1.default.MINIMUM_OTP_TIMER();
+            const otpNumber = utilHelper_1.default.generateAnOTP(6);
+            const otpExpireTime = const_1.default.MINIMUM_OTP_TIMER();
             try {
-                let getUser = yield userAuth_1.default.findOne({ email: oldEmailId });
+                const getUser = yield userAuth_1.default.findOne({ email: oldEmailId });
                 if (getUser && !getUser.account_started) {
-                    let newToken = yield tokenHelper_1.default.createJWTToken({ email_id: newEmailID, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
+                    const newToken = yield tokenHelper_1.default.createJWTToken({ email_id: newEmailID, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
                     if (newToken) {
                         getUser.email = newEmailID;
                         getUser.otp = otpNumber;
@@ -280,9 +266,9 @@ let authHelper = {
     },
     resetToken: (userId) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            let findUser = yield userAuth_1.default.findById(userId);
+            const findUser = yield userAuth_1.default.findById(userId);
             if (findUser) {
-                let newToken = yield tokenHelper_1.default.createJWTToken({ email_id: findUser.email, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
+                const newToken = yield tokenHelper_1.default.createJWTToken({ email_id: findUser.email, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
                 if (newToken) {
                     findUser.jwtToken = newToken;
                     yield findUser.save();
@@ -303,9 +289,9 @@ let authHelper = {
     }),
     updateUserProfile: (data, user_id) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            let findUser = yield userAuth_1.default.findById(user_id);
+            const findUser = yield userAuth_1.default.findById(user_id);
             if (findUser) {
-                let mergedData = Object.assign(Object.assign({}, findUser.toObject()), data);
+                const mergedData = Object.assign(Object.assign({}, findUser.toObject()), data);
                 Object.assign(findUser, mergedData);
                 findUser.save();
                 return {

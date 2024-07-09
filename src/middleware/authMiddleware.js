@@ -12,20 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// import { OTP_TYPE } from "../config/const";
-// import { OTP_TYPE } from '../config/const'
 const const_1 = __importDefault(require("../config/const"));
-// import tokenHelper from "../helper/tokenHelper";
 const tokenHelper_1 = __importDefault(require("../helper/tokenHelper"));
+const authAdminHelper_1 = __importDefault(require("../helper/authAdminHelper"));
 let { OTP_TYPE } = const_1.default;
 const authMiddleware = {
     isValidSignUpTrying: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const headers = req.headers;
-        if (headers.authorization && headers.authorization.split(' ')[0] === 'Bearer') {
+        const token = authAdminHelper_1.default.getTokenFromHeader(headers['authorization']);
+        if (token) {
             if (!req.context) {
                 req.context = {};
             }
-            const token = headers.authorization.split(' ')[1];
             req.context.auth_token = token;
             const checkValidity = yield tokenHelper_1.default.checkTokenValidity(token);
             if (checkValidity) {
