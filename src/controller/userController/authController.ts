@@ -8,6 +8,8 @@ import IUserAuthController from '../../config/Interface/IController/IUserAuthCon
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
 import UserAuthenticationRepo from '../../repositories/UserAuthentication';
+import IBaseUser from '../../config/Interface/Objects/IBaseUser';
+import UserAuthServices from '../../services/UserAuthServices';
 
 
 let { AUTH_PROVIDERS_DATA } = const_data;
@@ -15,9 +17,11 @@ let { AUTH_PROVIDERS_DATA } = const_data;
 class UserAuthController implements IUserAuthController {
 
     private readonly UserAuthRepo;
+    private readonly UserAuthService
 
     constructor() {
         this.UserAuthRepo = new UserAuthenticationRepo();
+        this.UserAuthService = new UserAuthServices();
     }
 
     async signUpController(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -29,7 +33,7 @@ class UserAuthController implements IUserAuthController {
             const location: string = req.body.location;
             const blood_group: string = req.body.blood_group;
 
-            const auth_id = null;
+            const auth_id = '';
             const auth_provider: string = AUTH_PROVIDERS_DATA.CREDENTIAL;
 
             const { error, value } = signUpUserValidation.validate({
@@ -50,7 +54,7 @@ class UserAuthController implements IUserAuthController {
                 }
                 res.status(500).json({ response });
             } else {
-                const isUserExist = await this.UserAuthRepo.isUserExist(email_address, phone_number) //await userHelper.isUserExist(email_address, phone_number.toString());
+                const isUserExist = await this.UserAuthRepo.findUser(null, email_address, Number(phone_number))
                 if (isUserExist) {
                     let response: ControllerResponseInterFace = {
                         status: false,
@@ -58,8 +62,17 @@ class UserAuthController implements IUserAuthController {
                     }
                     res.status(401).json(response);
                 } else {
-                    userHelper.insertNewUser(first_name, last_name, phone_number.toString(), email_address, auth_id, auth_provider, location).then((jwtData) => {
-
+                    this.UserAuthRepo.insertNewUser(
+                        {
+                            auth_id: auth_id,
+                            first_name,
+                            last_name,
+                            auth_provider,
+                            location,
+                            email: email_address,
+                            phone_number
+                        } as IBaseUser
+                    ).then((jwtData) => {
                         const successResponse: ControllerResponseInterFace = {
                             status: true,
                             msg: 'Account created success',
@@ -89,10 +102,8 @@ class UserAuthController implements IUserAuthController {
     async signInController(req: Request, res: Response, next: NextFunction): Promise<void> {
         const email: string = req.body.email;
 
-        console.log('Checking email id is  a : ' + email);
-
         try {
-            const userSign: HelperFunctionResponse = await authHelper.userSignInHelper(email);
+            const userSign: HelperFunctionResponse = await this.UserAuthService.signInHelper(email)
 
             if (userSign.status && userSign.data) {
                 const response: ControllerResponseInterFace = {

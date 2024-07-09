@@ -33,7 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const amqplib = __importStar(require("amqplib"));
-class NotificationProvider {
+class AuthNotificationProvider {
     constructor() {
         this.connection = null;
         this.channel = null;
@@ -145,4 +145,4 @@ class NotificationProvider {
 //         }
 //     }
 // };
-exports.default = NotificationProvider;
+exports.default = AuthNotificationProvider;

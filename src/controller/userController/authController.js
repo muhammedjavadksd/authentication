@@ -15,12 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const const_1 = __importDefault(require("../../config/const"));
 const validation_1 = __importDefault(require("../../config/validation/validation"));
 const authUserHelper_1 = __importDefault(require("../../helper/authUserHelper"));
-const userHelper_1 = __importDefault(require("../../helper/userHelper"));
 const UserAuthentication_1 = __importDefault(require("../../repositories/UserAuthentication"));
+const UserAuthServices_1 = __importDefault(require("../../services/UserAuthServices"));
 let { AUTH_PROVIDERS_DATA } = const_1.default;
 class UserAuthController {
     constructor() {
         this.UserAuthRepo = new UserAuthentication_1.default();
+        this.UserAuthService = new UserAuthServices_1.default();
     }
     signUpController(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -31,7 +32,7 @@ class UserAuthController {
                 const last_name = req.body.last_name;
                 const location = req.body.location;
                 const blood_group = req.body.blood_group;
-                const auth_id = null;
+                const auth_id = '';
                 const auth_provider = AUTH_PROVIDERS_DATA.CREDENTIAL;
                 const { error, value } = validation_1.default.validate({
                     phone_number,
@@ -51,7 +52,7 @@ class UserAuthController {
                     res.status(500).json({ response });
                 }
                 else {
-                    const isUserExist = yield this.UserAuthRepo.isUserExist(email_address, phone_number); //await userHelper.isUserExist(email_address, phone_number.toString());
+                    const isUserExist = yield this.UserAuthRepo.findUser(null, email_address, Number(phone_number));
                     if (isUserExist) {
                         let response = {
                             status: false,
@@ -60,7 +61,15 @@ class UserAuthController {
                         res.status(401).json(response);
                     }
                     else {
-                        userHelper_1.default.insertNewUser(first_name, last_name, phone_number.toString(), email_address, auth_id, auth_provider, location).then((jwtData) => {
+                        this.UserAuthRepo.insertNewUser({
+                            auth_id: auth_id,
+                            first_name,
+                            last_name,
+                            auth_provider,
+                            location,
+                            email: email_address,
+                            phone_number
+                        }).then((jwtData) => {
                             const successResponse = {
                                 status: true,
                                 msg: 'Account created success',
@@ -92,9 +101,8 @@ class UserAuthController {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             const email = req.body.email;
-            console.log('Checking email id is  a : ' + email);
             try {
-                const userSign = yield authUserHelper_1.default.userSignInHelper(email);
+                const userSign = yield this.UserAuthService.signInHelper(email);
                 if (userSign.status && userSign.data) {
                     const response = {
                         status: true,

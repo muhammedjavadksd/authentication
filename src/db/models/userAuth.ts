@@ -1,5 +1,6 @@
 
 // const constant_data = require("../../config/const");
+import UserModelDocument from "../../config/Interface/IModel/IUserAuthModel";
 import constant_data from "../../config/const";
 // const mongo = require("mongoose");
 import mongoose from "mongoose";
@@ -66,6 +67,6 @@ const userAuthSchema = {
 }
 
 
-const userAuthModel = new mongoose.Schema(userAuthSchema);
+const userAuthModel = new mongoose.Schema<UserModelDocument>(userAuthSchema);
 
 export default mongoose.model("user", userAuthModel, "user")

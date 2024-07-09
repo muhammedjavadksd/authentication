@@ -9,7 +9,7 @@ interface CommunicationProvider {
 }
 
 
-class NotificationProvider {
+class AuthNotificationProvider {
 
     private connection: amqplib.Connection | null = null;
     private channel: amqplib.Channel | null = null
@@ -125,5 +125,5 @@ class NotificationProvider {
 //     }
 // };
 
-export default NotificationProvider;
+export default AuthNotificationProvider;
 

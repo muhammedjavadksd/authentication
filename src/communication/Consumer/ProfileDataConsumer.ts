@@ -5,6 +5,7 @@ const authHelper = require("../../helper/authUserHelper");
 interface ProfielDataConsumerInterface {
 
     // _getChannel(queue_name: string): Promise<amqplib.Channel | null>,
+    _init_(): void
     authProfileUpdation(): void
 }
 
