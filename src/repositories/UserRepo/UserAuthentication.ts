@@ -1,12 +1,14 @@
+import mongoose from "mongoose";
 import AuthNotificationProvider from "../../communication/Provider/notification/notification_service";
 import IUserModelDocument from "../../config/Interface/IModel/UserAuthModel/IUserAuthModel";
 import UserModelDocument from "../../config/Interface/IModel/UserAuthModel/IUserAuthModel";
 import IBaseUser from "../../config/Interface/Objects/IBaseUser";
 import constant_data from "../../config/const";
 import userAuth from "../../db/models/userAuth";
-import tokenHelper from "../../helper/tokenHelper";
-import userHelper from "../../helper/userHelper";
-import utilHelper from "../../helper/utilHelper";
+import tokenHelper from "../../helper/token/tokenHelper";
+import utilHelper from "../../helper/util/utilHelper";
+import TokenHelper from "../../helper/token/tokenHelper";
+import UserAuthServices from "../../services/UserAuthService/UserAuthServices";
 
 interface IUserAuthenticationRepo {
     isUserExist(email_address: string, phone_number: number): Promise<boolean>
@@ -19,11 +21,33 @@ interface IUserAuthenticationRepo {
 class UserAuthenticationRepo implements IUserAuthenticationRepo {
 
     private readonly UserAuthCollection;
+    private readonly tokenHelpers;
 
     constructor() {
         this.UserAuthCollection = userAuth;
+        this.tokenHelpers = new TokenHelper()
     }
 
+    async findByUserId(user_id: string): Promise<UserModelDocument | null> {
+        try {
+            const user = this.UserAuthCollection.findOne<UserModelDocument>({ user_id });
+            return user
+        } catch (e) {
+            console.log(e);
+            return null
+        }
+    }
+
+
+    async updateUserById(user_id: mongoose.Types.ObjectId, data: object): Promise<boolean> {
+        const findUser = await this.UserAuthCollection.findById<UserModelDocument>(user_id);
+        if (!findUser) {
+            throw new Error('User not found');
+        }
+        Object.assign(findUser, data);
+        await findUser.save();
+        return true
+    }
 
     async updateUser(newAuthUser: IUserModelDocument): Promise<boolean> {
         try {
@@ -41,11 +65,11 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
 
             const otpNumber = utilHelper.generateAnOTP(6);
             const expireTime = constant_data.MINIMUM_OTP_TIMER();
-            const userid = await userHelper.generateUserID(baseUSER['first_name'])
-
+            const userService = new UserAuthServices();
+            const userid = await userService.generateUserID(baseUSER['first_name']);
 
             if (userid) {
-                const jwtToken = await tokenHelper.createJWTToken({ email_id: baseUSER['email'], type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.USERAUTH_EXPIRE_TIME.toString())
+                const jwtToken = await this.tokenHelpers.generateJWtToken({ email_id: baseUSER['email'], type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.USERAUTH_EXPIRE_TIME.toString())
                 if (jwtToken) {
 
                     this.UserAuthCollection.updateOne({ email: baseUSER['email'] }, {

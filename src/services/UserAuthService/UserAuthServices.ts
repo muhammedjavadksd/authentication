@@ -3,10 +3,11 @@ import AuthNotificationProvider from "../../communication/Provider/notification/
 import { HelperFunctionResponse, UserJwtInterFace } from "../../config/Datas/InterFace";
 import IUserModelDocument from "../../config/Interface/IModel/UserAuthModel/IUserAuthModel";
 import constant_data from "../../config/const";
-import tokenHelper from "../../helper/tokenHelper";
-import utilHelper from "../../helper/utilHelper";
+import tokenHelper from "../../helper/token/tokenHelper";
+import utilHelper from "../../helper/util/utilHelper";
 import UserAuthenticationRepo from "../../repositories/UserRepo/UserAuthentication";
 import ProfileCommunicationProvider from "../../communication/Provider/profile/profile_service";
+import TokenHelper from "../../helper/token/tokenHelper";
 
 
 interface IUserAuthServices {
@@ -16,9 +17,11 @@ interface IUserAuthServices {
 class UserAuthServices implements IUserAuthServices {
 
     private UserAuthRepo;
+    private TokenHelpers;
 
     constructor() {
         this.UserAuthRepo = new UserAuthenticationRepo()
+        this.TokenHelpers = new TokenHelper();
     }
 
     async signInHelper(email: string): Promise<HelperFunctionResponse> {
@@ -29,7 +32,7 @@ class UserAuthServices implements IUserAuthServices {
                 const otpNumber: number = utilHelper.generateAnOTP(6);
                 const otpExpireTime: number = constant_data.MINIMUM_OTP_TIMER();
 
-                const token: string | null = await tokenHelper.createJWTToken({ email_id: userAuth['email'], type: constant_data.OTP_TYPE.SIGN_IN_OTP }, constant_data.OTP_EXPIRE_TIME.toString())
+                const token: string | null = await this.TokenHelpers.generateJWtToken({ email_id: userAuth['email'], type: constant_data.OTP_TYPE.SIGN_IN_OTP }, constant_data.OTP_EXPIRE_TIME.toString())
                 if (token) {
                     userAuth.otp = otpNumber;
                     userAuth.otp_timer = otpExpireTime;
@@ -114,7 +117,7 @@ class UserAuthServices implements IUserAuthServices {
             const _id: mongoose.Types.ObjectId = getUser._id;
             const phone_number: number = getUser.phone_number;
 
-            const jwtToken: string | null = await tokenHelper.createJWTToken({ email: email_id, first_name: first_name, last_name: last_name, phone: phone_number } as UserJwtInterFace, constant_data.USERAUTH_EXPIRE_TIME.toString())
+            const jwtToken: string | null = await this.TokenHelpers.generateJWtToken({ email: email_id, first_name: first_name, last_name: last_name, phone: phone_number } as UserJwtInterFace, constant_data.USERAUTH_EXPIRE_TIME.toString())
             if (!jwtToken) {
                 return {
                     status: false,
@@ -168,7 +171,7 @@ class UserAuthServices implements IUserAuthServices {
         try {
             const getUser: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, newEmailID, null);
             if (getUser && !getUser.account_started) {
-                const newToken: string | null = await tokenHelper.createJWTToken({ email_id: newEmailID, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.OTP_EXPIRE_TIME.toString())
+                const newToken: string | null = await this.TokenHelpers.generateJWtToken({ email_id: newEmailID, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.OTP_EXPIRE_TIME.toString())
                 if (newToken) {
                     getUser.email = newEmailID;
                     getUser.otp = otpNumber;
@@ -223,7 +226,7 @@ class UserAuthServices implements IUserAuthServices {
             if (getUser) {
                 const otpNumber: number = utilHelper.generateAnOTP(6);
                 const otpExpireTime: number = constant_data.MINIMUM_OTP_TIMER();
-                const newToken: string | null = await tokenHelper.createJWTToken({ email_id: getUser.email, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.OTP_EXPIRE_TIME.toString())
+                const newToken: string | null = await this.TokenHelpers.generateJWtToken({ email_id: getUser.email, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.OTP_EXPIRE_TIME.toString())
                 if (newToken) {
                     getUser.otp = otpNumber;
                     getUser.otp_timer = otpExpireTime;
@@ -267,6 +270,41 @@ class UserAuthServices implements IUserAuthServices {
             }
         }
     }
+
+
+    private async _checkUserIDValidity(user_id: string): Promise<boolean> {
+        try {
+            const user = await this.UserAuthRepo.findByUserId(user_id);
+            if (!user) {
+                return false
+            } else {
+                return true
+            }
+        } catch (e) {
+            return false;
+        }
+    }
+
+    async generateUserID(first_name: string): Promise<string | false> {
+        try {
+            const randomText = utilHelper.createRandomText(4);
+            let count = 0;
+            let userId: string;
+            let isUserIDValid: boolean;
+
+            do {
+                userId = first_name + "@" + randomText + count
+                isUserIDValid = await this._checkUserIDValidity(userId)
+                count++;
+            } while (isUserIDValid);
+            return userId;
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+    }
+
+
 }
 
 export default UserAuthServices

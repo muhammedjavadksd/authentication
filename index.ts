@@ -5,11 +5,8 @@ import authenticationDbConnection from "./src/db/config/connection";
 import userRouter from "./src/router/userRouter/userRouter";
 import adminRouter from "./src/router/adminRouter/adminRouter";
 import logger from "morgan";
-// import BulkConsumer from './src/communication/BulkDataConsumer'
 import organizationRouter from "./src/router/organization/organizationRouter";
 import BulkDataConsumer from "./src/communication/BulkDataConsumer";
-
-
 
 
 const app: Express = express();

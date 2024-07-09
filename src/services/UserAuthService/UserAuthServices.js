@@ -14,13 +14,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const notification_service_1 = __importDefault(require("../../communication/Provider/notification/notification_service"));
 const const_1 = __importDefault(require("../../config/const"));
-const tokenHelper_1 = __importDefault(require("../../helper/tokenHelper"));
-const utilHelper_1 = __importDefault(require("../../helper/utilHelper"));
+const utilHelper_1 = __importDefault(require("../../helper/util/utilHelper"));
 const UserAuthentication_1 = __importDefault(require("../../repositories/UserRepo/UserAuthentication"));
 const profile_service_1 = __importDefault(require("../../communication/Provider/profile/profile_service"));
+const tokenHelper_1 = __importDefault(require("../../helper/token/tokenHelper"));
 class UserAuthServices {
     constructor() {
         this.UserAuthRepo = new UserAuthentication_1.default();
+        this.TokenHelpers = new tokenHelper_1.default();
     }
     signInHelper(email) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -29,7 +30,7 @@ class UserAuthServices {
                 if (userAuth) {
                     const otpNumber = utilHelper_1.default.generateAnOTP(6);
                     const otpExpireTime = const_1.default.MINIMUM_OTP_TIMER();
-                    const token = yield tokenHelper_1.default.createJWTToken({ email_id: userAuth['email'], type: const_1.default.OTP_TYPE.SIGN_IN_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
+                    const token = yield this.TokenHelpers.generateJWtToken({ email_id: userAuth['email'], type: const_1.default.OTP_TYPE.SIGN_IN_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
                     if (token) {
                         userAuth.otp = otpNumber;
                         userAuth.otp_timer = otpExpireTime;
@@ -110,7 +111,7 @@ class UserAuthServices {
                 const last_name = getUser.last_name;
                 const _id = getUser._id;
                 const phone_number = getUser.phone_number;
-                const jwtToken = yield tokenHelper_1.default.createJWTToken({ email: email_id, first_name: first_name, last_name: last_name, phone: phone_number }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
+                const jwtToken = yield this.TokenHelpers.generateJWtToken({ email: email_id, first_name: first_name, last_name: last_name, phone: phone_number }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
                 if (!jwtToken) {
                     return {
                         status: false,
@@ -157,7 +158,7 @@ class UserAuthServices {
             try {
                 const getUser = yield this.UserAuthRepo.findUser(null, newEmailID, null);
                 if (getUser && !getUser.account_started) {
-                    const newToken = yield tokenHelper_1.default.createJWTToken({ email_id: newEmailID, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
+                    const newToken = yield this.TokenHelpers.generateJWtToken({ email_id: newEmailID, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
                     if (newToken) {
                         getUser.email = newEmailID;
                         getUser.otp = otpNumber;
@@ -213,7 +214,7 @@ class UserAuthServices {
                 if (getUser) {
                     const otpNumber = utilHelper_1.default.generateAnOTP(6);
                     const otpExpireTime = const_1.default.MINIMUM_OTP_TIMER();
-                    const newToken = yield tokenHelper_1.default.createJWTToken({ email_id: getUser.email, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
+                    const newToken = yield this.TokenHelpers.generateJWtToken({ email_id: getUser.email, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
                     if (newToken) {
                         getUser.otp = otpNumber;
                         getUser.otp_timer = otpExpireTime;
@@ -257,6 +258,42 @@ class UserAuthServices {
                     status: false,
                     msg: "Something went wrong"
                 };
+            }
+        });
+    }
+    _checkUserIDValidity(user_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = yield this.UserAuthRepo.findByUserId(user_id);
+                if (!user) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+            catch (e) {
+                return false;
+            }
+        });
+    }
+    generateUserID(first_name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const randomText = utilHelper_1.default.createRandomText(4);
+                let count = 0;
+                let userId;
+                let isUserIDValid;
+                do {
+                    userId = first_name + "@" + randomText + count;
+                    isUserIDValid = yield this._checkUserIDValidity(userId);
+                    count++;
+                } while (isUserIDValid);
+                return userId;
+            }
+            catch (e) {
+                console.log(e);
+                return false;
             }
         });
     }

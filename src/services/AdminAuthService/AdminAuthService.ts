@@ -2,16 +2,20 @@ import { JwtPayload } from "jsonwebtoken";
 import AuthNotificationProvider from "../../communication/Provider/notification/notification_service";
 import { AdminJwtInterFace, HelperFunctionResponse } from "../../config/Datas/InterFace";
 import constant_data from "../../config/const";
-import tokenHelper from "../../helper/tokenHelper";
+import tokenHelper from "../../helper/token/tokenHelper";
 import AdminAuthenticationRepo from "../../repositories/AdminRepo/AdminAuthentication";
 import bcrypt from 'bcrypt';
 import IAdminAuthModel from "../../config/Interface/IModel/AdminAuthModel/IAdminAuthModel";
+import TokenHelper from "../../helper/token/tokenHelper";
 
 class AdminAuthService {
 
     private AdminAuthRepo;
+    private tokenHelpers;
+
     constructor() {
         this.AdminAuthRepo = new AdminAuthenticationRepo();
+        this.tokenHelpers = new TokenHelper();
     }
 
     async signIn(email: string, password: string): Promise<HelperFunctionResponse> {
@@ -22,7 +26,7 @@ class AdminAuthService {
                 const adminPassword: string | null = findAdmin.password as string;
                 if (adminPassword) {
                     const comparePassword: boolean = await bcrypt.compare(password, adminPassword);
-                    const token: string | null = await tokenHelper.createJWTToken({ email: findAdmin.email_address, type: constant_data.JWT_FOR.ADMIN_AUTH }, constant_data.USERAUTH_EXPIRE_TIME.toString())
+                    const token: string | null = await this.tokenHelpers.generateJWtToken({ email: findAdmin.email_address, type: constant_data.JWT_FOR.ADMIN_AUTH }, constant_data.USERAUTH_EXPIRE_TIME.toString())
 
                     if (comparePassword && token) {
                         return {
@@ -72,7 +76,7 @@ class AdminAuthService {
 
         try {
             const findAdmin = await this.AdminAuthRepo.findAdmin(email)
-            const token: string | null = await tokenHelper.createJWTToken({ email, type: constant_data.MAIL_TYPE.ADMIN_PASSWORD_REST }, constant_data.OTP_EXPIRE_TIME.toString())
+            const token: string | null = await this.tokenHelpers.generateJWtToken({ email, type: constant_data.MAIL_TYPE.ADMIN_PASSWORD_REST }, constant_data.OTP_EXPIRE_TIME.toString())
 
             if (findAdmin && token) {
                 findAdmin.token = token;
@@ -107,7 +111,7 @@ class AdminAuthService {
     }
 
     async resetPassword(token: string, password: string): Promise<HelperFunctionResponse> {
-        const isTokenValid: string | boolean | JwtPayload = await tokenHelper.checkTokenValidity(token)
+        const isTokenValid: string | boolean | JwtPayload = await this.tokenHelpers.checkTokenValidity(token)
 
         if (isTokenValid) {
             if (typeof isTokenValid == "object") {

@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const const_1 = __importDefault(require("../../config/const"));
 const validation_1 = __importDefault(require("../../config/validation/validation"));
-const authUserHelper_1 = __importDefault(require("../../helper/authUserHelper"));
 const UserAuthentication_1 = __importDefault(require("../../repositories/UserRepo/UserAuthentication"));
 const UserAuthServices_1 = __importDefault(require("../../services/UserAuthService/UserAuthServices"));
 let { AUTH_PROVIDERS_DATA } = const_1.default;
@@ -137,7 +136,7 @@ class UserAuthController {
             const token = (_b = req.context) === null || _b === void 0 ? void 0 : _b.token;
             if (email_id && token) {
                 try {
-                    const otpVerification = yield authUserHelper_1.default.AuthOTPValidate(otp, email_id, token);
+                    const otpVerification = yield this.UserAuthService.authOTPValidate(otp, email_id, token);
                     if (otpVerification.status) {
                         let responseData = otpVerification.data;
                         res.status(200).json({
@@ -182,7 +181,7 @@ class UserAuthController {
             if (requestContext && (requestContext === null || requestContext === void 0 ? void 0 : requestContext.email_id)) {
                 const oldEmailId = requestContext.email_id;
                 try {
-                    const editRequest = yield this.UserAuthService.editAuthEmailID(oldEmailId, newEmailID); //await authHelper.editAuthPhoneNumber(oldEmailId, newEmailID);
+                    const editRequest = yield this.UserAuthService.editAuthEmailID(oldEmailId, newEmailID);
                     if (editRequest.status) {
                         let { token } = editRequest.data;
                         if (token) {
@@ -232,7 +231,7 @@ class UserAuthController {
                 const tokenEmail = requestContext.email_id;
                 if (tokenEmail) {
                     try {
-                        const result = yield authUserHelper_1.default.resendOtpNumer(tokenEmail);
+                        const result = yield this.UserAuthService.resendOtpNumer(tokenEmail);
                         if (result.data) {
                             let token = (_a = result.data) === null || _a === void 0 ? void 0 : _a.token;
                             if (token) {

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import authAdminHelper from "../../helper/authAdminHelper";
 import { AdminJwtInterFace, ControllerResponseInterFace, HelperFunctionResponse } from "../../config/Datas/InterFace";
 import AdminAuthService from "../../services/AdminAuthService/AdminAuthService";
+import utilHelper from "../../helper/util/utilHelper";
 
 interface IAdminController {
 
@@ -21,7 +21,7 @@ class AdminController implements IAdminController {
         const password: string = req.body.password;
 
         try {
-            const adminAuthAttempt: HelperFunctionResponse = await this.AdminServices.signIn(email_address, password) //await authAdminHelper.signInHelper(email_address, password)
+            const adminAuthAttempt: HelperFunctionResponse = await this.AdminServices.signIn(email_address, password)
             if (adminAuthAttempt.status) {
                 const helperData: AdminJwtInterFace | null | undefined = adminAuthAttempt.data;
 
@@ -57,7 +57,7 @@ class AdminController implements IAdminController {
         try {
 
             let email_id: string = req.body.email_id;
-            let adminResetRequest: HelperFunctionResponse = await authAdminHelper.forgetPasswordHelpers(email_id)
+            let adminResetRequest: HelperFunctionResponse = await this.AdminServices.forgetPassword(email_id);
             res.status(adminResetRequest.statusCode).json({ status: true, msg: adminResetRequest.msg } as ControllerResponseInterFace)
         } catch (e) {
             console.log(e);
@@ -71,11 +71,11 @@ class AdminController implements IAdminController {
         try {
 
 
-            let token: string | false = authAdminHelper.getTokenFromHeader(req['headers']['authorization']);
+            let token: string | false = utilHelper.getTokenFromHeader(req['headers']['authorization']);
             let password: string = req.body.password;
 
             if (password && token) {
-                const resetPassword: HelperFunctionResponse = await this.AdminServices.resetPassword(token, password); //authAdminHelper.resetPassword(token, password);
+                const resetPassword: HelperFunctionResponse = await this.AdminServices.resetPassword(token, password);
                 res.status(resetPassword.statusCode).json({
                     status: resetPassword.status,
                     msg: resetPassword.msg,

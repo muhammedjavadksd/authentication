@@ -10,7 +10,6 @@ const connection_1 = __importDefault(require("./src/db/config/connection"));
 const userRouter_1 = __importDefault(require("./src/router/userRouter/userRouter"));
 const adminRouter_1 = __importDefault(require("./src/router/adminRouter/adminRouter"));
 const morgan_1 = __importDefault(require("morgan"));
-// import BulkConsumer from './src/communication/BulkDataConsumer'
 const organizationRouter_1 = __importDefault(require("./src/router/organization/organizationRouter"));
 const BulkDataConsumer_1 = __importDefault(require("./src/communication/BulkDataConsumer"));
 const app = (0, express_1.default)();

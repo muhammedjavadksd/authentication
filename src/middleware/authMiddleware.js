@@ -13,26 +13,37 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const const_1 = __importDefault(require("../config/const"));
-const tokenHelper_1 = __importDefault(require("../helper/tokenHelper"));
-const authAdminHelper_1 = __importDefault(require("../helper/authAdminHelper"));
+const utilHelper_1 = __importDefault(require("../helper/util/utilHelper"));
+const tokenHelper_1 = __importDefault(require("../helper/token/tokenHelper"));
 let { OTP_TYPE } = const_1.default;
-const authMiddleware = {
-    isValidSignUpTrying: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        const headers = req.headers;
-        const token = authAdminHelper_1.default.getTokenFromHeader(headers['authorization']);
-        if (token) {
-            if (!req.context) {
-                req.context = {};
-            }
-            req.context.auth_token = token;
-            const checkValidity = yield tokenHelper_1.default.checkTokenValidity(token);
-            if (checkValidity) {
-                if (typeof checkValidity == "object") {
-                    if (checkValidity.email_id) {
-                        if (checkValidity.type == OTP_TYPE.SIGN_UP_OTP || checkValidity.type == OTP_TYPE.SIGN_IN_OTP) {
-                            req.context.email_id = checkValidity === null || checkValidity === void 0 ? void 0 : checkValidity.email_id;
-                            req.context.token = token;
-                            next();
+class AuthMiddleware {
+    constructor() {
+        this.tokenHelpers = new tokenHelper_1.default();
+    }
+    isValidSignUpAttempt(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const headers = req.headers;
+            const token = utilHelper_1.default.getTokenFromHeader(headers['authorization']);
+            if (token) {
+                if (!req.context) {
+                    req.context = {};
+                }
+                req.context.auth_token = token;
+                const checkValidity = yield this.tokenHelpers.checkTokenValidity(token);
+                if (checkValidity) {
+                    if (typeof checkValidity == "object") {
+                        if (checkValidity.email_id) {
+                            if (checkValidity.type == OTP_TYPE.SIGN_UP_OTP || checkValidity.type == OTP_TYPE.SIGN_IN_OTP) {
+                                req.context.email_id = checkValidity === null || checkValidity === void 0 ? void 0 : checkValidity.email_id;
+                                req.context.token = token;
+                                next();
+                            }
+                            else {
+                                res.status(401).json({
+                                    status: false,
+                                    msg: "Authorization is failed"
+                                });
+                            }
                         }
                         else {
                             res.status(401).json({
@@ -58,25 +69,19 @@ const authMiddleware = {
             else {
                 res.status(401).json({
                     status: false,
-                    msg: "Authorization is failed"
+                    msg: "Invalid auth attempt"
                 });
             }
-        }
-        else {
-            res.status(401).json({
-                status: false,
-                msg: "Invalid auth attempt"
-            });
-        }
-    }),
-    isUserLogged: (req, res, next) => {
-        next();
-    },
-    isAdminLogged: (req, res, next) => {
-        next();
-    },
-    isOrganizationLogged: (req, res, next) => {
+        });
+    }
+    isUserLogged(req, res, next) {
         next();
     }
-};
-exports.default = authMiddleware;
+    isAdminLogged(req, res, next) {
+        next();
+    }
+    isOrganizationLogged(req, res, next) {
+        next();
+    }
+}
+exports.default = AuthMiddleware;

@@ -2,8 +2,8 @@
 
 import express from 'express'
 import multer from 'multer';
-import organizationStorage from '../../helper/multerStorage';
 import OrganizationController from '../../controller/organization/authController';
+import organizationStorage from '../../helper/multer/multerStorage';
 
 const kycStorage = multer({ storage: organizationStorage.kycMulter })
 const logoStorage = multer({ storage: organizationStorage.logoPicture })

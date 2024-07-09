@@ -2,9 +2,10 @@ import { JwtPayload } from "jsonwebtoken";
 import AuthNotificationProvider from "../../communication/Provider/notification/notification_service";
 import { HelperFunctionResponse, OrganizationJwtInteraFace } from "../../config/Datas/InterFace";
 import constant_data from "../../config/const";
-import tokenHelper from "../../helper/tokenHelper";
+import tokenHelper from "../../helper/token/tokenHelper";
 import OrganizationRepo from "../../repositories/OrganizationRepo/OrganizationRepo";
 import bcrypt from 'bcrypt'
+import TokenHelper from "../../helper/token/tokenHelper";
 
 interface IOrganizationService {
     forgetPasswordHelper(email_address: string): Promise<HelperFunctionResponse>
@@ -13,9 +14,11 @@ interface IOrganizationService {
 class OrganizationService implements IOrganizationService {
 
     private OrganizationRepos;
+    private tokenHelpers;
 
     constructor() {
         this.OrganizationRepos = new OrganizationRepo()
+        this.tokenHelpers = new TokenHelper();
     }
 
 
@@ -34,7 +37,7 @@ class OrganizationService implements IOrganizationService {
                     id: getData.id
                 }
 
-                const jwtToken: string | null = await tokenHelper.createJWTToken(organizationJwtPayload, constant_data.USERAUTH_EXPIRE_TIME.toString());
+                const jwtToken: string | null = await this.tokenHelpers.generateJWtToken(organizationJwtPayload, constant_data.USERAUTH_EXPIRE_TIME.toString());
                 if (jwtToken) {
                     getData.token = jwtToken
                     await getData.save()
@@ -60,7 +63,7 @@ class OrganizationService implements IOrganizationService {
         try {
 
             const organization = await this.OrganizationRepos.findOrganization(email_address) //OrganizationAuth.findOne({ email_address });
-            const token: string | null = await tokenHelper.createJWTToken({ email_id: email_address, type: constant_data.OTP_TYPE.ORGANIZATION_FORGET_PASSWORD }, constant_data.OTP_EXPIRE_TIME.toString())
+            const token: string | null = await this.tokenHelpers.generateJWtToken({ email_id: email_address, type: constant_data.OTP_TYPE.ORGANIZATION_FORGET_PASSWORD }, constant_data.OTP_EXPIRE_TIME.toString())
 
             if (organization && token) {
                 organization.token = token;
@@ -95,7 +98,7 @@ class OrganizationService implements IOrganizationService {
     async resetPassword(token: string, password: string): Promise<HelperFunctionResponse> {
 
         try {
-            const organizationToken: boolean | JwtPayload | string = await tokenHelper.checkTokenValidity(token);
+            const organizationToken: boolean | JwtPayload | string = await this.tokenHelpers.checkTokenValidity(token);
             if (typeof organizationToken == "object") {
                 const email_address: string = organizationToken.email_id;
                 if (email_address) {

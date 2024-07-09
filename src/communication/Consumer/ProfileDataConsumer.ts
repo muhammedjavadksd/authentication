@@ -1,10 +1,9 @@
 // let amqplib = require("amqplib");
 import amqplib, { Channel, Connection } from 'amqplib';
-const authHelper = require("../../helper/authUserHelper");
+import UserAuthenticationRepo from '../../repositories/UserRepo/UserAuthentication';
+import mongoose from 'mongoose';
 
 interface ProfielDataConsumerInterface {
-
-    // _getChannel(queue_name: string): Promise<amqplib.Channel | null>,
     _init_(): void
     authProfileUpdation(): void
 }
@@ -31,7 +30,9 @@ class ProfileDataConsumer implements ProfielDataConsumerInterface {
 
                 const profile_id: string = messageContent.profile_id;
                 if (profile_id) {
-                    await authHelper.updateUserProfile(messageContent.edit_details, profile_id)
+                    const userRepo = new UserAuthenticationRepo();
+
+                    await userRepo.updateUserById(new mongoose.Types.ObjectId(profile_id), messageContent.edit_details)
                     console.log("Authentication data has been updated ");
                 }
             }
@@ -39,50 +40,4 @@ class ProfileDataConsumer implements ProfielDataConsumerInterface {
     }
 }
 
-
-
-
-// let ProfielDataConsumer: ProfielDataConsumerInterface = {
-
-
-//     _getChannel: async (queue_name: string): Promise<amqplib.Channel | null> => {
-//         try {
-//             const connection: Connection = await amqplib.connect("amqp://localhost");
-//             const channel: Channel = await connection.createChannel()
-//             await channel.assertQueue(queue_name, { durable: true });
-//             return channel
-//         } catch (e) {
-//             return null;
-//         }
-//     },
-
-//     authProfileUpdation: async function (): Promise<void> {
-
-
-//         const queueName: string = process.env.AUTH_DATA_UPDATE_QUEUE!;
-//         const channel: Channel | null = await this._getChannel(queueName);
-//         if (channel) {
-
-//             channel.consume(queueName, async (msg) => {
-
-//                 if (msg) {
-//                     console.log("This msg");
-
-//                     const messageContent = JSON.parse(msg.content.toString());
-//                     console.log("Update profile content is :");
-//                     console.log(messageContent);
-
-//                     const profile_id: string = messageContent.profile_id;
-//                     if (profile_id) {
-//                         await authHelper.updateUserProfile(messageContent.edit_details, profile_id)
-//                         console.log("Authentication data has been updated ");
-//                     }
-//                 }
-//             }, { noAck: true })
-//         }
-//     }
-// }
-
-
-// module.exports = ProfielDataConsumer;
 export default ProfileDataConsumer

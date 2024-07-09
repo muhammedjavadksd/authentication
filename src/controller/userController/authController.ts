@@ -1,12 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import const_data from '../../config/const';
 import signUpUserValidation from '../../config/validation/validation'
-import authHelper from '../../helper/authUserHelper';
-import userHelper from '../../helper/userHelper';
-import { AuthController, ControllerResponseInterFace, CustomRequest, HelperFunctionResponse, UserJwtInterFace } from '../../config/Datas/InterFace';
+import { ControllerResponseInterFace, CustomRequest, HelperFunctionResponse, UserJwtInterFace } from '../../config/Datas/InterFace';
 import IUserAuthController from '../../config/Interface/IController/IUserAuthController';
-import { ParamsDictionary } from 'express-serve-static-core';
-import { ParsedQs } from 'qs';
 import UserAuthenticationRepo from '../../repositories/UserRepo/UserAuthentication';
 import IBaseUser from '../../config/Interface/Objects/IBaseUser';
 import UserAuthServices from '../../services/UserAuthService/UserAuthServices';
@@ -135,7 +131,7 @@ class UserAuthController implements IUserAuthController {
 
         if (email_id && token) {
             try {
-                const otpVerification: HelperFunctionResponse = await authHelper.AuthOTPValidate(otp, email_id, token);
+                const otpVerification: HelperFunctionResponse = await this.UserAuthService.authOTPValidate(otp, email_id, token)
 
                 if (otpVerification.status) {
                     let responseData: UserJwtInterFace = otpVerification.data;
@@ -179,7 +175,7 @@ class UserAuthController implements IUserAuthController {
             const oldEmailId: string = requestContext.email_id;
 
             try {
-                const editRequest: HelperFunctionResponse = await this.UserAuthService.editAuthEmailID(oldEmailId, newEmailID); //await authHelper.editAuthPhoneNumber(oldEmailId, newEmailID);
+                const editRequest: HelperFunctionResponse = await this.UserAuthService.editAuthEmailID(oldEmailId, newEmailID);
                 if (editRequest.status) {
                     let { token } = editRequest.data;
                     if (token) {
@@ -224,7 +220,7 @@ class UserAuthController implements IUserAuthController {
             const tokenEmail: string = requestContext.email_id;
             if (tokenEmail) {
                 try {
-                    const result: HelperFunctionResponse = await authHelper.resendOtpNumer(tokenEmail);
+                    const result: HelperFunctionResponse = await this.UserAuthService.resendOtpNumer(tokenEmail)
                     if (result.data) {
                         let token: string = result.data?.token;
                         if (token) {

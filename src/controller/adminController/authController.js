@@ -12,8 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const authAdminHelper_1 = __importDefault(require("../../helper/authAdminHelper"));
 const AdminAuthService_1 = __importDefault(require("../../services/AdminAuthService/AdminAuthService"));
+const utilHelper_1 = __importDefault(require("../../helper/util/utilHelper"));
 class AdminController {
     constructor() {
         this.AdminServices = new AdminAuthService_1.default();
@@ -23,7 +23,7 @@ class AdminController {
             const email_address = req.body.email_address;
             const password = req.body.password;
             try {
-                const adminAuthAttempt = yield this.AdminServices.signIn(email_address, password); //await authAdminHelper.signInHelper(email_address, password)
+                const adminAuthAttempt = yield this.AdminServices.signIn(email_address, password);
                 if (adminAuthAttempt.status) {
                     const helperData = adminAuthAttempt.data;
                     if (helperData) {
@@ -60,7 +60,7 @@ class AdminController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let email_id = req.body.email_id;
-                let adminResetRequest = yield authAdminHelper_1.default.forgetPasswordHelpers(email_id);
+                let adminResetRequest = yield this.AdminServices.forgetPassword(email_id);
                 res.status(adminResetRequest.statusCode).json({ status: true, msg: adminResetRequest.msg });
             }
             catch (e) {
@@ -72,10 +72,10 @@ class AdminController {
     adminPasswordReset(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let token = authAdminHelper_1.default.getTokenFromHeader(req['headers']['authorization']);
+                let token = utilHelper_1.default.getTokenFromHeader(req['headers']['authorization']);
                 let password = req.body.password;
                 if (password && token) {
-                    const resetPassword = yield this.AdminServices.resetPassword(token, password); //authAdminHelper.resetPassword(token, password);
+                    const resetPassword = yield this.AdminServices.resetPassword(token, password);
                     res.status(resetPassword.statusCode).json({
                         status: resetPassword.status,
                         msg: resetPassword.msg,

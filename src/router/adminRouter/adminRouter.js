@@ -27,11 +27,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = __importStar(require("express"));
-const authMiddleware_1 = __importDefault(require("../../middleware/authMiddleware"));
 const authController_1 = __importDefault(require("../../controller/adminController/authController"));
+const authMiddleware_1 = __importDefault(require("../../middleware/authMiddleware"));
 const adminRouter = express.Router();
 const adminController = new authController_1.default();
-adminRouter.post("/sign_in", authMiddleware_1.default.isAdminLogged, adminController.signInController);
-adminRouter.post("/forget_password", authMiddleware_1.default.isAdminLogged, adminController.forgetPasswordController);
-adminRouter.post("/reset_password", authMiddleware_1.default.isAdminLogged, adminController.forgetPasswordController);
+const adminMiddleware = new authMiddleware_1.default();
+adminRouter.post("/sign_in", adminMiddleware.isAdminLogged, adminController.signInController);
+adminRouter.post("/forget_password", adminMiddleware.isAdminLogged, adminController.forgetPasswordController);
+adminRouter.post("/reset_password", adminMiddleware.isAdminLogged, adminController.forgetPasswordController);
 exports.default = adminRouter;

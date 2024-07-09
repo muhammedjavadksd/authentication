@@ -1,9 +1,12 @@
+import { Request } from "express";
+
 interface IUtilHelper {
     generateAnOTP: (length: number) => number;
     createRandomText: (length: number) => string;
     organizationFileName: (file_name: string, type: string) => string;
     isFalsyValue: (data: any) => boolean
     OTPValidator: (otp_number: number, db_otp_number: number, expire_time: number) => IOTPValidationResponse
+    getTokenFromHeader: (headers: Request['headers']['authorization']) => string | false
 }
 
 interface IOTPValidationResponse {
@@ -52,6 +55,17 @@ const utilHelper: IUtilHelper = {
         } else {
             return { status: false, msg: "Incorrect OTP Number" }
         }
+    },
+
+    getTokenFromHeader: (headers: Request['headers']['authorization']): string | false => {
+        const splitAuth = headers?.split(" ");
+        if (splitAuth && splitAuth[0] == "Bearer") {
+            const token: string | undefined = splitAuth[0];
+            if (token) {
+                return token
+            }
+        }
+        return false
     }
 };
 

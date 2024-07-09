@@ -1,14 +1,16 @@
 import * as jwt from "jsonwebtoken";
 import * as constant_data from "../config/const";
 
-interface TokenHelper {
+interface ITokenHelper {
     createJWTToken: (payload: object, timer: string) => Promise<string | null>;
-    decodeJWTToken: (jwttoken: string) => Promise<any | null>;
+    decodeJWTToken: (jwttoken: string) => Promise<jwt.Jwt | null>;
     checkTokenValidity: (token: string) => Promise<jwt.JwtPayload | boolean | string>;
 }
 
-const tokenHelper: TokenHelper = {
-    createJWTToken: async (payload: object = {}, timer: string): Promise<string | null> => {
+
+class TokenHelper {
+
+    async generateJWtToken(payload: object = {}, timer: string): Promise<string | null> {
         try {
             const jwtToken: string = await jwt.sign(payload, process.env.JWT_SECRET!, { algorithm: "HS256", expiresIn: timer });
             return jwtToken;
@@ -16,18 +18,18 @@ const tokenHelper: TokenHelper = {
             console.log(e);
             return null;
         }
-    },
+    }
 
-    decodeJWTToken: async (jwttoken: string): Promise<jwt.Jwt | null> => {
+    async decodeJWTToken(jwttoken: string): Promise<jwt.Jwt | null> {
         try {
             const decode: jwt.Jwt | null = await jwt.decode(jwttoken, { complete: true });
             return decode;
         } catch (e) {
             return null;
         }
-    },
+    }
 
-    checkTokenValidity: async (token: string): Promise<jwt.JwtPayload | boolean | string> => {
+    async checkTokenValidity(token: string): Promise<jwt.JwtPayload | boolean | string> {
         try {
             const checkValidity: jwt.JwtPayload | string = await jwt.verify(token, process.env.JWT_SECRET!);
             return checkValidity;
@@ -35,7 +37,9 @@ const tokenHelper: TokenHelper = {
             return false;
         }
     }
-};
+}
 
-export default tokenHelper;
+
+
+export default TokenHelper;
 

@@ -14,12 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const notification_service_1 = __importDefault(require("../../communication/Provider/notification/notification_service"));
 const const_1 = __importDefault(require("../../config/const"));
-const tokenHelper_1 = __importDefault(require("../../helper/tokenHelper"));
 const OrganizationRepo_1 = __importDefault(require("../../repositories/OrganizationRepo/OrganizationRepo"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const tokenHelper_1 = __importDefault(require("../../helper/token/tokenHelper"));
 class OrganizationService {
     constructor() {
         this.OrganizationRepos = new OrganizationRepo_1.default();
+        this.tokenHelpers = new tokenHelper_1.default();
     }
     signIn(email, password) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -33,7 +34,7 @@ class OrganizationService {
                         email: email,
                         id: getData.id
                     };
-                    const jwtToken = yield tokenHelper_1.default.createJWTToken(organizationJwtPayload, const_1.default.USERAUTH_EXPIRE_TIME.toString());
+                    const jwtToken = yield this.tokenHelpers.generateJWtToken(organizationJwtPayload, const_1.default.USERAUTH_EXPIRE_TIME.toString());
                     if (jwtToken) {
                         getData.token = jwtToken;
                         yield getData.save();
@@ -62,7 +63,7 @@ class OrganizationService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const organization = yield this.OrganizationRepos.findOrganization(email_address); //OrganizationAuth.findOne({ email_address });
-                const token = yield tokenHelper_1.default.createJWTToken({ email_id: email_address, type: const_1.default.OTP_TYPE.ORGANIZATION_FORGET_PASSWORD }, const_1.default.OTP_EXPIRE_TIME.toString());
+                const token = yield this.tokenHelpers.generateJWtToken({ email_id: email_address, type: const_1.default.OTP_TYPE.ORGANIZATION_FORGET_PASSWORD }, const_1.default.OTP_EXPIRE_TIME.toString());
                 if (organization && token) {
                     organization.token = token;
                     this.OrganizationRepos.updateOrganization(organization);
@@ -98,7 +99,7 @@ class OrganizationService {
     resetPassword(token, password) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const organizationToken = yield tokenHelper_1.default.checkTokenValidity(token);
+                const organizationToken = yield this.tokenHelpers.checkTokenValidity(token);
                 if (typeof organizationToken == "object") {
                     const email_address = organizationToken.email_id;
                     if (email_address) {

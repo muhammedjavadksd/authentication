@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const multer_1 = __importDefault(require("multer"));
-const multerStorage_1 = __importDefault(require("../../helper/multerStorage"));
 const authController_1 = __importDefault(require("../../controller/organization/authController"));
+const multerStorage_1 = __importDefault(require("../../helper/multer/multerStorage"));
 const kycStorage = (0, multer_1.default)({ storage: multerStorage_1.default.kycMulter });
 const logoStorage = (0, multer_1.default)({ storage: multerStorage_1.default.logoPicture });
 const organizationRouter = express_1.default.Router();

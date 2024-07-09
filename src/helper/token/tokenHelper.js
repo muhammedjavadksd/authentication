@@ -33,34 +33,40 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const jwt = __importStar(require("jsonwebtoken"));
-const tokenHelper = {
-    createJWTToken: (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (payload = {}, timer) {
-        try {
-            const jwtToken = yield jwt.sign(payload, process.env.JWT_SECRET, { algorithm: "HS256", expiresIn: timer });
-            return jwtToken;
-        }
-        catch (e) {
-            console.log(e);
-            return null;
-        }
-    }),
-    decodeJWTToken: (jwttoken) => __awaiter(void 0, void 0, void 0, function* () {
-        try {
-            const decode = yield jwt.decode(jwttoken, { complete: true });
-            return decode;
-        }
-        catch (e) {
-            return null;
-        }
-    }),
-    checkTokenValidity: (token) => __awaiter(void 0, void 0, void 0, function* () {
-        try {
-            const checkValidity = yield jwt.verify(token, process.env.JWT_SECRET);
-            return checkValidity;
-        }
-        catch (e) {
-            return false;
-        }
-    })
-};
-exports.default = tokenHelper;
+class TokenHelper {
+    generateJWtToken() {
+        return __awaiter(this, arguments, void 0, function* (payload = {}, timer) {
+            try {
+                const jwtToken = yield jwt.sign(payload, process.env.JWT_SECRET, { algorithm: "HS256", expiresIn: timer });
+                return jwtToken;
+            }
+            catch (e) {
+                console.log(e);
+                return null;
+            }
+        });
+    }
+    decodeJWTToken(jwttoken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const decode = yield jwt.decode(jwttoken, { complete: true });
+                return decode;
+            }
+            catch (e) {
+                return null;
+            }
+        });
+    }
+    checkTokenValidity(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const checkValidity = yield jwt.verify(token, process.env.JWT_SECRET);
+                return checkValidity;
+            }
+            catch (e) {
+                return false;
+            }
+        });
+    }
+}
+exports.default = TokenHelper;

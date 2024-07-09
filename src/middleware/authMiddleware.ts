@@ -1,26 +1,35 @@
-import { NextFunction, Response } from "express";
+import { NextFunction, Response, Request } from "express";
 import { ControllerInterFace, ControllerResponseInterFace, CustomRequest } from "../config/Datas/InterFace";
 import const_data from '../config/const'
-import tokenHelper from "../helper/tokenHelper";
+import tokenHelper from "../helper/token/tokenHelper";
 import { JwtPayload } from "jsonwebtoken";
-import utilHelper from "../helper/utilHelper";
-import authAdminHelper from "../helper/authAdminHelper";
+import utilHelper from "../helper/util/utilHelper";
+import TokenHelper from "../helper/token/tokenHelper";
 
 let { OTP_TYPE } = const_data;
 
+class AuthMiddleware {
 
-const authMiddleware: ControllerInterFace = {
-    isValidSignUpTrying: async (req: CustomRequest, res: Response, next: NextFunction): Promise<void> => {
 
+    private readonly tokenHelpers;
+
+    constructor() {
+        this.tokenHelpers = new TokenHelper();
+    }
+
+
+    async isValidSignUpAttempt(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
         const headers: CustomRequest['headers'] = req.headers;
-        const token: string | false = authAdminHelper.getTokenFromHeader(headers['authorization'])
+        const token: string | false = utilHelper.getTokenFromHeader(headers['authorization'])
 
         if (token) {
             if (!req.context) {
                 req.context = {}
             }
             req.context.auth_token = token;
-            const checkValidity: JwtPayload | string | boolean = await tokenHelper.checkTokenValidity(token);
+
+            const checkValidity: JwtPayload | string | boolean = await this.tokenHelpers.checkTokenValidity(token);
+
             if (checkValidity) {
                 if (typeof checkValidity == "object") {
                     if (checkValidity.email_id) {
@@ -58,20 +67,23 @@ const authMiddleware: ControllerInterFace = {
                 msg: "Invalid auth attempt"
             } as ControllerResponseInterFace);
         }
-    },
+    }
 
-    isUserLogged: (req, res, next) => {
-        next();
-    },
-
-    isAdminLogged: (req, res, next) => {
-        next();
-    },
-
-    isOrganizationLogged: (req, res, next) => {
+    isUserLogged(req: Request, res: Response, next: NextFunction) {
         next();
     }
-};
 
-export default authMiddleware;
+    isAdminLogged(req: Request, res: Response, next: NextFunction) {
+        next();
+    }
+
+    isOrganizationLogged(req: Request, res: Response, next: NextFunction) {
+        next();
+    }
+}
+
+
+
+
+export default AuthMiddleware;
 

@@ -15,12 +15,36 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const notification_service_1 = __importDefault(require("../../communication/Provider/notification/notification_service"));
 const const_1 = __importDefault(require("../../config/const"));
 const userAuth_1 = __importDefault(require("../../db/models/userAuth"));
-const tokenHelper_1 = __importDefault(require("../../helper/tokenHelper"));
-const userHelper_1 = __importDefault(require("../../helper/userHelper"));
-const utilHelper_1 = __importDefault(require("../../helper/utilHelper"));
+const utilHelper_1 = __importDefault(require("../../helper/util/utilHelper"));
+const tokenHelper_1 = __importDefault(require("../../helper/token/tokenHelper"));
+const UserAuthServices_1 = __importDefault(require("../../services/UserAuthService/UserAuthServices"));
 class UserAuthenticationRepo {
     constructor() {
         this.UserAuthCollection = userAuth_1.default;
+        this.tokenHelpers = new tokenHelper_1.default();
+    }
+    findByUserId(user_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = this.UserAuthCollection.findOne({ user_id });
+                return user;
+            }
+            catch (e) {
+                console.log(e);
+                return null;
+            }
+        });
+    }
+    updateUserById(user_id, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const findUser = yield this.UserAuthCollection.findById(user_id);
+            if (!findUser) {
+                throw new Error('User not found');
+            }
+            Object.assign(findUser, data);
+            yield findUser.save();
+            return true;
+        });
     }
     updateUser(newAuthUser) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -39,9 +63,10 @@ class UserAuthenticationRepo {
             return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
                 const otpNumber = utilHelper_1.default.generateAnOTP(6);
                 const expireTime = const_1.default.MINIMUM_OTP_TIMER();
-                const userid = yield userHelper_1.default.generateUserID(baseUSER['first_name']);
+                const userService = new UserAuthServices_1.default();
+                const userid = yield userService.generateUserID(baseUSER['first_name']);
                 if (userid) {
-                    const jwtToken = yield tokenHelper_1.default.createJWTToken({ email_id: baseUSER['email'], type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
+                    const jwtToken = yield this.tokenHelpers.generateJWtToken({ email_id: baseUSER['email'], type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
                     if (jwtToken) {
                         this.UserAuthCollection.updateOne({ email: baseUSER['email'] }, {
                             $set: {

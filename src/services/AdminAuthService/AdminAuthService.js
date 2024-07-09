@@ -14,12 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const notification_service_1 = __importDefault(require("../../communication/Provider/notification/notification_service"));
 const const_1 = __importDefault(require("../../config/const"));
-const tokenHelper_1 = __importDefault(require("../../helper/tokenHelper"));
 const AdminAuthentication_1 = __importDefault(require("../../repositories/AdminRepo/AdminAuthentication"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const tokenHelper_1 = __importDefault(require("../../helper/token/tokenHelper"));
 class AdminAuthService {
     constructor() {
         this.AdminAuthRepo = new AdminAuthentication_1.default();
+        this.tokenHelpers = new tokenHelper_1.default();
     }
     signIn(email, password) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -29,7 +30,7 @@ class AdminAuthService {
                     const adminPassword = findAdmin.password;
                     if (adminPassword) {
                         const comparePassword = yield bcrypt_1.default.compare(password, adminPassword);
-                        const token = yield tokenHelper_1.default.createJWTToken({ email: findAdmin.email_address, type: const_1.default.JWT_FOR.ADMIN_AUTH }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
+                        const token = yield this.tokenHelpers.generateJWtToken({ email: findAdmin.email_address, type: const_1.default.JWT_FOR.ADMIN_AUTH }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
                         if (comparePassword && token) {
                             return {
                                 statusCode: 200,
@@ -81,7 +82,7 @@ class AdminAuthService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const findAdmin = yield this.AdminAuthRepo.findAdmin(email);
-                const token = yield tokenHelper_1.default.createJWTToken({ email, type: const_1.default.MAIL_TYPE.ADMIN_PASSWORD_REST }, const_1.default.OTP_EXPIRE_TIME.toString());
+                const token = yield this.tokenHelpers.generateJWtToken({ email, type: const_1.default.MAIL_TYPE.ADMIN_PASSWORD_REST }, const_1.default.OTP_EXPIRE_TIME.toString());
                 if (findAdmin && token) {
                     findAdmin.token = token;
                     yield this.AdminAuthRepo.updateAdmin(findAdmin);
@@ -117,7 +118,7 @@ class AdminAuthService {
     }
     resetPassword(token, password) {
         return __awaiter(this, void 0, void 0, function* () {
-            const isTokenValid = yield tokenHelper_1.default.checkTokenValidity(token);
+            const isTokenValid = yield this.tokenHelpers.checkTokenValidity(token);
             if (isTokenValid) {
                 if (typeof isTokenValid == "object") {
                     const email_id = isTokenValid.email;

@@ -35,6 +35,16 @@ const utilHelper = {
         else {
             return { status: false, msg: "Incorrect OTP Number" };
         }
+    },
+    getTokenFromHeader: (headers) => {
+        const splitAuth = headers === null || headers === void 0 ? void 0 : headers.split(" ");
+        if (splitAuth && splitAuth[0] == "Bearer") {
+            const token = splitAuth[0];
+            if (token) {
+                return token;
+            }
+        }
+        return false;
     }
 };
 exports.default = utilHelper;
