@@ -33,49 +33,78 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const amqplib = __importStar(require("amqplib"));
-const PROFILE_COMMUNICATION_PROVIDER = {
-    authTransferConnection: (queue_name) => __awaiter(void 0, void 0, void 0, function* () {
-        try {
-            const connection = yield amqplib.connect("amqp://localhost");
-            const channel = yield connection.createChannel();
-            yield channel.assertQueue(queue_name);
-            return channel;
-        }
-        catch (e) {
-            return null;
-        }
-    }),
-    authDataTransfer: function (first_name, last_name, email, location, phone_number, user_id, profile_id) {
+class ProfileCommunicationProvider {
+    constructor() {
+        this.connection = null;
+        this.channel = null;
+        this.Queue = process.env.AUTH_TRANSFER;
+    }
+    _init_() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.connection = yield amqplib.connect("amqp://localhost");
+            this.channel = yield this.connection.createChannel();
+        });
+    }
+    authDataTransfer(baseUser) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const queueName = (_a = process.env.AUTH_TRANSFER) !== null && _a !== void 0 ? _a : "";
-                if (!queueName) {
-                    throw new Error("AUTH_TRANSFER environment variable is not set");
-                }
-                const authTransferConnection = yield this.authTransferConnection(queueName);
-                if (authTransferConnection) {
-                    const authData = {
-                        first_name,
-                        last_name,
-                        email,
-                        location,
-                        phone_number,
-                        user_id,
-                        profile_id
-                    };
-                    authTransferConnection.sendToQueue(queueName, Buffer.from(JSON.stringify(authData)));
-                    console.log("Auth data has been transferred");
-                }
-                else {
-                    console.log("Auth data transfer failed");
-                }
+                const authData = {
+                    first_name: baseUser['first_name'],
+                    last_name: baseUser['last_name'],
+                    email: baseUser['email'],
+                    location: baseUser['location'],
+                    phone_number: baseUser['phone_number'],
+                    user_id: baseUser['user_id'],
+                    profile_id: baseUser['profile_id'],
+                    auth_id: baseUser['auth_id'],
+                    auth_provider: baseUser['auth_provider']
+                };
+                (_a = this.channel) === null || _a === void 0 ? void 0 : _a.sendToQueue(this.Queue, Buffer.from(JSON.stringify(authData)));
             }
             catch (e) {
-                console.log("Something went wrong while sending data to auth profile");
                 console.error(e);
             }
         });
     }
-};
-exports.default = PROFILE_COMMUNICATION_PROVIDER;
+}
+// const PROFILE_COMMUNICATION_PROVIDER: PROFILE_COMMUNICATION_PROVIDER_INTERFACE = {
+//     authTransferConnection: async (queue_name: string): Promise<amqplib.Channel | null> => {
+//         try {
+//             const connection: amqplib.Connection = await amqplib.connect("amqp://localhost");
+//             const channel: amqplib.Channel = await connection.createChannel();
+//             await channel.assertQueue(queue_name);
+//             return channel;
+//         } catch (e) {
+//             return null;
+//         }
+//     },
+//     authDataTransfer: async function (first_name: string, last_name: string, email: string, location: object, phone_number: number, user_id: string, profile_id: string): Promise<void> {
+//         try {
+//             const queueName: string = process.env.AUTH_TRANSFER ?? "";
+//             if (!queueName) {
+//                 throw new Error("AUTH_TRANSFER environment variable is not set");
+//             }
+//             const authTransferConnection: amqplib.Channel | null = await this.authTransferConnection(queueName);
+//             if (authTransferConnection) {
+//                 const authData: AuthData = {
+//                     first_name,
+//                     last_name,
+//                     email,
+//                     location,
+//                     phone_number,
+//                     user_id,
+//                     profile_id
+//                 };
+//                 authTransferConnection.sendToQueue(queueName, Buffer.from(JSON.stringify(authData)));
+//                 console.log("Auth data has been transferred");
+//             } else {
+//                 console.log("Auth data transfer failed");
+//             }
+//         } catch (e) {
+//             console.log("Something went wrong while sending data to auth profile");
+//             console.error(e);
+//         }
+//     }
+// };
+exports.default = ProfileCommunicationProvider;
