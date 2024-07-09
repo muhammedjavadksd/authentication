@@ -25,7 +25,7 @@ class OrganizationService {
     signIn(email, password) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const getData = yield this.OrganizationRepos.findOrganization(email); //await OrganizationAuth.findOne({ email_address });
+                const getData = yield this.OrganizationRepos.findOrganization(email);
                 if (getData && getData.password) {
                     const dbPassword = getData.password;
                     const comparePassword = yield bcrypt_1.default.compare(password, dbPassword);
@@ -37,7 +37,8 @@ class OrganizationService {
                     const jwtToken = yield this.tokenHelpers.generateJWtToken(organizationJwtPayload, const_1.default.USERAUTH_EXPIRE_TIME.toString());
                     if (jwtToken) {
                         getData.token = jwtToken;
-                        yield getData.save();
+                        // await getData.save()
+                        yield this.OrganizationRepos.updateOrganization(getData);
                         if (comparePassword) {
                             return { status: true, data: { token: jwtToken }, msg: "Sign in success", statusCode: 200 };
                         }

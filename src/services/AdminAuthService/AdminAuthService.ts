@@ -7,8 +7,9 @@ import AdminAuthenticationRepo from "../../repositories/AdminRepo/AdminAuthentic
 import bcrypt from 'bcrypt';
 import IAdminAuthModel from "../../config/Interface/IModel/AdminAuthModel/IAdminAuthModel";
 import TokenHelper from "../../helper/token/tokenHelper";
+import { IAdminAuthService } from "../../config/Interface/ServiceInterface";
 
-class AdminAuthService {
+class AdminAuthService implements IAdminAuthService {
 
     private AdminAuthRepo;
     private tokenHelpers;
@@ -21,7 +22,7 @@ class AdminAuthService {
     async signIn(email: string, password: string): Promise<HelperFunctionResponse> {
 
         try {
-            const findAdmin = await this.AdminAuthRepo.findAdmin(email) //await AdminAuthModel.findOne({ email_address: email });
+            const findAdmin: IAdminAuthModel | null = await this.AdminAuthRepo.findAdmin(email) //await AdminAuthModel.findOne({ email_address: email });
             if (findAdmin) {
                 const adminPassword: string | null = findAdmin.password as string;
                 if (adminPassword) {
@@ -75,7 +76,7 @@ class AdminAuthService {
     async forgetPassword(email: string): Promise<HelperFunctionResponse> {
 
         try {
-            const findAdmin = await this.AdminAuthRepo.findAdmin(email)
+            const findAdmin: IAdminAuthModel | null = await this.AdminAuthRepo.findAdmin(email)
             const token: string | null = await this.tokenHelpers.generateJWtToken({ email, type: constant_data.MAIL_TYPE.ADMIN_PASSWORD_REST }, constant_data.OTP_EXPIRE_TIME.toString())
 
             if (findAdmin && token) {

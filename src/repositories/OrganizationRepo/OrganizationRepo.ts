@@ -1,9 +1,7 @@
 import IOrganizationAuthModel from "../../config/Interface/IModel/OrganizationAuthModel/IOrganizationModel";
+import { IOrganizationRepo } from "../../config/Interface/RepositoriesInterface";
 import OrganizationAuth from "../../db/models/organizationAuth";
 
-interface IOrganizationRepo {
-    findOrganization(email_address: string): Promise<IOrganizationAuthModel | null>
-}
 
 class OrganizationRepo implements IOrganizationRepo {
 
@@ -13,7 +11,7 @@ class OrganizationRepo implements IOrganizationRepo {
         this.organizationAuth = OrganizationAuth
     }
 
-    async updateOrganization(organization: IOrganizationAuthModel) {
+    async updateOrganization(organization: IOrganizationAuthModel): Promise<boolean> {
         try {
             await organization.save()
             return true

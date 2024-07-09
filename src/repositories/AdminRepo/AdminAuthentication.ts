@@ -1,14 +1,11 @@
 import IAdminAuthModel from "../../config/Interface/IModel/AdminAuthModel/IAdminAuthModel";
+import { IAdminRepo } from "../../config/Interface/RepositoriesInterface";
 import AdminAuthModel from "../../db/models/adminAuth";
 
 
-interface IAdminAuthenticationRepo {
-    findAdmin(email: string): Promise<IAdminAuthModel | null>
-    updateAdmin(admin: IAdminAuthModel): Promise<boolean>
-}
 
 
-class AdminAuthenticationRepo implements IAdminAuthenticationRepo {
+class AdminAuthenticationRepo implements IAdminRepo {
 
     private AdminAuthCollection;
 

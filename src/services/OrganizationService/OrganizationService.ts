@@ -6,12 +6,12 @@ import tokenHelper from "../../helper/token/tokenHelper";
 import OrganizationRepo from "../../repositories/OrganizationRepo/OrganizationRepo";
 import bcrypt from 'bcrypt'
 import TokenHelper from "../../helper/token/tokenHelper";
+import { IOrganizationAuthService } from "../../config/Interface/ServiceInterface";
+import IOrganizationAuthModel from "../../config/Interface/IModel/OrganizationAuthModel/IOrganizationModel";
 
-interface IOrganizationService {
-    forgetPasswordHelper(email_address: string): Promise<HelperFunctionResponse>
-}
 
-class OrganizationService implements IOrganizationService {
+
+class OrganizationService implements IOrganizationAuthService {
 
     private OrganizationRepos;
     private tokenHelpers;
@@ -22,10 +22,10 @@ class OrganizationService implements IOrganizationService {
     }
 
 
-    async signIn(email: string, password: string) {
+    async signIn(email: string, password: string): Promise<HelperFunctionResponse> {
         try {
 
-            const getData = await this.OrganizationRepos.findOrganization(email) //await OrganizationAuth.findOne({ email_address });
+            const getData: IOrganizationAuthModel | null = await this.OrganizationRepos.findOrganization(email)
 
             if (getData && getData.password) {
                 const dbPassword: string = getData.password as string;
@@ -40,7 +40,8 @@ class OrganizationService implements IOrganizationService {
                 const jwtToken: string | null = await this.tokenHelpers.generateJWtToken(organizationJwtPayload, constant_data.USERAUTH_EXPIRE_TIME.toString());
                 if (jwtToken) {
                     getData.token = jwtToken
-                    await getData.save()
+                    // await getData.save()
+                    await this.OrganizationRepos.updateOrganization(getData);
                     if (comparePassword) {
                         return { status: true, data: { token: jwtToken }, msg: "Sign in success", statusCode: 200 }
                     } else {
@@ -62,7 +63,7 @@ class OrganizationService implements IOrganizationService {
 
         try {
 
-            const organization = await this.OrganizationRepos.findOrganization(email_address) //OrganizationAuth.findOne({ email_address });
+            const organization: IOrganizationAuthModel | null = await this.OrganizationRepos.findOrganization(email_address) //OrganizationAuth.findOne({ email_address });
             const token: string | null = await this.tokenHelpers.generateJWtToken({ email_id: email_address, type: constant_data.OTP_TYPE.ORGANIZATION_FORGET_PASSWORD }, constant_data.OTP_EXPIRE_TIME.toString())
 
             if (organization && token) {
@@ -102,7 +103,7 @@ class OrganizationService implements IOrganizationService {
             if (typeof organizationToken == "object") {
                 const email_address: string = organizationToken.email_id;
                 if (email_address) {
-                    const organization = await this.OrganizationRepos.findOrganization(email_address)
+                    const organization: IOrganizationAuthModel | null = await this.OrganizationRepos.findOrganization(email_address)
                     if (organization) {
                         const newPassword: string = await bcrypt.hash(password, Number(process.env.BCRYPT_SALTROUND));
                         const comparePassword: boolean = await bcrypt.compare(password, organization.password as string);

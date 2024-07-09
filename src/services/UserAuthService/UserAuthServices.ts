@@ -8,13 +8,11 @@ import utilHelper from "../../helper/util/utilHelper";
 import UserAuthenticationRepo from "../../repositories/UserRepo/UserAuthentication";
 import ProfileCommunicationProvider from "../../communication/Provider/profile/profile_service";
 import TokenHelper from "../../helper/token/tokenHelper";
+import { IUserAuthService } from "../../config/Interface/ServiceInterface";
 
 
-interface IUserAuthServices {
 
-}
-
-class UserAuthServices implements IUserAuthServices {
+class UserAuthServices implements IUserAuthService {
 
     private UserAuthRepo;
     private TokenHelpers;
@@ -81,7 +79,7 @@ class UserAuthServices implements IUserAuthServices {
 
     async authOTPValidate(otp: number, email_id: string, token: string): Promise<HelperFunctionResponse> {
         try {
-            const getUser = await this.UserAuthRepo.findUser(null, email_id, null);
+            const getUser: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, email_id, null);
 
             if (!getUser) {
                 return {
@@ -221,7 +219,7 @@ class UserAuthServices implements IUserAuthServices {
     async resendOtpNumer(email_id: string): Promise<HelperFunctionResponse> {
 
         try {
-            const getUser = await this.UserAuthRepo.findUser(null, email_id, null);
+            const getUser: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, email_id, null);
 
             if (getUser) {
                 const otpNumber: number = utilHelper.generateAnOTP(6);
@@ -274,7 +272,7 @@ class UserAuthServices implements IUserAuthServices {
 
     private async _checkUserIDValidity(user_id: string): Promise<boolean> {
         try {
-            const user = await this.UserAuthRepo.findByUserId(user_id);
+            const user: IUserModelDocument | null = await this.UserAuthRepo.findByUserId(user_id);
             if (!user) {
                 return false
             } else {
@@ -287,8 +285,8 @@ class UserAuthServices implements IUserAuthServices {
 
     async generateUserID(first_name: string): Promise<string | false> {
         try {
-            const randomText = utilHelper.createRandomText(4);
-            let count = 0;
+            const randomText: string = utilHelper.createRandomText(4);
+            let count: number = 0;
             let userId: string;
             let isUserIDValid: boolean;
 

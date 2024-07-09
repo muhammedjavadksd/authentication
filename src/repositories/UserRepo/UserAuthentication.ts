@@ -9,12 +9,8 @@ import tokenHelper from "../../helper/token/tokenHelper";
 import utilHelper from "../../helper/util/utilHelper";
 import TokenHelper from "../../helper/token/tokenHelper";
 import UserAuthServices from "../../services/UserAuthService/UserAuthServices";
+import { IUserAuthenticationRepo } from "../../config/Interface/RepositoriesInterface";
 
-interface IUserAuthenticationRepo {
-    isUserExist(email_address: string, phone_number: number): Promise<boolean>
-    findUser(id: string | null, email: string | null | undefined, phone: number | null | undefined): Promise<boolean | IUserModelDocument>
-    updateUser(newAuthUser: IUserModelDocument): Promise<boolean>
-}
 
 
 

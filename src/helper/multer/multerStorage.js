@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const multer_1 = __importDefault(require("multer"));
-const utilHelper_1 = __importDefault(require("../util/utilHelper"));
+const utilHelper_1 = __importDefault(require("./utilHelper"));
 const { organizationFileName } = utilHelper_1.default;
 const organizationStorage = {
     kycMulter: multer_1.default.diskStorage({
