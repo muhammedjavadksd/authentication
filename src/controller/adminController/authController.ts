@@ -2,10 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import { AdminJwtInterFace, ControllerResponseInterFace, HelperFunctionResponse } from "../../config/Datas/InterFace";
 import AdminAuthService from "../../services/AdminAuthService/AdminAuthService";
 import utilHelper from "../../helper/util/utilHelper";
+import IAdminController from "../../config/Interface/IController/iAdminController";
 
-interface IAdminController {
 
-}
 
 class AdminController implements IAdminController {
 

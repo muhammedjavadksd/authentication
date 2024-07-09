@@ -3,7 +3,6 @@ import { AuthData } from '../../../config/Datas/InterFace';
 import IBaseUser from '../../../config/Interface/Objects/IBaseUser';
 
 interface PROFILE_COMMUNICATION_PROVIDER_INTERFACE {
-    // authTransferConnection(queue_name: string): Promise<amqplib.Channel | null>
     authDataTransfer(baseUSER: IBaseUser): Promise<void>
     _init_(): void
 }

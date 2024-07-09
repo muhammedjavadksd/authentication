@@ -18,6 +18,7 @@ class OrganizationController {
         this.organizationService = new OrganizationService_1.default();
     }
     signUpController(req, res, next) {
+        return;
     }
     signInController(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -2,14 +2,10 @@
 import { Request, Response, NextFunction } from "express";
 import { AdminJwtInterFace, ControllerResponseInterFace, HelperFunctionResponse } from "../../config/Datas/InterFace";
 import OrganizationService from "../../services/OrganizationService/OrganizationService";
+import IOrganizationControllerInterface from "../../config/Interface/IController/IOrganizationController";
 
 
-interface IOrganizationControllerInterface {
-    signUpController(req: Request, res: Response, next: NextFunction): void,
-    signInController(req: Request, res: Response, next: NextFunction): void
-    forgetPasswordController(req: Request, res: Response, next: NextFunction): void
-    resetPasswordController(req: Request, res: Response, next: NextFunction): void
-}
+
 
 
 class OrganizationController implements IOrganizationControllerInterface {
@@ -23,7 +19,7 @@ class OrganizationController implements IOrganizationControllerInterface {
 
 
     signUpController(req: Request, res: Response, next: NextFunction): void {
-
+        return;
     }
 
     async signInController(req: Request, res: Response, next: NextFunction): Promise<void> {
