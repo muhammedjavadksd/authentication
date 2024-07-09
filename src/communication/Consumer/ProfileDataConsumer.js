@@ -15,39 +15,63 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // let amqplib = require("amqplib");
 const amqplib_1 = __importDefault(require("amqplib"));
 const authHelper = require("../../helper/authUserHelper");
-let ProfielDataConsumer = {
-    _getChannel: (queue_name) => __awaiter(void 0, void 0, void 0, function* () {
-        try {
-            let connection = yield amqplib_1.default.connect("amqp://localhost");
-            let channel = yield connection.createChannel();
-            yield channel.assertQueue(queue_name, { durable: true });
-            return channel;
-        }
-        catch (e) {
-            return null;
-        }
-    }),
-    authProfileUpdation: function () {
+class ProfileDataConsumer {
+    constructor() {
+        this.connection = null;
+        this.channel = null;
+        this.Queue = process.env.AUTH_DATA_UPDATE_QUEUE;
+    }
+    _init_() {
         return __awaiter(this, void 0, void 0, function* () {
-            const queueName = process.env.AUTH_DATA_UPDATE_QUEUE;
-            const channel = yield this._getChannel(queueName);
-            if (channel) {
-                channel.consume(queueName, (msg) => __awaiter(this, void 0, void 0, function* () {
-                    if (msg) {
-                        console.log("This msg");
-                        let messageContent = JSON.parse(msg.content.toString());
-                        console.log("Update profile content is :");
-                        console.log(messageContent);
-                        const profile_id = messageContent.profile_id;
-                        if (profile_id) {
-                            yield authHelper.updateUserProfile(messageContent.edit_details, profile_id);
-                            console.log("Authentication data has been updated ");
-                        }
-                    }
-                }), { noAck: true });
-            }
+            this.connection = yield amqplib_1.default.connect("amqp://localhost");
+            this.channel = yield this.connection.createChannel();
         });
     }
-};
+    authProfileUpdation() {
+        var _a;
+        (_a = this.channel) === null || _a === void 0 ? void 0 : _a.consume(this.Queue, (msg) => __awaiter(this, void 0, void 0, function* () {
+            if (msg) {
+                const messageContent = JSON.parse(msg.content.toString());
+                console.log(messageContent);
+                const profile_id = messageContent.profile_id;
+                if (profile_id) {
+                    yield authHelper.updateUserProfile(messageContent.edit_details, profile_id);
+                    console.log("Authentication data has been updated ");
+                }
+            }
+        }), { noAck: true });
+    }
+}
+// let ProfielDataConsumer: ProfielDataConsumerInterface = {
+//     _getChannel: async (queue_name: string): Promise<amqplib.Channel | null> => {
+//         try {
+//             const connection: Connection = await amqplib.connect("amqp://localhost");
+//             const channel: Channel = await connection.createChannel()
+//             await channel.assertQueue(queue_name, { durable: true });
+//             return channel
+//         } catch (e) {
+//             return null;
+//         }
+//     },
+//     authProfileUpdation: async function (): Promise<void> {
+//         const queueName: string = process.env.AUTH_DATA_UPDATE_QUEUE!;
+//         const channel: Channel | null = await this._getChannel(queueName);
+//         if (channel) {
+//             channel.consume(queueName, async (msg) => {
+//                 if (msg) {
+//                     console.log("This msg");
+//                     const messageContent = JSON.parse(msg.content.toString());
+//                     console.log("Update profile content is :");
+//                     console.log(messageContent);
+//                     const profile_id: string = messageContent.profile_id;
+//                     if (profile_id) {
+//                         await authHelper.updateUserProfile(messageContent.edit_details, profile_id)
+//                         console.log("Authentication data has been updated ");
+//                     }
+//                 }
+//             }, { noAck: true })
+//         }
+//     }
+// }
 // module.exports = ProfielDataConsumer;
-exports.default = ProfielDataConsumer;
+exports.default = ProfileDataConsumer;
