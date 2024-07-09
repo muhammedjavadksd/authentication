@@ -7,11 +7,18 @@ import { AuthController, ControllerResponseInterFace, CustomRequest, HelperFunct
 import IUserAuthController from '../../config/Interface/IController/IUserAuthController';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
+import UserAuthenticationRepo from '../../repositories/UserAuthentication';
 
 
 let { AUTH_PROVIDERS_DATA } = const_data;
 
 class UserAuthController implements IUserAuthController {
+
+    private readonly UserAuthRepo;
+
+    constructor() {
+        this.UserAuthRepo = new UserAuthenticationRepo();
+    }
 
     async signUpController(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
@@ -43,7 +50,7 @@ class UserAuthController implements IUserAuthController {
                 }
                 res.status(500).json({ response });
             } else {
-                const isUserExist = await userHelper.isUserExist(email_address, phone_number.toString());
+                const isUserExist = await this.UserAuthRepo.isUserExist(email_address, phone_number) //await userHelper.isUserExist(email_address, phone_number.toString());
                 if (isUserExist) {
                     let response: ControllerResponseInterFace = {
                         status: false,

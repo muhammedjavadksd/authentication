@@ -4,8 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const authOrganizationHelper_1 = __importDefault(require("../../helper/authOrganizationHelper"));
-const utilHelper_1 = __importDefault(require("../../helper/utilHelper"));
-const { organizationFileName } = utilHelper_1.default;
 let authController = {
     signUpController: (req, res, next) => {
         const name = req.body.name;

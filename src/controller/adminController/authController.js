@@ -17,8 +17,6 @@ let authController = {
     signInController: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const email_address = req.body.email_address;
         const password = req.body.password;
-        console.log(email_address);
-        console.log(password);
         try {
             const adminAuthAttempt = yield authAdminHelper_1.default.signInHelper(email_address, password);
             const helperData = adminAuthAttempt.data;
@@ -47,7 +45,6 @@ let authController = {
                 status: false,
                 msg: "Internal server error",
             };
-            // res.status(adminAuthAttempt.statusCode).json(response)
             res.status(500).json(response);
         }
     }),
@@ -64,7 +61,6 @@ let authController = {
     }),
     adminPasswordReset: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            // let token = req.params.token;
             let token = authAdminHelper_1.default.getTokenFromHeader(req['headers']['authorization']);
             let password = req.body.password;
             if (password && token) {
@@ -91,4 +87,3 @@ let authController = {
     })
 };
 exports.default = authController;
-// module.exports = authController
