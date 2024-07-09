@@ -15,6 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const OrganizationService_1 = __importDefault(require("../../services/OrganizationService/OrganizationService"));
 class OrganizationController {
     constructor() {
+        this.signInController = this.signInController.bind(this);
+        this.signUpController = this.signUpController.bind(this);
+        this.forgetPasswordController = this.forgetPasswordController.bind(this);
+        this.resetPasswordController = this.resetPasswordController.bind(this);
         this.organizationService = new OrganizationService_1.default();
     }
     signUpController(req, res, next) {
@@ -51,36 +55,44 @@ class OrganizationController {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             const email_address = req.body.email_address;
+            // console.log(this);
             try {
                 const organizationForgetPassword = yield this.organizationService.forgetPasswordHelper(email_address);
                 if (organizationForgetPassword.status) {
-                    res.status(200).json({ status: true });
+                    res.status(200).json({ status: true, data: { token: organizationForgetPassword.data.token } });
                 }
                 else {
                     res.status(organizationForgetPassword.statusCode).json({ status: false, msg: (_a = organizationForgetPassword.msg) !== null && _a !== void 0 ? _a : "Something went wrong" });
                 }
             }
             catch (e) {
+                console.log(e);
                 res.status(500).json({ status: false, msg: "Internal server error" });
             }
         });
     }
     resetPasswordController(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const password = req.body.password;
-                const token = req.params.token;
-                const resetPassword = yield this.organizationService.resetPassword(token, password);
-                if (resetPassword.status) {
-                    res.status(200).json({ status: true });
+            const context = req.context;
+            if (context && context.email_id && context.email_id) {
+                try {
+                    const password = req.body.password;
+                    const token = context.token;
+                    const resetPassword = yield this.organizationService.resetPassword(token, password);
+                    if (resetPassword.status) {
+                        res.status(200).json({ status: true });
+                    }
+                    else {
+                        res.status(resetPassword.statusCode).json({ status: false, msg: resetPassword.msg });
+                    }
                 }
-                else {
-                    res.status(resetPassword.statusCode).json({ status: false, msg: resetPassword.msg });
+                catch (e) {
+                    console.log(e);
+                    res.status(500).json({ status: false, msg: "Internal server error" });
                 }
             }
-            catch (e) {
-                console.log(e);
-                res.status(500).json({ status: false, msg: "Internal server error" });
+            else {
+                res.status(401).json({ status: false, msg: "Invalid authentication" });
             }
         });
     }

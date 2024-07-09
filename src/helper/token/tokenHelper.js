@@ -34,6 +34,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const jwt = __importStar(require("jsonwebtoken"));
 class TokenHelper {
+    constructor() {
+        this.checkTokenValidity = this.checkTokenValidity.bind(this);
+        this.decodeJWTToken = this.decodeJWTToken.bind(this);
+        this.generateJWtToken = this.generateJWtToken.bind(this);
+    }
     generateJWtToken() {
         return __awaiter(this, arguments, void 0, function* (payload = {}, timer) {
             try {

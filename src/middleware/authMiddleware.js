@@ -22,7 +22,62 @@ class AuthMiddleware {
         this.isOrganizationLogged = this.isOrganizationLogged.bind(this);
         this.isUserLogged = this.isUserLogged.bind(this);
         this.isValidSignUpAttempt = this.isValidSignUpAttempt.bind(this);
+        this.isValidResetPasswordForOrganization = this.isValidResetPasswordForOrganization.bind(this);
         this.tokenHelpers = new tokenHelper_1.default();
+    }
+    isValidResetPasswordForOrganization(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const headers = req.headers;
+            const token = utilHelper_1.default.getTokenFromHeader(headers['authorization']);
+            if (token) {
+                if (!req.context) {
+                    req.context = {};
+                }
+                req.context.auth_token = token;
+                const checkValidity = yield this.tokenHelpers.checkTokenValidity(token);
+                if (checkValidity) {
+                    if (typeof checkValidity == "object") {
+                        if (checkValidity.email_id) {
+                            if (checkValidity.type == OTP_TYPE.ORGANIZATION_FORGET_PASSWORD) {
+                                req.context.email_id = checkValidity === null || checkValidity === void 0 ? void 0 : checkValidity.email_id;
+                                req.context.token = token;
+                                next();
+                            }
+                            else {
+                                res.status(401).json({
+                                    status: false,
+                                    msg: "Authorization is failed"
+                                });
+                            }
+                        }
+                        else {
+                            res.status(401).json({
+                                status: false,
+                                msg: "Authorization is failed"
+                            });
+                        }
+                    }
+                    else {
+                        res.status(401).json({
+                            status: false,
+                            msg: "Authorization is failed"
+                        });
+                    }
+                }
+                else {
+                    res.status(401).json({
+                        status: false,
+                        msg: "Authorization is failed"
+                    });
+                }
+            }
+            else {
+                res.status(401).json({
+                    status: false,
+                    msg: "Invalid auth attempt"
+                });
+            }
+        });
     }
     isValidSignUpAttempt(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {

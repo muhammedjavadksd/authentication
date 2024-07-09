@@ -8,6 +8,8 @@ class OrganizationRepo implements IOrganizationRepo {
     private organizationAuth;
 
     constructor() {
+        this.findOrganization = this.findOrganization.bind(this)
+        this.updateOrganization = this.updateOrganization.bind(this)
         this.organizationAuth = OrganizationAuth
     }
 

@@ -15,6 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const organizationAuth_1 = __importDefault(require("../../db/models/organizationAuth"));
 class OrganizationRepo {
     constructor() {
+        this.findOrganization = this.findOrganization.bind(this);
+        this.updateOrganization = this.updateOrganization.bind(this);
         this.organizationAuth = organizationAuth_1.default;
     }
     updateOrganization(organization) {

@@ -7,6 +7,7 @@ interface IAuthMiddleware {
     isUserLogged(req: Request, res: Response, next: NextFunction): void
     isAdminLogged(req: Request, res: Response, next: NextFunction): void
     isOrganizationLogged(req: Request, res: Response, next: NextFunction): void
+    isValidResetPasswordForOrganization(req: Request, res: Response, next: NextFunction): Promise<void>
 }
 
 export default IAuthMiddleware

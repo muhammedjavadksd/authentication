@@ -19,6 +19,9 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const tokenHelper_1 = __importDefault(require("../../helper/token/tokenHelper"));
 class OrganizationService {
     constructor() {
+        this.signIn = this.signIn.bind(this);
+        this.forgetPasswordHelper = this.forgetPasswordHelper.bind(this);
+        this.resetPassword = this.resetPassword.bind(this);
         this.OrganizationRepos = new OrganizationRepo_1.default();
         this.tokenHelpers = new tokenHelper_1.default();
     }
@@ -77,14 +80,17 @@ class OrganizationService {
                     return {
                         status: true,
                         statusCode: 200,
-                        msg: "Reset email has been sent"
+                        msg: "Reset email has been sent",
+                        data: {
+                            token
+                        }
                     };
                 }
                 else {
                     return {
                         status: false,
                         statusCode: 500,
-                        msg: "Something went wrong"
+                        msg: "Organization not found"
                     };
                 }
             }

@@ -10,7 +10,7 @@ const adminMiddleware = new AuthMiddleware();
 
 adminRouter.post("/sign_in", adminMiddleware.isAdminLogged, adminController.signInController)
 adminRouter.post("/forget_password", adminMiddleware.isAdminLogged, adminController.forgetPasswordController)
-adminRouter.post("/reset_password", adminMiddleware.isAdminLogged, adminController.forgetPasswordController)
+adminRouter.post("/reset_password", adminMiddleware.isAdminLogged, adminController.adminPasswordReset)
 
 export default adminRouter
 

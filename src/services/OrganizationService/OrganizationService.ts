@@ -17,6 +17,9 @@ class OrganizationService implements IOrganizationAuthService {
     private tokenHelpers;
 
     constructor() {
+        this.signIn = this.signIn.bind(this)
+        this.forgetPasswordHelper = this.forgetPasswordHelper.bind(this)
+        this.resetPassword = this.resetPassword.bind(this)
         this.OrganizationRepos = new OrganizationRepo()
         this.tokenHelpers = new TokenHelper();
     }
@@ -78,13 +81,16 @@ class OrganizationService implements IOrganizationAuthService {
                 return {
                     status: true,
                     statusCode: 200,
-                    msg: "Reset email has been sent"
+                    msg: "Reset email has been sent",
+                    data: {
+                        token
+                    }
                 }
             } else {
                 return {
                     status: false,
                     statusCode: 500,
-                    msg: "Something went wrong"
+                    msg: "Organization not found"
                 }
             }
         } catch (e) {

@@ -3,6 +3,12 @@ import ITokenHelper from "../../config/Interface/IHelper/iTokenHelper";
 
 class TokenHelper implements ITokenHelper {
 
+    constructor() {
+        this.checkTokenValidity = this.checkTokenValidity.bind(this)
+        this.decodeJWTToken = this.decodeJWTToken.bind(this)
+        this.generateJWtToken = this.generateJWtToken.bind(this)
+    }
+
     async generateJWtToken(payload: object = {}, timer: string): Promise<string | null> {
         try {
             const jwtToken: string = await jwt.sign(payload, process.env.JWT_SECRET!, { algorithm: "HS256", expiresIn: timer });
