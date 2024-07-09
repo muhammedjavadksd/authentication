@@ -8,6 +8,9 @@ import logger from "morgan";
 import BulkConsumer from './communication/BulkDataConsumer'
 import organizationRouter from "./router/organization/organizationRouter";
 
+
+
+
 const app: Express = express();
 
 app.use(bodyparser.json());
