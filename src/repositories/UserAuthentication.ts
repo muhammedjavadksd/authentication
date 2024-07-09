@@ -1,3 +1,6 @@
+import AuthNotificationProvider from "../communication/Provider/notification/notification_service";
+import IUserModelDocument from "../config/Interface/IModel/IUserAuthModel";
+import UserModelDocument from "../config/Interface/IModel/IUserAuthModel";
 import IBaseUser from "../config/Interface/Objects/IBaseUser";
 import constant_data from "../config/const";
 import userAuth from "../db/models/userAuth";
@@ -6,7 +9,9 @@ import userHelper from "../helper/userHelper";
 import utilHelper from "../helper/utilHelper";
 
 interface IUserAuthenticationRepo {
-
+    isUserExist(email_address: string, phone_number: number): Promise<boolean>
+    findUser(id: string | null, email: string | null | undefined, phone: number | null | undefined): Promise<boolean | IUserModelDocument>
+    updateUser(newAuthUser: IUserModelDocument): Promise<boolean>
 }
 
 
@@ -19,8 +24,18 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
         this.UserAuthCollection = userAuth;
     }
 
+    async updateUser(newAuthUser: IUserModelDocument): Promise<boolean> {
+        try {
+            await newAuthUser.save();
+            return true
+        } catch (e) {
+            console.log(e);
+            return false
+        }
+    }
 
-    async insertNewUser(baseUSER: IBaseUser) {
+
+    async insertNewUser(baseUSER: IBaseUser): Promise<{ token: string }> {
         return new Promise(async (resolve, reject) => {
 
             const otpNumber = utilHelper.generateAnOTP(6);
@@ -46,7 +61,7 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
                             jwtToken: jwtToken,
                             user_id: userid
                         }
-                    }, { upsert: true }).then((data) => {
+                    }, { upsert: true }).then(async (data) => {
                         resolve({ token: jwtToken })
 
                         let communicationData = {
@@ -55,7 +70,11 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
                             recipientEmail: baseUSER['email']
                         }
 
-                        COMMUNICATION_PROVIDER.signUpOTPSender(communicationData)
+                        const authenticationCommunicationProvider = new AuthNotificationProvider();
+                        await authenticationCommunicationProvider._init_();
+                        authenticationCommunicationProvider.signUpOTPSender(communicationData)
+
+                        // COMMUNICATION_PROVIDER.signUpOTPSender(communicationData)
 
                     }).catch((err) => {
                         reject(err)
@@ -71,7 +90,7 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
 
 
 
-    async isUserExist(email_address: string, phone_number: number) {
+    async isUserExist(email_address: string, phone_number: number): Promise<boolean> {
         if ((email_address == null || email_address == "") && (phone_number == null && phone_number == "")) {
             return false
         }
@@ -86,7 +105,7 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
 
 
             if (user) {
-                if (user.account_started == true) return user;
+                if (user.account_started == true) return true;
                 else return false;
             } else {
                 return false;
@@ -94,9 +113,37 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
 
         } catch (e) {
             console.log(e);
-            return null;
+            return false;
         }
     }
+
+
+    async findUser(id: string | null, email: string | null | undefined, phone: number | null | undefined): Promise<false | IUserModelDocument> {
+        if (utilHelper.isFalsyValue(id) && utilHelper.isFalsyValue(email) && utilHelper.isFalsyValue(phone)) {
+            throw new Error("Please provide any of arguments")
+        }
+
+        try {
+            const user = await this.UserAuthCollection.findOne({
+                $or: [
+                    { email: email },
+                    { phone_number: phone },
+                    { _id: id }
+                ]
+            });
+            if (user) {
+                return user
+            } else {
+                return false
+            }
+        } catch (e) {
+            console.log(e);
+            return false
+        }
+    }
+
+
+    // updateUser: ((newAuthUser: IUserModelDocument) => {}) | undefined
 
 
 

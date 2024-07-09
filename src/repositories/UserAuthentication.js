@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const notification_service_1 = __importDefault(require("../communication/Provider/notification/notification_service"));
 const const_1 = __importDefault(require("../config/const"));
 const userAuth_1 = __importDefault(require("../db/models/userAuth"));
 const tokenHelper_1 = __importDefault(require("../helper/tokenHelper"));
@@ -20,6 +21,18 @@ const utilHelper_1 = __importDefault(require("../helper/utilHelper"));
 class UserAuthenticationRepo {
     constructor() {
         this.UserAuthCollection = userAuth_1.default;
+    }
+    updateUser(newAuthUser) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield newAuthUser.save();
+                return true;
+            }
+            catch (e) {
+                console.log(e);
+                return false;
+            }
+        });
     }
     insertNewUser(baseUSER) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -44,15 +57,18 @@ class UserAuthenticationRepo {
                                 jwtToken: jwtToken,
                                 user_id: userid
                             }
-                        }, { upsert: true }).then((data) => {
+                        }, { upsert: true }).then((data) => __awaiter(this, void 0, void 0, function* () {
                             resolve({ token: jwtToken });
                             let communicationData = {
                                 otp: otpNumber,
                                 recipientName: baseUSER['first_name'] + baseUSER['last_name'],
                                 recipientEmail: baseUSER['email']
                             };
-                            COMMUNICATION_PROVIDER.signUpOTPSender(communicationData);
-                        }).catch((err) => {
+                            const authenticationCommunicationProvider = new notification_service_1.default();
+                            yield authenticationCommunicationProvider._init_();
+                            authenticationCommunicationProvider.signUpOTPSender(communicationData);
+                            // COMMUNICATION_PROVIDER.signUpOTPSender(communicationData)
+                        })).catch((err) => {
                             reject(err);
                         });
                     }
@@ -80,7 +96,7 @@ class UserAuthenticationRepo {
                 });
                 if (user) {
                     if (user.account_started == true)
-                        return user;
+                        return true;
                     else
                         return false;
                 }
@@ -90,7 +106,33 @@ class UserAuthenticationRepo {
             }
             catch (e) {
                 console.log(e);
-                return null;
+                return false;
+            }
+        });
+    }
+    findUser(id, email, phone) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (utilHelper_1.default.isFalsyValue(id) && utilHelper_1.default.isFalsyValue(email) && utilHelper_1.default.isFalsyValue(phone)) {
+                throw new Error("Please provide any of arguments");
+            }
+            try {
+                const user = yield this.UserAuthCollection.findOne({
+                    $or: [
+                        { email: email },
+                        { phone_number: phone },
+                        { _id: id }
+                    ]
+                });
+                if (user) {
+                    return user;
+                }
+                else {
+                    return false;
+                }
+            }
+            catch (e) {
+                console.log(e);
+                return false;
             }
         });
     }
