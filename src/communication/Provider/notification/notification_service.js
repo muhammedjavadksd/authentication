@@ -33,74 +33,116 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const amqplib = __importStar(require("amqplib"));
-const COMMUNICATION_PROVIDER = {
-    notificationConnection: (QUEUE) => __awaiter(void 0, void 0, void 0, function* () {
-        const connection = yield amqplib.connect("amqp://localhost");
-        const channel = yield connection.createChannel();
-        yield channel.assertQueue(QUEUE);
-        return channel;
-    }),
-    signInOTPSender: function (data) {
+class NotificationProvider {
+    constructor() {
+        this.connection = null;
+        this.channel = null;
+        this.NOTIFICATION_QUEUE = process.env.USER_SIGN_IN_NOTIFICATION;
+    }
+    _init_() {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const NOTIFICATION_QUEUE = process.env.USER_SIGN_IN_NOTIFICATION;
-                const channel = yield this.notificationConnection(NOTIFICATION_QUEUE);
-                channel.sendToQueue(NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
-                return true;
-            }
-            catch (e) {
-                console.log(e);
-                return false;
-            }
-        });
-    },
-    signUpOTPSender: function (data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const NOTIFICATION_QUEUE = process.env.USER_SIGN_UP_NOTIFICATION;
-                const channel = yield this.notificationConnection(NOTIFICATION_QUEUE);
-                channel.sendToQueue(NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
-                console.log("Notification communication has been sent");
-                return true;
-            }
-            catch (e) {
-                console.log(e);
-                console.log("Message Sending Failed");
-                return false;
-            }
-        });
-    },
-    adminForgetPasswordEmail: function (data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const NOTIFICATION_QUEUE = process.env.ADMIN_FORGETPASSWORD_EMAIL;
-                const channel = yield this.notificationConnection(NOTIFICATION_QUEUE);
-                channel.sendToQueue(NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
-                console.log("Notification for admin password reset");
-                return true;
-            }
-            catch (e) {
-                console.log(e);
-                console.log("Message Sending Failed");
-                return false;
-            }
-        });
-    },
-    organizationForgetPasswordEmail: function (data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const NOTIFICATION_QUEUE = process.env.ORGANIZATION_FORGETPASSWORD_EMAIL;
-                const channel = yield this.notificationConnection(NOTIFICATION_QUEUE);
-                channel.sendToQueue(NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
-                console.log("Notification for organization password reset");
-                return true;
-            }
-            catch (e) {
-                console.log(e);
-                console.log("Message Sending Failed");
-                return false;
-            }
+            this.connection = yield amqplib.connect("amqp://localhost");
+            this.channel = yield this.connection.createChannel();
         });
     }
-};
-exports.default = COMMUNICATION_PROVIDER;
+    signInOTPSender(data) {
+        var _a;
+        try {
+            (_a = this.channel) === null || _a === void 0 ? void 0 : _a.sendToQueue(this.NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
+            return true;
+        }
+        catch (e) {
+            console.log(e);
+            return false;
+        }
+    }
+    signUpOTPSender(data) {
+        var _a;
+        try {
+            (_a = this.channel) === null || _a === void 0 ? void 0 : _a.sendToQueue(this.NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
+            return true;
+        }
+        catch (e) {
+            return false;
+        }
+    }
+    adminForgetPasswordEmail(data) {
+        var _a;
+        try {
+            (_a = this.channel) === null || _a === void 0 ? void 0 : _a.sendToQueue(this.NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
+            return true;
+        }
+        catch (e) {
+            return false;
+        }
+    }
+    organizationForgetPasswordEmail(data) {
+        var _a;
+        try {
+            (_a = this.channel) === null || _a === void 0 ? void 0 : _a.sendToQueue(this.NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
+            return true;
+        }
+        catch (e) {
+            return false;
+        }
+    }
+}
+// const COMMUNICATION_PROVIDER: CommunicationProvider = {
+//     notificationConnection: async (QUEUE: string): Promise<amqplib.Channel> => {
+//         const connection: amqplib.Connection = await amqplib.connect("amqp://localhost");
+//         const channel: amqplib.Channel = await connection.createChannel();
+//         await channel.assertQueue(QUEUE);
+//         return channel;
+//     },
+//     signInOTPSender: async function (data: any): Promise<boolean> {
+//         try {
+//             const NOTIFICATION_QUEUE: string = process.env.USER_SIGN_IN_NOTIFICATION as string;
+//             const channel: amqplib.Channel = await this.notificationConnection(NOTIFICATION_QUEUE);
+//             channel.sendToQueue(NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
+//             return true
+//         } catch (e) {
+//             console.log(e);
+//             return false
+//         }
+//     },
+//     signUpOTPSender: async function (data: any): Promise<boolean> {
+//         try {
+//             const NOTIFICATION_QUEUE: string = process.env.USER_SIGN_UP_NOTIFICATION as string;
+//             const channel: amqplib.Channel = await this.notificationConnection(NOTIFICATION_QUEUE);
+//             channel.sendToQueue(NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
+//             console.log("Notification communication has been sent");
+//             return true
+//         } catch (e) {
+//             console.log(e);
+//             console.log("Message Sending Failed");
+//             return false
+//         }
+//     },
+//     adminForgetPasswordEmail: async function (data: any): Promise<boolean> {
+//         try {
+//             const NOTIFICATION_QUEUE: string = process.env.ADMIN_FORGETPASSWORD_EMAIL as string;
+//             const channel: amqplib.Channel = await this.notificationConnection(NOTIFICATION_QUEUE);
+//             channel.sendToQueue(NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
+//             console.log("Notification for admin password reset");
+//             return true
+//         } catch (e) {
+//             console.log(e);
+//             console.log("Message Sending Failed");
+//             return false;
+//         }
+//     },
+//     organizationForgetPasswordEmail: async function (data: any): Promise<boolean> {
+//         try {
+//             const NOTIFICATION_QUEUE: string = process.env.ORGANIZATION_FORGETPASSWORD_EMAIL as string;
+//             const channel: amqplib.Channel = await this.notificationConnection(NOTIFICATION_QUEUE);
+//             channel.sendToQueue(NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
+//             console.log("Notification for organization password reset");
+//             return true;
+//         } catch (e) {
+//             console.log(e);
+//             console.log("Message Sending Failed");
+//             return false
+//         }
+//     }
+// };
+exports.default = NotificationProvider;
