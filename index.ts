@@ -1,12 +1,13 @@
 import express, { Express } from "express";
 import dotenv from "dotenv";
 import bodyparser from "body-parser";
-import authenticationDbConnection from "./db/config/connection";
-import userRouter from "./router/userRouter/userRouter";
-import adminRouter from "./router/adminRouter/adminRouter";
+import authenticationDbConnection from "./src/db/config/connection";
+import userRouter from "./src/router/userRouter/userRouter";
+import adminRouter from "./src/router/adminRouter/adminRouter";
 import logger from "morgan";
-import BulkConsumer from './communication/BulkDataConsumer'
-import organizationRouter from "./router/organization/organizationRouter";
+// import BulkConsumer from './src/communication/BulkDataConsumer'
+import organizationRouter from "./src/router/organization/organizationRouter";
+import BulkDataConsumer from "./src/communication/BulkDataConsumer";
 
 
 
@@ -20,7 +21,7 @@ app.use(bodyparser.urlencoded({ extended: true }));
 
 dotenv.config();
 
-BulkConsumer();
+BulkDataConsumer()
 
 app.use(logger("common"));
 

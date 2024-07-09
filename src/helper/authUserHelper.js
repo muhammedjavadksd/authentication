@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const const_1 = __importDefault(require("../config/const"));
-const notification_service_1 = __importDefault(require("../communication/Provider/notification/notification_service"));
 const userAuth_1 = __importDefault(require("../db/models/userAuth"));
 const tokenHelper_1 = __importDefault(require("./tokenHelper"));
 const userHelper_1 = __importDefault(require("./userHelper"));
@@ -127,11 +126,12 @@ let authHelper = {
                     userAuth.otp_timer = otpExpireTime;
                     userAuth.jwtToken = token;
                     yield userAuth.save();
-                    notification_service_1.default.signInOTPSender({
-                        otp: otpNumber,
-                        email: userAuth.email,
-                        full_name: userAuth.first_name + userAuth.last_name
-                    });
+                    //Uncommend below line if not repo pattern
+                    // COMMUNICATION_PROVIDER.signInOTPSender({
+                    //     otp: otpNumber,
+                    //     email: userAuth.email,
+                    //     full_name: userAuth.first_name + userAuth.last_name
+                    // })
                     return {
                         statusCode: 200,
                         status: true,
@@ -226,11 +226,12 @@ let authHelper = {
                         getUser.otp_timer = otpExpireTime;
                         getUser.jwtToken = newToken;
                         getUser.save();
-                        notification_service_1.default.signInOTPSender({
-                            otp: otpNumber,
-                            email: newEmailID,
-                            full_name: getUser.first_name + getUser.last_name
-                        });
+                        //Uncommend below line if not repo pattern
+                        // COMMUNICATION_PROVIDER.signInOTPSender({
+                        //     otp: otpNumber,
+                        //     email: newEmailID,
+                        //     full_name: getUser.first_name + getUser.last_name
+                        // })
                         return {
                             status: true,
                             msg: "Email id has been updated",

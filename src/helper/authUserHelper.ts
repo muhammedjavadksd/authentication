@@ -140,11 +140,13 @@ let authHelper: authHelperInterFace = {
                 userAuth.jwtToken = token;
 
                 await userAuth.save()
-                COMMUNICATION_PROVIDER.signInOTPSender({
-                    otp: otpNumber,
-                    email: userAuth.email,
-                    full_name: userAuth.first_name + userAuth.last_name
-                })
+                //Uncommend below line if not repo pattern
+
+                // COMMUNICATION_PROVIDER.signInOTPSender({
+                //     otp: otpNumber,
+                //     email: userAuth.email,
+                //     full_name: userAuth.first_name + userAuth.last_name
+                // })
                 return {
                     statusCode: 200,
                     status: true,
@@ -244,11 +246,13 @@ let authHelper: authHelperInterFace = {
                     getUser.jwtToken = newToken
                     getUser.save()
 
-                    COMMUNICATION_PROVIDER.signInOTPSender({
-                        otp: otpNumber,
-                        email: newEmailID,
-                        full_name: getUser.first_name + getUser.last_name
-                    })
+                    //Uncommend below line if not repo pattern
+
+                    // COMMUNICATION_PROVIDER.signInOTPSender({
+                    //     otp: otpNumber,
+                    //     email: newEmailID,
+                    //     full_name: getUser.first_name + getUser.last_name
+                    // })
 
 
                     return {

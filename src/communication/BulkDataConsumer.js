@@ -21,4 +21,4 @@ function bulkConsumer() {
         profileDataConsumer.authProfileUpdation();
     });
 }
-exports.default = bulkConsumer();
+exports.default = bulkConsumer;

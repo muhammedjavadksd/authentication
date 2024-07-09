@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const adminAuth_1 = __importDefault(require("../db/models/adminAuth"));
-const notification_service_1 = __importDefault(require("../communication/Provider/notification/notification_service"));
 const tokenHelper_1 = __importDefault(require("./tokenHelper"));
 const const_1 = __importDefault(require("../config/const"));
 let authAdminHelper = {
@@ -79,11 +78,12 @@ let authAdminHelper = {
             if (findAdmin && token) {
                 findAdmin.token = token;
                 yield findAdmin.save();
-                notification_service_1.default.adminForgetPasswordEmail({
-                    token: token,
-                    email,
-                    name: findAdmin.name
-                });
+                //Uncommend below line if not repo pattern
+                // COMMUNICATION_PROVIDER.adminForgetPasswordEmail({
+                //     token: token,
+                //     email,
+                //     name: findAdmin.name
+                // })
                 return {
                     status: true,
                     statusCode: 200,
@@ -113,7 +113,7 @@ let authAdminHelper = {
             if (typeof isTokenValid == "object") {
                 const email_id = isTokenValid.email;
                 const findAdmin = yield adminAuth_1.default.findOne({ email_address: email_id });
-                if (findAdmin && findAdmin.pasword) {
+                if (findAdmin && findAdmin.password) {
                     if (findAdmin.token == token) {
                         const newPassword = yield bcrypt_1.default.hash(password, Number(process.env.BCRYPT_SALTROUND));
                         const comparePassword = yield bcrypt_1.default.compare(password, findAdmin.password);

@@ -79,11 +79,12 @@ let authAdminHelper: authAdminHelper = {
             if (findAdmin && token) {
                 findAdmin.token = token;
                 await findAdmin.save();
-                COMMUNICATION_PROVIDER.adminForgetPasswordEmail({
-                    token: token,
-                    email,
-                    name: findAdmin.name
-                })
+                //Uncommend below line if not repo pattern
+                // COMMUNICATION_PROVIDER.adminForgetPasswordEmail({
+                //     token: token,
+                //     email,
+                //     name: findAdmin.name
+                // })
                 return {
                     status: true,
                     statusCode: 200,
@@ -115,7 +116,7 @@ let authAdminHelper: authAdminHelper = {
                 const email_id: string = isTokenValid.email
                 const findAdmin = await AdminAuthModel.findOne({ email_address: email_id })
 
-                if (findAdmin && findAdmin.pasword) {
+                if (findAdmin && findAdmin.password) {
                     if (findAdmin.token == token) {
 
                         const newPassword: string = await bcrypt.hash(password, Number(process.env.BCRYPT_SALTROUND));

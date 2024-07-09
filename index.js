@@ -6,12 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const body_parser_1 = __importDefault(require("body-parser"));
-const connection_1 = __importDefault(require("./db/config/connection"));
-const userRouter_1 = __importDefault(require("./router/userRouter/userRouter"));
-const adminRouter_1 = __importDefault(require("./router/adminRouter/adminRouter"));
+const connection_1 = __importDefault(require("./src/db/config/connection"));
+const userRouter_1 = __importDefault(require("./src/router/userRouter/userRouter"));
+const adminRouter_1 = __importDefault(require("./src/router/adminRouter/adminRouter"));
 const morgan_1 = __importDefault(require("morgan"));
-const BulkDataConsumer_1 = __importDefault(require("./communication/BulkDataConsumer"));
-const organizationRouter_1 = __importDefault(require("./router/organization/organizationRouter"));
+// import BulkConsumer from './src/communication/BulkDataConsumer'
+const organizationRouter_1 = __importDefault(require("./src/router/organization/organizationRouter"));
+const BulkDataConsumer_1 = __importDefault(require("./src/communication/BulkDataConsumer"));
 const app = (0, express_1.default)();
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));

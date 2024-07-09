@@ -1,6 +1,7 @@
 // const { required } = require("joi");
 // const { default: mongoose } = require("mongoose");
 import mongoose from "mongoose";
+import IOrganizationAuthModel from "../../config/Interface/IModel/OrganizationAuthModel/IOrganizationModel";
 
 
 let OrganizationAuthModel: mongoose.Schema = new mongoose.Schema({
@@ -62,6 +63,6 @@ let OrganizationAuthModel: mongoose.Schema = new mongoose.Schema({
     }
 })
 
-let OrganizationAuth = mongoose.model("organization", OrganizationAuthModel, "organization");
+let OrganizationAuth = mongoose.model<IOrganizationAuthModel>("organization", OrganizationAuthModel, "organization");
 
 export default OrganizationAuth;
