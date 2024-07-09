@@ -8,7 +8,7 @@ import utilHelper from "../../helper/util/utilHelper";
 import UserAuthenticationRepo from "../../repositories/UserRepo/UserAuthentication";
 import ProfileCommunicationProvider from "../../communication/Provider/profile/profile_service";
 import TokenHelper from "../../helper/token/tokenHelper";
-import { IUserAuthService } from "../../config/Interface/ServiceInterface";
+import { IUserAuthService } from "../../config/Interface/Service/ServiceInterface";
 
 
 

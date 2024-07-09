@@ -1,5 +1,5 @@
 import IOrganizationAuthModel from "../../config/Interface/IModel/OrganizationAuthModel/IOrganizationModel";
-import { IOrganizationRepo } from "../../config/Interface/RepositoriesInterface";
+import { IOrganizationRepo } from "../../config/Interface/Repos/RepositoriesInterface";
 import OrganizationAuth from "../../db/models/organizationAuth";
 
 

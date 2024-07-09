@@ -7,7 +7,7 @@ import AdminAuthenticationRepo from "../../repositories/AdminRepo/AdminAuthentic
 import bcrypt from 'bcrypt';
 import IAdminAuthModel from "../../config/Interface/IModel/AdminAuthModel/IAdminAuthModel";
 import TokenHelper from "../../helper/token/tokenHelper";
-import { IAdminAuthService } from "../../config/Interface/ServiceInterface";
+import { IAdminAuthService } from "../../config/Interface/Service/ServiceInterface";
 
 class AdminAuthService implements IAdminAuthService {
 

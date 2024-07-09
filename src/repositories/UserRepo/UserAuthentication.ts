@@ -9,7 +9,7 @@ import tokenHelper from "../../helper/token/tokenHelper";
 import utilHelper from "../../helper/util/utilHelper";
 import TokenHelper from "../../helper/token/tokenHelper";
 import UserAuthServices from "../../services/UserAuthService/UserAuthServices";
-import { IUserAuthenticationRepo } from "../../config/Interface/RepositoriesInterface";
+import { IUserAuthenticationRepo } from "../../config/Interface/Repos/RepositoriesInterface";
 
 
 

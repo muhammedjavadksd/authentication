@@ -1,4 +1,4 @@
-import { HelperFunctionResponse } from "../Datas/InterFace"
+import { HelperFunctionResponse } from "../../Datas/InterFace"
 
 
 interface IAdminAuthService {

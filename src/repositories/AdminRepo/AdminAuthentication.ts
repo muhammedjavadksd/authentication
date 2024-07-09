@@ -1,5 +1,5 @@
 import IAdminAuthModel from "../../config/Interface/IModel/AdminAuthModel/IAdminAuthModel";
-import { IAdminRepo } from "../../config/Interface/RepositoriesInterface";
+import { IAdminRepo } from "../../config/Interface/Repos/RepositoriesInterface";
 import AdminAuthModel from "../../db/models/adminAuth";
 
 

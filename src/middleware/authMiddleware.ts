@@ -1,14 +1,14 @@
 import { NextFunction, Response, Request } from "express";
-import { ControllerInterFace, ControllerResponseInterFace, CustomRequest } from "../config/Datas/InterFace";
+import { ControllerResponseInterFace, CustomRequest } from "../config/Datas/InterFace";
 import const_data from '../config/const'
-import tokenHelper from "../helper/token/tokenHelper";
 import { JwtPayload } from "jsonwebtoken";
 import utilHelper from "../helper/util/utilHelper";
 import TokenHelper from "../helper/token/tokenHelper";
+import IAuthMiddleware from "../config/Interface/Middleware/AuthMiddlewareInterface";
 
 let { OTP_TYPE } = const_data;
 
-class AuthMiddleware {
+class AuthMiddleware implements IAuthMiddleware {
 
 
     private readonly tokenHelpers;
@@ -16,7 +16,6 @@ class AuthMiddleware {
     constructor() {
         this.tokenHelpers = new TokenHelper();
     }
-
 
     async isValidSignUpAttempt(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
         const headers: CustomRequest['headers'] = req.headers;
@@ -69,15 +68,15 @@ class AuthMiddleware {
         }
     }
 
-    isUserLogged(req: Request, res: Response, next: NextFunction) {
+    isUserLogged(req: Request, res: Response, next: NextFunction): void {
         next();
     }
 
-    isAdminLogged(req: Request, res: Response, next: NextFunction) {
+    isAdminLogged(req: Request, res: Response, next: NextFunction): void {
         next();
     }
 
-    isOrganizationLogged(req: Request, res: Response, next: NextFunction) {
+    isOrganizationLogged(req: Request, res: Response, next: NextFunction): void {
         next();
     }
 }

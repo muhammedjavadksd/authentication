@@ -6,7 +6,7 @@ import tokenHelper from "../../helper/token/tokenHelper";
 import OrganizationRepo from "../../repositories/OrganizationRepo/OrganizationRepo";
 import bcrypt from 'bcrypt'
 import TokenHelper from "../../helper/token/tokenHelper";
-import { IOrganizationAuthService } from "../../config/Interface/ServiceInterface";
+import { IOrganizationAuthService } from "../../config/Interface/Service/ServiceInterface";
 import IOrganizationAuthModel from "../../config/Interface/IModel/OrganizationAuthModel/IOrganizationModel";
 
 

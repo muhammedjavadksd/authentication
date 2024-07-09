@@ -1,18 +1,7 @@
 import { Request } from "express";
+import { IOTPValidationResponse, IUtilHelper } from "../../config/Interface/IUtilHelper/IUtilHelper";
 
-interface IUtilHelper {
-    generateAnOTP: (length: number) => number;
-    createRandomText: (length: number) => string;
-    organizationFileName: (file_name: string, type: string) => string;
-    isFalsyValue: (data: any) => boolean
-    OTPValidator: (otp_number: number, db_otp_number: number, expire_time: number) => IOTPValidationResponse
-    getTokenFromHeader: (headers: Request['headers']['authorization']) => string | false
-}
 
-interface IOTPValidationResponse {
-    status: boolean
-    msg?: string
-}
 
 const utilHelper: IUtilHelper = {
     generateAnOTP: (length: number): number => {
@@ -39,7 +28,7 @@ const utilHelper: IUtilHelper = {
         return type + file_name;
     },
 
-    isFalsyValue: (data: any) => {
+    isFalsyValue: (data: any): boolean => {
         return data == "" || data == null || data == undefined
     },
 
