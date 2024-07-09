@@ -1,18 +1,17 @@
-import AuthNotificationProvider from "../communication/Provider/notification/notification_service";
-import IUserModelDocument from "../config/Interface/IModel/IUserAuthModel";
-import UserModelDocument from "../config/Interface/IModel/IUserAuthModel";
-import IBaseUser from "../config/Interface/Objects/IBaseUser";
-import constant_data from "../config/const";
-import userAuth from "../db/models/userAuth";
-import tokenHelper from "../helper/tokenHelper";
-import userHelper from "../helper/userHelper";
-import utilHelper from "../helper/utilHelper";
+import AuthNotificationProvider from "../../communication/Provider/notification/notification_service";
+import IUserModelDocument from "../../config/Interface/IModel/UserAuthModel/IUserAuthModel";
+import UserModelDocument from "../../config/Interface/IModel/UserAuthModel/IUserAuthModel";
+import IBaseUser from "../../config/Interface/Objects/IBaseUser";
+import constant_data from "../../config/const";
+import userAuth from "../../db/models/userAuth";
+import tokenHelper from "../../helper/tokenHelper";
+import userHelper from "../../helper/userHelper";
+import utilHelper from "../../helper/utilHelper";
 
 interface IUserAuthenticationRepo {
     isUserExist(email_address: string, phone_number: number): Promise<boolean>
     findUser(id: string | null, email: string | null | undefined, phone: number | null | undefined): Promise<boolean | IUserModelDocument>
     updateUser(newAuthUser: IUserModelDocument): Promise<boolean>
-    updateToken(userId: string): Promise<string | null>
 }
 
 
@@ -24,6 +23,7 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
     constructor() {
         this.UserAuthCollection = userAuth;
     }
+
 
     async updateUser(newAuthUser: IUserModelDocument): Promise<boolean> {
         try {

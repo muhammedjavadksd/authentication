@@ -1,35 +1,48 @@
 import { Request, Response, NextFunction } from "express";
 import authAdminHelper from "../../helper/authAdminHelper";
-import { AdminAuthController, AdminJwtInterFace, ControllerResponseInterFace, HelperFunctionResponse } from "../../config/Datas/InterFace";
+import { AdminJwtInterFace, ControllerResponseInterFace, HelperFunctionResponse } from "../../config/Datas/InterFace";
+import AdminAuthService from "../../services/AdminAuthService/AdminAuthService";
+
+interface IAdminController {
+
+}
+
+class AdminController implements IAdminController {
+
+    private AdminServices;
+
+    constructor() {
+        this.AdminServices = new AdminAuthService();
+    }
 
 
-let authController: AdminAuthController = {
-
-    signInController: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-
+    async signInController(req: Request, res: Response, next: NextFunction): Promise<void> {
         const email_address: string = req.body.email_address;
         const password: string = req.body.password;
 
         try {
-            const adminAuthAttempt: HelperFunctionResponse = await authAdminHelper.signInHelper(email_address, password)
-            const helperData: AdminJwtInterFace | null | undefined = adminAuthAttempt.data;
-            if (helperData) {
-                const response: ControllerResponseInterFace = {
-                    status: adminAuthAttempt.status,
-                    msg: adminAuthAttempt.msg,
-                    data: {
-                        email: helperData.email,
-                        name: helperData.name,
-                        token: helperData.token
+            const adminAuthAttempt: HelperFunctionResponse = await this.AdminServices.signIn(email_address, password) //await authAdminHelper.signInHelper(email_address, password)
+            if (adminAuthAttempt.status) {
+                const helperData: AdminJwtInterFace | null | undefined = adminAuthAttempt.data;
+
+                if (helperData) {
+                    const response: ControllerResponseInterFace = {
+                        status: adminAuthAttempt.status,
+                        msg: adminAuthAttempt.msg,
+                        data: {
+                            email: helperData.email,
+                            name: helperData.name,
+                            token: helperData.token
+                        }
                     }
+                    res.status(adminAuthAttempt.statusCode).json(response)
+                } else {
+                    const response: ControllerResponseInterFace = {
+                        status: adminAuthAttempt.status,
+                        msg: adminAuthAttempt.msg,
+                    }
+                    res.status(adminAuthAttempt.statusCode).json(response)
                 }
-                res.status(adminAuthAttempt.statusCode).json(response)
-            } else {
-                const response: ControllerResponseInterFace = {
-                    status: adminAuthAttempt.status,
-                    msg: adminAuthAttempt.msg,
-                }
-                res.status(adminAuthAttempt.statusCode).json(response)
             }
         } catch (e) {
             const response: ControllerResponseInterFace = {
@@ -38,9 +51,9 @@ let authController: AdminAuthController = {
             }
             res.status(500).json(response)
         }
-    },
+    }
 
-    forgetPasswordController: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    async forgetPasswordController(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
             let email_id: string = req.body.email_id;
@@ -50,10 +63,10 @@ let authController: AdminAuthController = {
             console.log(e);
             res.status(500).json({ status: false, msg: "Internal Server Error" } as ControllerResponseInterFace)
         }
-    },
+    }
 
 
-    adminPasswordReset: async (req: Request, res: Response): Promise<void> => {
+    async adminPasswordReset(req: Request, res: Response): Promise<void> {
 
         try {
 
@@ -62,7 +75,7 @@ let authController: AdminAuthController = {
             let password: string = req.body.password;
 
             if (password && token) {
-                const resetPassword: HelperFunctionResponse = await authAdminHelper.resetPassword(token, password);
+                const resetPassword: HelperFunctionResponse = await this.AdminServices.resetPassword(token, password); //authAdminHelper.resetPassword(token, password);
                 res.status(resetPassword.statusCode).json({
                     status: resetPassword.status,
                     msg: resetPassword.msg,
@@ -81,6 +94,8 @@ let authController: AdminAuthController = {
             } as ControllerResponseInterFace)
         }
     }
+
 }
 
-export default authController
+
+export default AdminController

@@ -12,12 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const notification_service_1 = __importDefault(require("../communication/Provider/notification/notification_service"));
-const const_1 = __importDefault(require("../config/const"));
-const tokenHelper_1 = __importDefault(require("../helper/tokenHelper"));
-const utilHelper_1 = __importDefault(require("../helper/utilHelper"));
-const UserAuthentication_1 = __importDefault(require("../repositories/UserAuthentication"));
-const profile_service_1 = __importDefault(require("../communication/Provider/profile/profile_service"));
+const notification_service_1 = __importDefault(require("../../communication/Provider/notification/notification_service"));
+const const_1 = __importDefault(require("../../config/const"));
+const tokenHelper_1 = __importDefault(require("../../helper/tokenHelper"));
+const utilHelper_1 = __importDefault(require("../../helper/utilHelper"));
+const UserAuthentication_1 = __importDefault(require("../../repositories/UserRepo/UserAuthentication"));
+const profile_service_1 = __importDefault(require("../../communication/Provider/profile/profile_service"));
 class UserAuthServices {
     constructor() {
         this.UserAuthRepo = new UserAuthentication_1.default();

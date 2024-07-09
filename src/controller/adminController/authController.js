@@ -13,77 +13,89 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const authAdminHelper_1 = __importDefault(require("../../helper/authAdminHelper"));
-let authController = {
-    signInController: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        const email_address = req.body.email_address;
-        const password = req.body.password;
-        try {
-            const adminAuthAttempt = yield authAdminHelper_1.default.signInHelper(email_address, password);
-            const helperData = adminAuthAttempt.data;
-            if (helperData) {
-                const response = {
-                    status: adminAuthAttempt.status,
-                    msg: adminAuthAttempt.msg,
-                    data: {
-                        email: helperData.email,
-                        name: helperData.name,
-                        token: helperData.token
+const AdminAuthService_1 = __importDefault(require("../../services/AdminAuthService/AdminAuthService"));
+class AdminController {
+    constructor() {
+        this.AdminServices = new AdminAuthService_1.default();
+    }
+    signInController(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const email_address = req.body.email_address;
+            const password = req.body.password;
+            try {
+                const adminAuthAttempt = yield this.AdminServices.signIn(email_address, password); //await authAdminHelper.signInHelper(email_address, password)
+                if (adminAuthAttempt.status) {
+                    const helperData = adminAuthAttempt.data;
+                    if (helperData) {
+                        const response = {
+                            status: adminAuthAttempt.status,
+                            msg: adminAuthAttempt.msg,
+                            data: {
+                                email: helperData.email,
+                                name: helperData.name,
+                                token: helperData.token
+                            }
+                        };
+                        res.status(adminAuthAttempt.statusCode).json(response);
                     }
-                };
-                res.status(adminAuthAttempt.statusCode).json(response);
+                    else {
+                        const response = {
+                            status: adminAuthAttempt.status,
+                            msg: adminAuthAttempt.msg,
+                        };
+                        res.status(adminAuthAttempt.statusCode).json(response);
+                    }
+                }
             }
-            else {
+            catch (e) {
                 const response = {
-                    status: adminAuthAttempt.status,
-                    msg: adminAuthAttempt.msg,
-                };
-                res.status(adminAuthAttempt.statusCode).json(response);
-            }
-        }
-        catch (e) {
-            const response = {
-                status: false,
-                msg: "Internal server error",
-            };
-            res.status(500).json(response);
-        }
-    }),
-    forgetPasswordController: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        try {
-            let email_id = req.body.email_id;
-            let adminResetRequest = yield authAdminHelper_1.default.forgetPasswordHelpers(email_id);
-            res.status(adminResetRequest.statusCode).json({ status: true, msg: adminResetRequest.msg });
-        }
-        catch (e) {
-            console.log(e);
-            res.status(500).json({ status: false, msg: "Internal Server Error" });
-        }
-    }),
-    adminPasswordReset: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        try {
-            let token = authAdminHelper_1.default.getTokenFromHeader(req['headers']['authorization']);
-            let password = req.body.password;
-            if (password && token) {
-                const resetPassword = yield authAdminHelper_1.default.resetPassword(token, password);
-                res.status(resetPassword.statusCode).json({
-                    status: resetPassword.status,
-                    msg: resetPassword.msg,
-                });
-            }
-            else {
-                res.status(401).json({
                     status: false,
-                    msg: "Please provide a password",
+                    msg: "Internal server error",
+                };
+                res.status(500).json(response);
+            }
+        });
+    }
+    forgetPasswordController(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let email_id = req.body.email_id;
+                let adminResetRequest = yield authAdminHelper_1.default.forgetPasswordHelpers(email_id);
+                res.status(adminResetRequest.statusCode).json({ status: true, msg: adminResetRequest.msg });
+            }
+            catch (e) {
+                console.log(e);
+                res.status(500).json({ status: false, msg: "Internal Server Error" });
+            }
+        });
+    }
+    adminPasswordReset(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let token = authAdminHelper_1.default.getTokenFromHeader(req['headers']['authorization']);
+                let password = req.body.password;
+                if (password && token) {
+                    const resetPassword = yield this.AdminServices.resetPassword(token, password); //authAdminHelper.resetPassword(token, password);
+                    res.status(resetPassword.statusCode).json({
+                        status: resetPassword.status,
+                        msg: resetPassword.msg,
+                    });
+                }
+                else {
+                    res.status(401).json({
+                        status: false,
+                        msg: "Please provide a password",
+                    });
+                }
+            }
+            catch (e) {
+                console.log(e);
+                res.status(500).json({
+                    status: false,
+                    msg: "Internal Servor Error",
                 });
             }
-        }
-        catch (e) {
-            console.log(e);
-            res.status(500).json({
-                status: false,
-                msg: "Internal Servor Error",
-            });
-        }
-    })
-};
-exports.default = authController;
+        });
+    }
+}
+exports.default = AdminController;

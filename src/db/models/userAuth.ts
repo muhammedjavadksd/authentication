@@ -1,6 +1,6 @@
 
 // const constant_data = require("../../config/const");
-import UserModelDocument from "../../config/Interface/IModel/IUserAuthModel";
+import UserModelDocument from "../../config/Interface/IModel/UserAuthModel/IUserAuthModel";
 import constant_data from "../../config/const";
 // const mongo = require("mongoose");
 import mongoose from "mongoose";

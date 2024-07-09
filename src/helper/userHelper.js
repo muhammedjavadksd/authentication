@@ -12,8 +12,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// import { COMMUNICATION_PROVIDER } from '../communication/Provider/notification/notification_service';
-const notification_service_1 = __importDefault(require("../communication/Provider/notification/notification_service"));
 // import { constant_data } from '../config/const';
 const const_1 = __importDefault(require("../config/const"));
 const tokenHelper_1 = __importDefault(require("./tokenHelper"));
@@ -82,7 +80,8 @@ const userHelper = {
                             recipientName: first_name + last_name,
                             recipientEmail: email
                         };
-                        notification_service_1.default.signUpOTPSender(communicationData);
+                        //Uncommend if not clean architech
+                        // COMMUNICATION_PROVIDER.signUpOTPSender(communicationData)
                     }).catch((err) => {
                         reject(err);
                     });

@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
-import AuthNotificationProvider from "../communication/Provider/notification/notification_service";
-import { HelperFunctionResponse, UserJwtInterFace } from "../config/Datas/InterFace";
-import IUserModelDocument from "../config/Interface/IModel/IUserAuthModel";
-import constant_data from "../config/const";
-import tokenHelper from "../helper/tokenHelper";
-import utilHelper from "../helper/utilHelper";
-import UserAuthenticationRepo from "../repositories/UserAuthentication";
-import ProfileCommunicationProvider from "../communication/Provider/profile/profile_service";
+import AuthNotificationProvider from "../../communication/Provider/notification/notification_service";
+import { HelperFunctionResponse, UserJwtInterFace } from "../../config/Datas/InterFace";
+import IUserModelDocument from "../../config/Interface/IModel/UserAuthModel/IUserAuthModel";
+import constant_data from "../../config/const";
+import tokenHelper from "../../helper/tokenHelper";
+import utilHelper from "../../helper/utilHelper";
+import UserAuthenticationRepo from "../../repositories/UserRepo/UserAuthentication";
+import ProfileCommunicationProvider from "../../communication/Provider/profile/profile_service";
 
 
 interface IUserAuthServices {

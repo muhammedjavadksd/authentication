@@ -7,9 +7,9 @@ import { AuthController, ControllerResponseInterFace, CustomRequest, HelperFunct
 import IUserAuthController from '../../config/Interface/IController/IUserAuthController';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import UserAuthenticationRepo from '../../repositories/UserAuthentication';
+import UserAuthenticationRepo from '../../repositories/UserRepo/UserAuthentication';
 import IBaseUser from '../../config/Interface/Objects/IBaseUser';
-import UserAuthServices from '../../services/UserAuthServices';
+import UserAuthServices from '../../services/UserAuthService/UserAuthServices';
 
 
 let { AUTH_PROVIDERS_DATA } = const_data;

@@ -15,8 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const const_1 = __importDefault(require("../../config/const"));
 const validation_1 = __importDefault(require("../../config/validation/validation"));
 const authUserHelper_1 = __importDefault(require("../../helper/authUserHelper"));
-const UserAuthentication_1 = __importDefault(require("../../repositories/UserAuthentication"));
-const UserAuthServices_1 = __importDefault(require("../../services/UserAuthServices"));
+const UserAuthentication_1 = __importDefault(require("../../repositories/UserRepo/UserAuthentication"));
+const UserAuthServices_1 = __importDefault(require("../../services/UserAuthService/UserAuthServices"));
 let { AUTH_PROVIDERS_DATA } = const_1.default;
 class UserAuthController {
     constructor() {

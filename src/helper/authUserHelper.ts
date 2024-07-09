@@ -66,7 +66,8 @@ let authHelper: authHelperInterFace = {
 
                                 if (!getUser.account_started) {
                                     getUser.account_started = true
-                                    PROFILE_COMMUNICATION_PROVIDER.authDataTransfer(getUser.first_name, getUser.last_name, getUser.email, getUser.location, getUser.phone_number, getUser.id, getUser.user_id)
+                                    //Uncommend if not clean architech
+                                    // PROFILE_COMMUNICATION_PROVIDER.authDataTransfer(getUser.first_name, getUser.last_name, getUser.email, getUser.location, getUser.phone_number, getUser.id, getUser.user_id)
                                 }
 
                                 await getUser.save();
@@ -184,11 +185,13 @@ let authHelper: authHelperInterFace = {
                     getUser.otp = otpNumber;
                     getUser.otp_timer = otpExpireTime;
                     await getUser.save()
-                    COMMUNICATION_PROVIDER.signInOTPSender({
-                        otp: otpNumber,
-                        email: email_id,
-                        full_name: getUser.first_name + " " + getUser.last_name
-                    })
+                    //Uncommend if not clean architech
+
+                    // COMMUNICATION_PROVIDER.signInOTPSender({
+                    //     otp: otpNumber,
+                    //     email: email_id,
+                    //     full_name: getUser.first_name + " " + getUser.last_name
+                    // })
                     return {
                         statusCode: 200,
                         status: true,

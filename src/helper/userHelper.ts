@@ -96,7 +96,8 @@ const userHelper: UserHelper = {
                             recipientEmail: email
                         }
 
-                        COMMUNICATION_PROVIDER.signUpOTPSender(communicationData)
+                        //Uncommend if not clean architech
+                        // COMMUNICATION_PROVIDER.signUpOTPSender(communicationData)
 
                     }).catch((err) => {
                         reject(err)

@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const const_1 = __importDefault(require("../config/const"));
 const notification_service_1 = __importDefault(require("../communication/Provider/notification/notification_service"));
-const profile_service_1 = __importDefault(require("../communication/Provider/profile/profile_service"));
 const userAuth_1 = __importDefault(require("../db/models/userAuth"));
 const tokenHelper_1 = __importDefault(require("./tokenHelper"));
 const userHelper_1 = __importDefault(require("./userHelper"));
@@ -57,7 +56,8 @@ let authHelper = {
                                 getUser.jwtToken = jwtToken;
                                 if (!getUser.account_started) {
                                     getUser.account_started = true;
-                                    profile_service_1.default.authDataTransfer(getUser.first_name, getUser.last_name, getUser.email, getUser.location, getUser.phone_number, getUser.id, getUser.user_id);
+                                    //Uncommend if not clean architech
+                                    // PROFILE_COMMUNICATION_PROVIDER.authDataTransfer(getUser.first_name, getUser.last_name, getUser.email, getUser.location, getUser.phone_number, getUser.id, getUser.user_id)
                                 }
                                 yield getUser.save();
                                 const userJwtData = {
@@ -170,11 +170,12 @@ let authHelper = {
                         getUser.otp = otpNumber;
                         getUser.otp_timer = otpExpireTime;
                         yield getUser.save();
-                        notification_service_1.default.signInOTPSender({
-                            otp: otpNumber,
-                            email: email_id,
-                            full_name: getUser.first_name + " " + getUser.last_name
-                        });
+                        //Uncommend if not clean architech
+                        // COMMUNICATION_PROVIDER.signInOTPSender({
+                        //     otp: otpNumber,
+                        //     email: email_id,
+                        //     full_name: getUser.first_name + " " + getUser.last_name
+                        // })
                         return {
                             statusCode: 200,
                             status: true,

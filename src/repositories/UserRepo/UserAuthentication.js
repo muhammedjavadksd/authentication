@@ -12,12 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const notification_service_1 = __importDefault(require("../communication/Provider/notification/notification_service"));
-const const_1 = __importDefault(require("../config/const"));
-const userAuth_1 = __importDefault(require("../db/models/userAuth"));
-const tokenHelper_1 = __importDefault(require("../helper/tokenHelper"));
-const userHelper_1 = __importDefault(require("../helper/userHelper"));
-const utilHelper_1 = __importDefault(require("../helper/utilHelper"));
+const notification_service_1 = __importDefault(require("../../communication/Provider/notification/notification_service"));
+const const_1 = __importDefault(require("../../config/const"));
+const userAuth_1 = __importDefault(require("../../db/models/userAuth"));
+const tokenHelper_1 = __importDefault(require("../../helper/tokenHelper"));
+const userHelper_1 = __importDefault(require("../../helper/userHelper"));
+const utilHelper_1 = __importDefault(require("../../helper/utilHelper"));
 class UserAuthenticationRepo {
     constructor() {
         this.UserAuthCollection = userAuth_1.default;
