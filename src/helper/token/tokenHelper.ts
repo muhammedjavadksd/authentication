@@ -1,14 +1,7 @@
 import * as jwt from "jsonwebtoken";
-import * as constant_data from "../../config/const";
+import ITokenHelper from "../../config/Interface/IHelper/iTokenHelper";
 
-interface ITokenHelper {
-    createJWTToken: (payload: object, timer: string) => Promise<string | null>;
-    decodeJWTToken: (jwttoken: string) => Promise<jwt.Jwt | null>;
-    checkTokenValidity: (token: string) => Promise<jwt.JwtPayload | boolean | string>;
-}
-
-
-class TokenHelper {
+class TokenHelper implements ITokenHelper {
 
     async generateJWtToken(payload: object = {}, timer: string): Promise<string | null> {
         try {

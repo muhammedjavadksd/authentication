@@ -1,5 +1,5 @@
 import { NextFunction, Response, Request } from "express"
-import { CustomRequest } from "../Datas/InterFace"
+import { CustomRequest } from "../../Datas/InterFace"
 
 
 interface IAuthMiddleware {

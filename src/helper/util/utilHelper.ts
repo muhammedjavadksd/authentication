@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { IOTPValidationResponse, IUtilHelper } from "../../config/Interface/IUtilHelper/IUtilHelper";
+import { IOTPValidationResponse, IUtilHelper } from "../../config/Interface/IHelper/IUtilHelper";
 
 
 
