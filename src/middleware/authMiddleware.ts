@@ -27,8 +27,9 @@ class AuthMiddleware implements IAuthMiddleware {
 
     async isValidResetPasswordForOrganization(req: CustomRequest, res: Response<any, Record<string, any>>, next: NextFunction): Promise<void> {
 
-        const headers: CustomRequest['headers'] = req.headers;
-        const token: string | false = utilHelper.getTokenFromHeader(headers['authorization'])
+        // const headers: CustomRequest['headers'] = req.headers;
+        const token: string = req.params.token //utilHelper.getTokenFromHeader(headers['authorization'])
+        console.log(token);
 
         if (token) {
             if (!req.context) {
@@ -84,6 +85,12 @@ class AuthMiddleware implements IAuthMiddleware {
 
         const headers: CustomRequest['headers'] = req.headers;
         const token: string | false = utilHelper.getTokenFromHeader(headers['authorization'])
+
+        console.log(token);
+
+        console.log("TOken is");
+
+        console.log(headers['authorization']);
 
 
 

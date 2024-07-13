@@ -85,7 +85,7 @@ class AdminController implements IAdminController {
         try {
 
 
-            let token: string | false = utilHelper.getTokenFromHeader(req['headers']['authorization']);
+            let token: string = req.params.token //utilHelper.getTokenFromHeader(req['headers']['authorization']);
             let password: string = req.body.password;
 
             if (password && token) {

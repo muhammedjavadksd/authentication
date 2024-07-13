@@ -1,4 +1,5 @@
 import * as amqplib from 'amqplib';
+import { string } from 'joi';
 
 interface CommunicationProvider {
     notificationConnection: (QUEUE: string) => Promise<amqplib.Channel>;
@@ -13,7 +14,13 @@ class AuthNotificationProvider {
 
     private connection: amqplib.Connection | null = null;
     private channel: amqplib.Channel | null = null
-    private readonly NOTIFICATION_QUEUE: string = process.env.USER_SIGN_IN_NOTIFICATION as string;
+    private readonly NOTIFICATION_QUEUE: string;
+    // process.env.USER_SIGN_IN_NOTIFICATION as string;
+
+
+    constructor(queue: string) {
+        this.NOTIFICATION_QUEUE = queue;
+    }
 
     async _init_() {
         this.connection = await amqplib.connect("amqp://localhost");
@@ -43,6 +50,8 @@ class AuthNotificationProvider {
     adminForgetPasswordEmail(data: any): boolean {
         try {
             this.channel?.sendToQueue(this.NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
+            console.log(this.NOTIFICATION_QUEUE);
+
             return true
         } catch (e) {
             return false;
@@ -51,9 +60,15 @@ class AuthNotificationProvider {
 
     organizationForgetPasswordEmail(data: any): boolean {
         try {
+            console.log("Reached here");
+            console.log(this.NOTIFICATION_QUEUE);
+            console.log(data);
+
+
             this.channel?.sendToQueue(this.NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
             return true;
         } catch (e) {
+            console.log(e);
             return false
         }
     }

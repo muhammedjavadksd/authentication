@@ -4,7 +4,7 @@ import signUpUserValidation from '../../config/validation/validation'
 import { ControllerResponseInterFace, CustomRequest, HelperFunctionResponse, UserJwtInterFace } from '../../config/Datas/InterFace';
 import IUserAuthController from '../../config/Interface/IController/IUserAuthController';
 import UserAuthenticationRepo from '../../repositories/UserRepo/UserAuthentication';
-import IBaseUser from '../../config/Interface/Objects/IBaseUser';
+import { IBaseUser } from '../../config/Interface/Objects/IBaseUser';
 import UserAuthServices from '../../services/UserAuthService/UserAuthServices';
 import IUserModelDocument from '../../config/Interface/IModel/UserAuthModel/IUserAuthModel';
 
@@ -28,6 +28,7 @@ class UserAuthController implements IUserAuthController {
     }
 
     async signUpController(req: Request, res: Response, next: NextFunction): Promise<void> {
+
         try {
             const phone_number: number = req.body.phone_number;
             const email_address: string = req.body.email_address;
@@ -54,8 +55,14 @@ class UserAuthController implements IUserAuthController {
                     status: false,
                     msg: error.details[0].message,
                 }
+                console.log("End");
+
+                console.log(response);
+
                 res.status(500).json({ response });
+                // console.log(error.details[0].message);
             } else {
+                console.log("Eneted");
                 console.log(this);
                 const isUserExist: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, email_address, Number(phone_number))
                 if (isUserExist && isUserExist.account_started) {
@@ -136,13 +143,16 @@ class UserAuthController implements IUserAuthController {
     }
 
     async AuthOTPSubmission(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+
         const otp: number = req.body.otp_number;
         const email_id: string = req.context?.email_id;
         const token: string = req.context?.token;
 
+        // console.log(email_id, token);
         if (email_id && token) {
             try {
                 const otpVerification: HelperFunctionResponse = await this.UserAuthService.authOTPValidate(otp, email_id, token)
+                console.log(otpVerification);
 
                 if (otpVerification.status) {
                     let responseData: UserJwtInterFace = otpVerification.data;
@@ -154,6 +164,8 @@ class UserAuthController implements IUserAuthController {
                         last_name: responseData['last_name'],
                         email: responseData['email'],
                         phone: responseData['phone'],
+                        user_id: responseData['user_id'],
+                        profile_id: responseData['profile_id']
                     } as UserJwtInterFace
 
                     console.log(otpResponse);
@@ -188,41 +200,52 @@ class UserAuthController implements IUserAuthController {
         const newEmailID: string = req.body.email_id;
         const requestContext = req.context;
 
+
         if (requestContext && requestContext?.email_id) {
 
             const oldEmailId: string = requestContext.email_id;
+            if (oldEmailId == newEmailID) {
+                res.status(400).json({
+                    status: false,
+                    msg: "Please enter diffrent email ID",
+                } as ControllerResponseInterFace);
+            } else {
 
+                try {
+                    const editRequest: HelperFunctionResponse = await this.UserAuthService.editAuthEmailID(oldEmailId, newEmailID);
+                    console.log("Worked here");
 
-            try {
-                const editRequest: HelperFunctionResponse = await this.UserAuthService.editAuthEmailID(oldEmailId, newEmailID);
-                if (editRequest.status) {
-                    let { token } = editRequest.data;
-                    if (token) {
-                        res.status(editRequest.statusCode).json({
-                            status: editRequest.status,
-                            data: {
-                                token: editRequest.data?.token,
-                            },
-                            msg: editRequest.msg,
-                        } as ControllerResponseInterFace);
+                    console.log(editRequest);
+
+                    if (editRequest.status) {
+                        let { token } = editRequest.data;
+                        if (token) {
+                            res.status(editRequest.statusCode).json({
+                                status: editRequest.status,
+                                data: {
+                                    token: editRequest.data?.token,
+                                },
+                                msg: editRequest.msg,
+                            } as ControllerResponseInterFace);
+                        } else {
+                            res.status(500).json({
+                                status: false,
+                                msg: "Something went wrong",
+                            } as ControllerResponseInterFace);
+                        }
                     } else {
                         res.status(500).json({
                             status: false,
-                            msg: "Something went wrong",
+                            msg: editRequest.msg,
                         } as ControllerResponseInterFace);
                     }
-                } else {
+                } catch (e) {
+                    console.log(e);
                     res.status(500).json({
                         status: false,
-                        msg: editRequest.msg,
+                        msg: 'Something went wrong',
                     } as ControllerResponseInterFace);
                 }
-            } catch (e) {
-                console.log(e);
-                res.status(500).json({
-                    status: false,
-                    msg: 'Something went wrong',
-                } as ControllerResponseInterFace);
             }
         } else {
             res.status(201).json({

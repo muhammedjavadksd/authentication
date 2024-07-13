@@ -15,6 +15,9 @@ class AdminAuthService implements IAdminAuthService {
     private tokenHelpers;
 
     constructor() {
+        this.signIn = this.signIn.bind(this)
+        this.forgetPassword = this.forgetPassword.bind(this)
+        this.resetPassword = this.resetPassword.bind(this)
         this.AdminAuthRepo = new AdminAuthenticationRepo();
         this.tokenHelpers = new TokenHelper();
     }
@@ -27,9 +30,10 @@ class AdminAuthService implements IAdminAuthService {
                 const adminPassword: string | null = findAdmin.password as string;
                 if (adminPassword) {
                     const comparePassword: boolean = await bcrypt.compare(password, adminPassword);
-                    const token: string | null = await this.tokenHelpers.generateJWtToken({ email: findAdmin.email_address, type: constant_data.JWT_FOR.ADMIN_AUTH }, constant_data.USERAUTH_EXPIRE_TIME.toString())
-
+                    const token: string | null = await this.tokenHelpers.generateJWtToken({ email: findAdmin.email_address, type: constant_data.JWT_FOR.ADMIN_AUTH, role: "admin" }, constant_data.USERAUTH_EXPIRE_TIME.toString())
                     if (comparePassword && token) {
+                        findAdmin.token = token ?? "";
+                        await this.AdminAuthRepo.updateAdmin(findAdmin)
                         return {
                             statusCode: 200,
                             status: true,
@@ -37,7 +41,8 @@ class AdminAuthService implements IAdminAuthService {
                             data: {
                                 email: email,
                                 name: findAdmin.name,
-                                token
+                                token,
+                                role: "admin"
                             } as AdminJwtInterFace
                         }
                     } else {
@@ -83,7 +88,8 @@ class AdminAuthService implements IAdminAuthService {
                 findAdmin.token = token;
                 await this.AdminAuthRepo.updateAdmin(findAdmin);
 
-                const authCommunicationProvider = new AuthNotificationProvider();
+                const authCommunicationProvider = new AuthNotificationProvider(process.env.ADMIN_FORGETPASSWORD_EMAIL as string);
+                await authCommunicationProvider._init_()
                 authCommunicationProvider.adminForgetPasswordEmail({
                     token: token,
                     email,

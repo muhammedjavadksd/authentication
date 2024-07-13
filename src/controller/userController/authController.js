@@ -52,9 +52,13 @@ class UserAuthController {
                         status: false,
                         msg: error.details[0].message,
                     };
+                    console.log("End");
+                    console.log(response);
                     res.status(500).json({ response });
+                    // console.log(error.details[0].message);
                 }
                 else {
+                    console.log("Eneted");
                     console.log(this);
                     const isUserExist = yield this.UserAuthRepo.findUser(null, email_address, Number(phone_number));
                     if (isUserExist && isUserExist.account_started) {
@@ -142,9 +146,11 @@ class UserAuthController {
             const otp = req.body.otp_number;
             const email_id = (_a = req.context) === null || _a === void 0 ? void 0 : _a.email_id;
             const token = (_b = req.context) === null || _b === void 0 ? void 0 : _b.token;
+            // console.log(email_id, token);
             if (email_id && token) {
                 try {
                     const otpVerification = yield this.UserAuthService.authOTPValidate(otp, email_id, token);
+                    console.log(otpVerification);
                     if (otpVerification.status) {
                         let responseData = otpVerification.data;
                         console.log(otpVerification.data);
@@ -154,6 +160,8 @@ class UserAuthController {
                             last_name: responseData['last_name'],
                             email: responseData['email'],
                             phone: responseData['phone'],
+                            user_id: responseData['user_id'],
+                            profile_id: responseData['profile_id']
                         };
                         console.log(otpResponse);
                         res.status(200).json({
@@ -191,39 +199,49 @@ class UserAuthController {
             const requestContext = req.context;
             if (requestContext && (requestContext === null || requestContext === void 0 ? void 0 : requestContext.email_id)) {
                 const oldEmailId = requestContext.email_id;
-                try {
-                    const editRequest = yield this.UserAuthService.editAuthEmailID(oldEmailId, newEmailID);
-                    if (editRequest.status) {
-                        let { token } = editRequest.data;
-                        if (token) {
-                            res.status(editRequest.statusCode).json({
-                                status: editRequest.status,
-                                data: {
-                                    token: (_a = editRequest.data) === null || _a === void 0 ? void 0 : _a.token,
-                                },
-                                msg: editRequest.msg,
-                            });
+                if (oldEmailId == newEmailID) {
+                    res.status(400).json({
+                        status: false,
+                        msg: "Please enter diffrent email ID",
+                    });
+                }
+                else {
+                    try {
+                        const editRequest = yield this.UserAuthService.editAuthEmailID(oldEmailId, newEmailID);
+                        console.log("Worked here");
+                        console.log(editRequest);
+                        if (editRequest.status) {
+                            let { token } = editRequest.data;
+                            if (token) {
+                                res.status(editRequest.statusCode).json({
+                                    status: editRequest.status,
+                                    data: {
+                                        token: (_a = editRequest.data) === null || _a === void 0 ? void 0 : _a.token,
+                                    },
+                                    msg: editRequest.msg,
+                                });
+                            }
+                            else {
+                                res.status(500).json({
+                                    status: false,
+                                    msg: "Something went wrong",
+                                });
+                            }
                         }
                         else {
                             res.status(500).json({
                                 status: false,
-                                msg: "Something went wrong",
+                                msg: editRequest.msg,
                             });
                         }
                     }
-                    else {
+                    catch (e) {
+                        console.log(e);
                         res.status(500).json({
                             status: false,
-                            msg: editRequest.msg,
+                            msg: 'Something went wrong',
                         });
                     }
-                }
-                catch (e) {
-                    console.log(e);
-                    res.status(500).json({
-                        status: false,
-                        msg: 'Something went wrong',
-                    });
                 }
             }
             else {

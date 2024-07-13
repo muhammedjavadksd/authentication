@@ -57,8 +57,6 @@ class ProfileCommunicationProvider {
                     phone_number: baseUser['phone_number'],
                     user_id: baseUser['user_id'],
                     profile_id: baseUser['profile_id'],
-                    auth_id: baseUser['auth_id'],
-                    auth_provider: baseUser['auth_provider']
                 };
                 (_a = this.channel) === null || _a === void 0 ? void 0 : _a.sendToQueue(this.Queue, Buffer.from(JSON.stringify(authData)));
             }

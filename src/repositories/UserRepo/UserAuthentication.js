@@ -94,7 +94,7 @@ class UserAuthenticationRepo {
                                 recipientName: baseUSER['first_name'] + baseUSER['last_name'],
                                 recipientEmail: baseUSER['email']
                             };
-                            const authenticationCommunicationProvider = new notification_service_1.default();
+                            const authenticationCommunicationProvider = new notification_service_1.default(process.env.USER_SIGN_UP_NOTIFICATION);
                             yield authenticationCommunicationProvider._init_();
                             authenticationCommunicationProvider.signUpOTPSender(communicationData);
                             // COMMUNICATION_PROVIDER.signUpOTPSender(communicationData)

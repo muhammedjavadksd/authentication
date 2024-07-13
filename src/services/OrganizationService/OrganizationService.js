@@ -71,7 +71,8 @@ class OrganizationService {
                 if (organization && token) {
                     organization.token = token;
                     this.OrganizationRepos.updateOrganization(organization);
-                    const authNotificationProvider = new notification_service_1.default();
+                    const authNotificationProvider = new notification_service_1.default(process.env.ORGANIZATION_FORGETPASSWORD_EMAIL);
+                    yield authNotificationProvider._init_();
                     authNotificationProvider.organizationForgetPasswordEmail({
                         token: token,
                         email: email_address,
@@ -89,7 +90,7 @@ class OrganizationService {
                 else {
                     return {
                         status: false,
-                        statusCode: 500,
+                        statusCode: 401,
                         msg: "Organization not found"
                     };
                 }

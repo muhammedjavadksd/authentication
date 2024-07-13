@@ -19,6 +19,9 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const tokenHelper_1 = __importDefault(require("../../helper/token/tokenHelper"));
 class AdminAuthService {
     constructor() {
+        this.signIn = this.signIn.bind(this);
+        this.forgetPassword = this.forgetPassword.bind(this);
+        this.resetPassword = this.resetPassword.bind(this);
         this.AdminAuthRepo = new AdminAuthentication_1.default();
         this.tokenHelpers = new tokenHelper_1.default();
     }
@@ -30,8 +33,10 @@ class AdminAuthService {
                     const adminPassword = findAdmin.password;
                     if (adminPassword) {
                         const comparePassword = yield bcrypt_1.default.compare(password, adminPassword);
-                        const token = yield this.tokenHelpers.generateJWtToken({ email: findAdmin.email_address, type: const_1.default.JWT_FOR.ADMIN_AUTH }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
+                        const token = yield this.tokenHelpers.generateJWtToken({ email: findAdmin.email_address, type: const_1.default.JWT_FOR.ADMIN_AUTH, role: "admin" }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
                         if (comparePassword && token) {
+                            findAdmin.token = token !== null && token !== void 0 ? token : "";
+                            yield this.AdminAuthRepo.updateAdmin(findAdmin);
                             return {
                                 statusCode: 200,
                                 status: true,
@@ -39,7 +44,8 @@ class AdminAuthService {
                                 data: {
                                     email: email,
                                     name: findAdmin.name,
-                                    token
+                                    token,
+                                    role: "admin"
                                 }
                             };
                         }
@@ -86,7 +92,8 @@ class AdminAuthService {
                 if (findAdmin && token) {
                     findAdmin.token = token;
                     yield this.AdminAuthRepo.updateAdmin(findAdmin);
-                    const authCommunicationProvider = new notification_service_1.default();
+                    const authCommunicationProvider = new notification_service_1.default(process.env.ADMIN_FORGETPASSWORD_EMAIL);
+                    yield authCommunicationProvider._init_();
                     authCommunicationProvider.adminForgetPasswordEmail({
                         token: token,
                         email,

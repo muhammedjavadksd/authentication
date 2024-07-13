@@ -27,8 +27,9 @@ class AuthMiddleware {
     }
     isValidResetPasswordForOrganization(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            const headers = req.headers;
-            const token = utilHelper_1.default.getTokenFromHeader(headers['authorization']);
+            // const headers: CustomRequest['headers'] = req.headers;
+            const token = req.params.token; //utilHelper.getTokenFromHeader(headers['authorization'])
+            console.log(token);
             if (token) {
                 if (!req.context) {
                     req.context = {};
@@ -83,6 +84,9 @@ class AuthMiddleware {
         return __awaiter(this, void 0, void 0, function* () {
             const headers = req.headers;
             const token = utilHelper_1.default.getTokenFromHeader(headers['authorization']);
+            console.log(token);
+            console.log("TOken is");
+            console.log(headers['authorization']);
             if (token) {
                 if (!req.context) {
                     req.context = {};

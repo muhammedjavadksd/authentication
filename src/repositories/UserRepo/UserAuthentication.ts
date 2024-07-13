@@ -96,7 +96,7 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
                             recipientEmail: baseUSER['email']
                         }
 
-                        const authenticationCommunicationProvider = new AuthNotificationProvider();
+                        const authenticationCommunicationProvider = new AuthNotificationProvider(process.env.USER_SIGN_UP_NOTIFICATION as string);
                         await authenticationCommunicationProvider._init_();
                         authenticationCommunicationProvider.signUpOTPSender(communicationData)
 

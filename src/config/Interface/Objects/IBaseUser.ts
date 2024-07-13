@@ -12,6 +12,15 @@ interface IBaseUser {
     profile_id?: string
 }
 
+interface IBaseProfileData {
+    first_name: string
+    last_name: string
+    phone_number: number
+    email: string
+    location?: locationTypeInterFace
+    user_id: string
+    profile_id: string
+}
 
 
-export default IBaseUser
+export { IBaseProfileData, IBaseUser }

@@ -33,6 +33,8 @@ class OrganizationController implements IOrganizationControllerInterface {
         try {
 
             let signInService: HelperFunctionResponse = await this.organizationService.signIn(email_address, password);
+            console.log(signInService);
+
             if (signInService.status) {
                 const responseData: AdminJwtInterFace = signInService.data;
                 const token: string = responseData.token;
@@ -52,7 +54,7 @@ class OrganizationController implements IOrganizationControllerInterface {
 
     async forgetPasswordController(req: Request, res: Response, next: NextFunction): Promise<void> {
         const email_address: string = req.body.email_address;
-        // console.log(this);
+
 
 
         try {
@@ -71,7 +73,10 @@ class OrganizationController implements IOrganizationControllerInterface {
 
     async resetPasswordController(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
 
+
         const context = req.context;
+        console.log(context);
+
         if (context && context.email_id && context.email_id) {
             try {
                 const password: string = req.body.password;

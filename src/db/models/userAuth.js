@@ -10,7 +10,8 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const userAuthSchema = {
     user_id: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     phone_number: {
         type: Number,

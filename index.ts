@@ -10,8 +10,8 @@ import BulkDataConsumer from "./src/communication/BulkDataConsumer";
 
 const app: Express = express();
 
-app.use(bodyparser.json());
-app.use(bodyparser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 dotenv.config();
 

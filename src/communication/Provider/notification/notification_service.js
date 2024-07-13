@@ -34,10 +34,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const amqplib = __importStar(require("amqplib"));
 class AuthNotificationProvider {
-    constructor() {
+    // process.env.USER_SIGN_IN_NOTIFICATION as string;
+    constructor(queue) {
         this.connection = null;
         this.channel = null;
-        this.NOTIFICATION_QUEUE = process.env.USER_SIGN_IN_NOTIFICATION;
+        this.NOTIFICATION_QUEUE = queue;
     }
     _init_() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -70,6 +71,7 @@ class AuthNotificationProvider {
         var _a;
         try {
             (_a = this.channel) === null || _a === void 0 ? void 0 : _a.sendToQueue(this.NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
+            console.log(this.NOTIFICATION_QUEUE);
             return true;
         }
         catch (e) {
@@ -79,10 +81,14 @@ class AuthNotificationProvider {
     organizationForgetPasswordEmail(data) {
         var _a;
         try {
+            console.log("Reached here");
+            console.log(this.NOTIFICATION_QUEUE);
+            console.log(data);
             (_a = this.channel) === null || _a === void 0 ? void 0 : _a.sendToQueue(this.NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
             return true;
         }
         catch (e) {
+            console.log(e);
             return false;
         }
     }

@@ -9,7 +9,7 @@ import UserAuthenticationRepo from "../../repositories/UserRepo/UserAuthenticati
 import ProfileCommunicationProvider from "../../communication/Provider/profile/profile_service";
 import TokenHelper from "../../helper/token/tokenHelper";
 import { IUserAuthService } from "../../config/Interface/Service/ServiceInterface";
-
+// import { } from 'expres'
 
 
 class UserAuthServices implements IUserAuthService {
@@ -55,7 +55,7 @@ class UserAuthServices implements IUserAuthService {
                     await this.UserAuthRepo.updateUser(userAuth);
 
                     // await userAuth.save()
-                    const userAuthProvider = new AuthNotificationProvider();
+                    const userAuthProvider = new AuthNotificationProvider(process.env.USER_SIGN_IN_NOTIFICATION as string);
                     await userAuthProvider._init_();
                     userAuthProvider.signInOTPSender({
                         otp: otpNumber,
@@ -132,7 +132,7 @@ class UserAuthServices implements IUserAuthService {
             const _id: mongoose.Types.ObjectId = getUser._id;
             const phone_number: number = getUser.phone_number;
 
-            const jwtToken: string | null = await this.TokenHelpers.generateJWtToken({ email: email_id, first_name: first_name, last_name: last_name, phone: phone_number } as UserJwtInterFace, constant_data.USERAUTH_EXPIRE_TIME.toString())
+            const jwtToken: string | null = await this.TokenHelpers.generateJWtToken({ email: email_id, first_name: first_name, last_name: last_name, phone: phone_number, profile_id: getUser.user_id, user_id: getUser.id, } as UserJwtInterFace, constant_data.USERAUTH_EXPIRE_TIME.toString())
             if (!jwtToken) {
                 return {
                     status: false,
@@ -148,7 +148,17 @@ class UserAuthServices implements IUserAuthService {
                 getUser.account_started = true
                 const profileCommunicationProvider = new ProfileCommunicationProvider();
                 await profileCommunicationProvider._init_();
-                profileCommunicationProvider.authDataTransfer({ email: getUser.email, first_name: getUser.first_name, last_name: getUser.last_name, phone_number: getUser.phone_number, auth_id: getUser.auth_id ?? "", auth_provider: getUser.auth_provider ?? "" })
+                console.log("Profile data transfer");
+
+                profileCommunicationProvider.authDataTransfer({
+                    email: getUser.email,
+                    first_name: getUser.first_name,
+                    last_name: getUser.last_name,
+                    phone_number: getUser.phone_number,
+                    location: getUser.location,
+                    user_id: getUser.id,
+                    profile_id: getUser.user_id
+                })
             }
 
             // await getUser.save();
@@ -160,6 +170,8 @@ class UserAuthServices implements IUserAuthService {
                 last_name: getUser.last_name,
                 email: getUser.email,
                 phone: getUser.phone_number,
+                user_id: getUser.id,
+                profile_id: getUser.user_id
             }
 
             return {
@@ -180,13 +192,15 @@ class UserAuthServices implements IUserAuthService {
 
     async editAuthEmailID(oldEmailId: string, newEmailID: string): Promise<HelperFunctionResponse> {
 
+        console.log("Entered here");
         const otpNumber: number = utilHelper.generateAnOTP(6);
         const otpExpireTime: number = constant_data.MINIMUM_OTP_TIMER();
 
+
+
         try {
             const getUser: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, oldEmailId, null);
-            // console.log(getUser);
-            // console.log(oldEmailId);
+
 
 
             if (getUser) {
@@ -199,13 +213,21 @@ class UserAuthServices implements IUserAuthService {
                     // getUser.save()
                     await this.UserAuthRepo.updateUser(getUser);
 
-                    const authNotificationProvider = new AuthNotificationProvider();
-                    authNotificationProvider._init_();
+                    const authNotificationProvider = new AuthNotificationProvider(process.env.USER_SIGN_IN_NOTIFICATION as string);
+                    await authNotificationProvider._init_();
                     authNotificationProvider.signInOTPSender({
                         otp: otpNumber,
                         email: newEmailID,
                         full_name: getUser.first_name + getUser.last_name
                     })
+                    console.log("Edit here");
+
+                    console.log({
+                        otp: otpNumber,
+                        email: newEmailID,
+                        full_name: getUser.first_name + getUser.last_name
+                    });
+
                     return {
                         status: true,
                         msg: "Email id has been updated",
@@ -253,8 +275,9 @@ class UserAuthServices implements IUserAuthService {
                     getUser.jwtToken = newToken;
                     await this.UserAuthRepo.updateUser(getUser)
 
-                    const authCommunicationProvider = new AuthNotificationProvider();
-                    authCommunicationProvider._init_();
+                    const authCommunicationProvider = new AuthNotificationProvider(process.env.USER_SIGN_IN_NOTIFICATION as string);
+                    await authCommunicationProvider._init_();
+
                     authCommunicationProvider.signInOTPSender({
                         otp: otpNumber,
                         email: email_id,

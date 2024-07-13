@@ -18,6 +18,7 @@ const utilHelper_1 = __importDefault(require("../../helper/util/utilHelper"));
 const UserAuthentication_1 = __importDefault(require("../../repositories/UserRepo/UserAuthentication"));
 const profile_service_1 = __importDefault(require("../../communication/Provider/profile/profile_service"));
 const tokenHelper_1 = __importDefault(require("../../helper/token/tokenHelper"));
+// import { } from 'expres'
 class UserAuthServices {
     constructor() {
         this.signInHelper = this.signInHelper.bind(this);
@@ -50,7 +51,7 @@ class UserAuthServices {
                         userAuth.jwtToken = token;
                         yield this.UserAuthRepo.updateUser(userAuth);
                         // await userAuth.save()
-                        const userAuthProvider = new notification_service_1.default();
+                        const userAuthProvider = new notification_service_1.default(process.env.USER_SIGN_IN_NOTIFICATION);
                         yield userAuthProvider._init_();
                         userAuthProvider.signInOTPSender({
                             otp: otpNumber,
@@ -94,7 +95,7 @@ class UserAuthServices {
     }
     authOTPValidate(otp, email_id, token) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b, _c;
+            var _a;
             try {
                 const getUser = yield this.UserAuthRepo.findUser(null, email_id, null);
                 if (!getUser) {
@@ -125,7 +126,7 @@ class UserAuthServices {
                 const last_name = getUser.last_name;
                 const _id = getUser._id;
                 const phone_number = getUser.phone_number;
-                const jwtToken = yield this.TokenHelpers.generateJWtToken({ email: email_id, first_name: first_name, last_name: last_name, phone: phone_number }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
+                const jwtToken = yield this.TokenHelpers.generateJWtToken({ email: email_id, first_name: first_name, last_name: last_name, phone: phone_number, profile_id: getUser.user_id, user_id: getUser.id, }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
                 if (!jwtToken) {
                     return {
                         status: false,
@@ -138,7 +139,16 @@ class UserAuthServices {
                     getUser.account_started = true;
                     const profileCommunicationProvider = new profile_service_1.default();
                     yield profileCommunicationProvider._init_();
-                    profileCommunicationProvider.authDataTransfer({ email: getUser.email, first_name: getUser.first_name, last_name: getUser.last_name, phone_number: getUser.phone_number, auth_id: (_b = getUser.auth_id) !== null && _b !== void 0 ? _b : "", auth_provider: (_c = getUser.auth_provider) !== null && _c !== void 0 ? _c : "" });
+                    console.log("Profile data transfer");
+                    profileCommunicationProvider.authDataTransfer({
+                        email: getUser.email,
+                        first_name: getUser.first_name,
+                        last_name: getUser.last_name,
+                        phone_number: getUser.phone_number,
+                        location: getUser.location,
+                        user_id: getUser.id,
+                        profile_id: getUser.user_id
+                    });
                 }
                 // await getUser.save();
                 yield this.UserAuthRepo.updateUser(getUser);
@@ -148,6 +158,8 @@ class UserAuthServices {
                     last_name: getUser.last_name,
                     email: getUser.email,
                     phone: getUser.phone_number,
+                    user_id: getUser.id,
+                    profile_id: getUser.user_id
                 };
                 return {
                     status: true,
@@ -167,12 +179,11 @@ class UserAuthServices {
     }
     editAuthEmailID(oldEmailId, newEmailID) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("Entered here");
             const otpNumber = utilHelper_1.default.generateAnOTP(6);
             const otpExpireTime = const_1.default.MINIMUM_OTP_TIMER();
             try {
                 const getUser = yield this.UserAuthRepo.findUser(null, oldEmailId, null);
-                // console.log(getUser);
-                // console.log(oldEmailId);
                 if (getUser) {
                     const newToken = yield this.TokenHelpers.generateJWtToken({ email_id: newEmailID, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
                     if (newToken) {
@@ -182,9 +193,15 @@ class UserAuthServices {
                         getUser.jwtToken = newToken;
                         // getUser.save()
                         yield this.UserAuthRepo.updateUser(getUser);
-                        const authNotificationProvider = new notification_service_1.default();
-                        authNotificationProvider._init_();
+                        const authNotificationProvider = new notification_service_1.default(process.env.USER_SIGN_IN_NOTIFICATION);
+                        yield authNotificationProvider._init_();
                         authNotificationProvider.signInOTPSender({
+                            otp: otpNumber,
+                            email: newEmailID,
+                            full_name: getUser.first_name + getUser.last_name
+                        });
+                        console.log("Edit here");
+                        console.log({
                             otp: otpNumber,
                             email: newEmailID,
                             full_name: getUser.first_name + getUser.last_name
@@ -237,8 +254,8 @@ class UserAuthServices {
                         getUser.otp_timer = otpExpireTime;
                         getUser.jwtToken = newToken;
                         yield this.UserAuthRepo.updateUser(getUser);
-                        const authCommunicationProvider = new notification_service_1.default();
-                        authCommunicationProvider._init_();
+                        const authCommunicationProvider = new notification_service_1.default(process.env.USER_SIGN_IN_NOTIFICATION);
+                        yield authCommunicationProvider._init_();
                         authCommunicationProvider.signInOTPSender({
                             otp: otpNumber,
                             email: email_id,

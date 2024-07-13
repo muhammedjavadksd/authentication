@@ -1,9 +1,9 @@
 import * as amqplib from 'amqplib';
 import { AuthData } from '../../../config/Datas/InterFace';
-import IBaseUser from '../../../config/Interface/Objects/IBaseUser';
+import { IBaseProfileData, IBaseUser } from '../../../config/Interface/Objects/IBaseUser';
 
 interface PROFILE_COMMUNICATION_PROVIDER_INTERFACE {
-    authDataTransfer(baseUSER: IBaseUser): Promise<void>
+    authDataTransfer(baseUSER: IBaseProfileData): Promise<void>
     _init_(): void
 }
 
@@ -20,10 +20,10 @@ class ProfileCommunicationProvider implements PROFILE_COMMUNICATION_PROVIDER_INT
         this.channel = await this.connection.createChannel();
     }
 
-    async authDataTransfer(baseUser: IBaseUser): Promise<void> {
+    async authDataTransfer(baseUser: IBaseProfileData): Promise<void> {
         try {
 
-            const authData: IBaseUser = {
+            const authData: IBaseProfileData = {
                 first_name: baseUser['first_name'],
                 last_name: baseUser['last_name'],
                 email: baseUser['email'],
@@ -31,8 +31,6 @@ class ProfileCommunicationProvider implements PROFILE_COMMUNICATION_PROVIDER_INT
                 phone_number: baseUser['phone_number'],
                 user_id: baseUser['user_id'],
                 profile_id: baseUser['profile_id'],
-                auth_id: baseUser['auth_id'],
-                auth_provider: baseUser['auth_provider']
             };
 
             this.channel?.sendToQueue(this.Queue, Buffer.from(JSON.stringify(authData)));

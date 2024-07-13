@@ -62,6 +62,8 @@ interface UserJwtInterFace {
     last_name: string,
     email: string,
     phone: number,
+    user_id: string,
+    profile_id: string
 }
 
 interface AdminJwtInterFace {

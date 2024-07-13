@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const AdminAuthService_1 = __importDefault(require("../../services/AdminAuthService/AdminAuthService"));
-const utilHelper_1 = __importDefault(require("../../helper/util/utilHelper"));
 class AdminController {
     constructor() {
         this.signInController = this.signInController.bind(this);
@@ -83,7 +82,7 @@ class AdminController {
     adminPasswordReset(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let token = utilHelper_1.default.getTokenFromHeader(req['headers']['authorization']);
+                let token = req.params.token; //utilHelper.getTokenFromHeader(req['headers']['authorization']);
                 let password = req.body.password;
                 if (password && token) {
                     const resetPassword = yield this.AdminServices.resetPassword(token, password);

@@ -31,6 +31,7 @@ class OrganizationController {
             const password = req.body.password;
             try {
                 let signInService = yield this.organizationService.signIn(email_address, password);
+                console.log(signInService);
                 if (signInService.status) {
                     const responseData = signInService.data;
                     const token = responseData.token;
@@ -55,7 +56,6 @@ class OrganizationController {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             const email_address = req.body.email_address;
-            // console.log(this);
             try {
                 const organizationForgetPassword = yield this.organizationService.forgetPasswordHelper(email_address);
                 if (organizationForgetPassword.status) {
@@ -74,6 +74,7 @@ class OrganizationController {
     resetPasswordController(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             const context = req.context;
+            console.log(context);
             if (context && context.email_id && context.email_id) {
                 try {
                     const password = req.body.password;

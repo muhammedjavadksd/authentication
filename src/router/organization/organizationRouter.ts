@@ -16,7 +16,7 @@ const authMiddleware = new AuthMiddleware();
 organizationRouter.post("/sign_up", logoStorage.single("logo"), kycStorage.single("office"), kycStorage.single("registration_photo"), kycStorage.single("pan_card"), organizationController.signUpController)
 organizationRouter.post("/sign_in", organizationController.signInController)
 organizationRouter.post("/forget_password", organizationController.forgetPasswordController)
-organizationRouter.post("/reset_password", authMiddleware.isValidResetPasswordForOrganization, organizationController.resetPasswordController)
+organizationRouter.post("/reset_password/:token", authMiddleware.isValidResetPasswordForOrganization, organizationController.resetPasswordController)
 
 
 export default organizationRouter
