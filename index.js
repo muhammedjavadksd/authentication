@@ -14,7 +14,7 @@ const BulkDataConsumer_1 = __importDefault(require("./src/communication/BulkData
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
-dotenv_1.default.config();
+dotenv_1.default.config({ path: "./.env" });
 (0, BulkDataConsumer_1.default)();
 app.use((0, morgan_1.default)("common"));
 app.use("/", userRouter_1.default);
