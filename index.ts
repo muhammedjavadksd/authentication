@@ -13,7 +13,7 @@ const app: Express = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-dotenv.config();
+dotenv.config({path:"./.env"});
 
 BulkDataConsumer()
 
