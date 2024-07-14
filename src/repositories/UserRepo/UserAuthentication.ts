@@ -90,7 +90,7 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
                     }, { upsert: true }).then(async (data) => {
                         resolve({ token: jwtToken })
 
-                        let communicationData = {
+                        const communicationData = {
                             otp: otpNumber,
                             recipientName: baseUSER['first_name'] + baseUSER['last_name'],
                             recipientEmail: baseUSER['email']

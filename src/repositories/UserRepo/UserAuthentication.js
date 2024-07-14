@@ -89,7 +89,7 @@ class UserAuthenticationRepo {
                             }
                         }, { upsert: true }).then((data) => __awaiter(this, void 0, void 0, function* () {
                             resolve({ token: jwtToken });
-                            let communicationData = {
+                            const communicationData = {
                                 otp: otpNumber,
                                 recipientName: baseUSER['first_name'] + baseUSER['last_name'],
                                 recipientEmail: baseUSER['email']

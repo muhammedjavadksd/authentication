@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import IOrganizationAuthModel from "../../config/Interface/IModel/OrganizationAuthModel/IOrganizationModel";
 
 
-let OrganizationAuthModel: mongoose.Schema = new mongoose.Schema({
+const OrganizationAuthModel: mongoose.Schema = new mongoose.Schema({
     name: {
         required: true,
         type: String
@@ -63,6 +63,6 @@ let OrganizationAuthModel: mongoose.Schema = new mongoose.Schema({
     }
 })
 
-let OrganizationAuth = mongoose.model<IOrganizationAuthModel>("organization", OrganizationAuthModel, "organization");
+const OrganizationAuth = mongoose.model<IOrganizationAuthModel>("organization", OrganizationAuthModel, "organization");
 
 export default OrganizationAuth;

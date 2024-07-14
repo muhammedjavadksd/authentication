@@ -17,7 +17,7 @@ const utilHelper: IUtilHelper = {
         let result = '';
         const charactersLength = characters.length;
 
-        for (let i = 0; i < length; i++) {
+        for (let index = 0; index < length; index++) {
             result += characters.charAt(Math.floor(Math.random() * charactersLength));
         }
 
@@ -36,8 +36,7 @@ const utilHelper: IUtilHelper = {
     OTPValidator: (otp_number: number, db_otp_number: number, expire_time: number): IOTPValidationResponse => {
 
         if (otp_number == db_otp_number) {
-            let currentTime = Date.now();
-            console.log(expire_time, currentTime);
+            const currentTime = Date.now();
             if (currentTime < expire_time) {
                 return { status: true, msg: "OTP verified" }
             } else {

@@ -32,7 +32,7 @@ class OrganizationController implements IOrganizationControllerInterface {
 
         try {
 
-            let signInService: HelperFunctionResponse = await this.organizationService.signIn(email_address, password);
+            const signInService: HelperFunctionResponse = await this.organizationService.signIn(email_address, password);
             console.log(signInService);
 
             if (signInService.status) {

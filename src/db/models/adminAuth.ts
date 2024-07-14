@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 import IAdminAuthModel from "../../config/Interface/IModel/AdminAuthModel/IAdminAuthModel";
 
-let AdminAuth: mongoose.Schema = new mongoose.Schema({
+const AdminAuth: mongoose.Schema = new mongoose.Schema({
     name: {
         required: true,
         type: String
@@ -25,5 +25,5 @@ let AdminAuth: mongoose.Schema = new mongoose.Schema({
     }
 })
 
-let AdminAuthModel = mongoose.model<IAdminAuthModel>("admin", AdminAuth, "admin");
+const AdminAuthModel = mongoose.model<IAdminAuthModel>("admin", AdminAuth, "admin");
 export default AdminAuthModel

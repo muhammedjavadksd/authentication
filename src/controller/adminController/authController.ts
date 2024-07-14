@@ -70,8 +70,8 @@ class AdminController implements IAdminController {
     async forgetPasswordController(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
-            let email_id: string = req.body.email_id;
-            let adminResetRequest: HelperFunctionResponse = await this.AdminServices.forgetPassword(email_id);
+            const email_id: string = req.body.email_id;
+            const adminResetRequest: HelperFunctionResponse = await this.AdminServices.forgetPassword(email_id);
             res.status(adminResetRequest.statusCode).json({ status: true, msg: adminResetRequest.msg } as ControllerResponseInterFace)
         } catch (e) {
             console.log(e);
@@ -85,8 +85,8 @@ class AdminController implements IAdminController {
         try {
 
 
-            let token: string = req.params.token //utilHelper.getTokenFromHeader(req['headers']['authorization']);
-            let password: string = req.body.password;
+            const token: string = req.params.token //utilHelper.getTokenFromHeader(req['headers']['authorization']);
+            const password: string = req.body.password;
 
             // console.log(token, password);
             

@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // const { required } = require("joi");
 // const { default: mongoose } = require("mongoose");
 const mongoose_1 = __importDefault(require("mongoose"));
-let OrganizationAuthModel = new mongoose_1.default.Schema({
+const OrganizationAuthModel = new mongoose_1.default.Schema({
     name: {
         required: true,
         type: String
@@ -64,5 +64,5 @@ let OrganizationAuthModel = new mongoose_1.default.Schema({
         required: false
     }
 });
-let OrganizationAuth = mongoose_1.default.model("organization", OrganizationAuthModel, "organization");
+const OrganizationAuth = mongoose_1.default.model("organization", OrganizationAuthModel, "organization");
 exports.default = OrganizationAuth;

@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const const_1 = __importDefault(require("../config/const"));
 const utilHelper_1 = __importDefault(require("../helper/util/utilHelper"));
 const tokenHelper_1 = __importDefault(require("../helper/token/tokenHelper"));
-let { OTP_TYPE } = const_1.default;
+const { OTP_TYPE } = const_1.default;
 class AuthMiddleware {
     constructor() {
         this.isAdminLogged = this.isAdminLogged.bind(this);

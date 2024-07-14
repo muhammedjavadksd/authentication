@@ -69,8 +69,8 @@ class AdminController {
     forgetPasswordController(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let email_id = req.body.email_id;
-                let adminResetRequest = yield this.AdminServices.forgetPassword(email_id);
+                const email_id = req.body.email_id;
+                const adminResetRequest = yield this.AdminServices.forgetPassword(email_id);
                 res.status(adminResetRequest.statusCode).json({ status: true, msg: adminResetRequest.msg });
             }
             catch (e) {
@@ -82,8 +82,8 @@ class AdminController {
     adminPasswordReset(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let token = req.params.token; //utilHelper.getTokenFromHeader(req['headers']['authorization']);
-                let password = req.body.password;
+                const token = req.params.token; //utilHelper.getTokenFromHeader(req['headers']['authorization']);
+                const password = req.body.password;
                 // console.log(token, password);
                 if (password && token) {
                     const resetPassword = yield this.AdminServices.resetPassword(token, password);

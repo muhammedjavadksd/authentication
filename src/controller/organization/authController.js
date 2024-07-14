@@ -30,7 +30,7 @@ class OrganizationController {
             const email_address = req.body.email_address;
             const password = req.body.password;
             try {
-                let signInService = yield this.organizationService.signIn(email_address, password);
+                const signInService = yield this.organizationService.signIn(email_address, password);
                 console.log(signInService);
                 if (signInService.status) {
                     const responseData = signInService.data;

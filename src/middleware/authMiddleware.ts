@@ -8,7 +8,7 @@ import IAuthMiddleware from "../config/Interface/Middleware/AuthMiddlewareInterf
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
 
-let { OTP_TYPE } = const_data;
+const { OTP_TYPE } = const_data;
 
 class AuthMiddleware implements IAuthMiddleware {
 

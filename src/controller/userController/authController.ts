@@ -9,7 +9,7 @@ import UserAuthServices from '../../services/UserAuthService/UserAuthServices';
 import IUserModelDocument from '../../config/Interface/IModel/UserAuthModel/IUserAuthModel';
 
 
-let { AUTH_PROVIDERS_DATA } = const_data;
+const { AUTH_PROVIDERS_DATA } = const_data;
 
 class UserAuthController implements IUserAuthController {
 
@@ -51,7 +51,7 @@ class UserAuthController implements IUserAuthController {
             });
 
             if (error) {
-                let response: ControllerResponseInterFace = {
+                const response: ControllerResponseInterFace = {
                     status: false,
                     msg: error.details[0].message,
                 }
@@ -68,7 +68,7 @@ class UserAuthController implements IUserAuthController {
                 
                 if (isUserExist && isUserExist.account_started) {
                     
-                    let response: ControllerResponseInterFace = {
+                    const response: ControllerResponseInterFace = {
                         status: false,
                         msg: 'Email/Phone already exist',
                     }
@@ -93,7 +93,7 @@ class UserAuthController implements IUserAuthController {
                         res.status(200).json(successResponse);
                     }).catch((err) => {
                         console.log(err);
-                        let response: ControllerResponseInterFace = {
+                        const response: ControllerResponseInterFace = {
                             status: false,
                             msg: "Something went wrong"
                         }
@@ -104,7 +104,7 @@ class UserAuthController implements IUserAuthController {
         } catch (e) {
             console.log(e);
 
-            let response: ControllerResponseInterFace = {
+            const response: ControllerResponseInterFace = {
                 status: false,
                 msg: "Something went wrong"
             }
@@ -157,7 +157,7 @@ class UserAuthController implements IUserAuthController {
                 console.log(otpVerification);
 
                 if (otpVerification.status) {
-                    let responseData: UserJwtInterFace = otpVerification.data;
+                    const responseData: UserJwtInterFace = otpVerification.data;
                     console.log(otpVerification.data);
 
                     const otpResponse = {
@@ -220,7 +220,7 @@ class UserAuthController implements IUserAuthController {
                     console.log(editRequest);
 
                     if (editRequest.status) {
-                        let { token } = editRequest.data;
+                        const { token } = editRequest.data;
                         if (token) {
                             res.status(editRequest.statusCode).json({
                                 status: editRequest.status,
@@ -270,7 +270,7 @@ class UserAuthController implements IUserAuthController {
                     
                     
                     if (result.data) {
-                        let token: string = result.data?.token;
+                        const token: string = result.data?.token;
                         if (token) {
                             res.status(result.statusCode).json({ msg: result.msg, status: result.status, token } as ControllerResponseInterFace);
                         } else {
