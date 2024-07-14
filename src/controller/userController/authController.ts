@@ -63,14 +63,16 @@ class UserAuthController implements IUserAuthController {
                 // console.log(error.details[0].message);
             } else {
                 console.log("Eneted");
-                console.log(this);
-                const isUserExist: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, email_address, Number(phone_number))
+                 const isUserExist: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, email_address, Number(phone_number))
+                console.log(isUserExist);
+                
                 if (isUserExist && isUserExist.account_started) {
+                    
                     let response: ControllerResponseInterFace = {
                         status: false,
                         msg: 'Email/Phone already exist',
                     }
-                    res.status(401).json(response);
+                    res.status(400).json(response);
                 } else {
                     this.UserAuthRepo.insertNewUser({
                         auth_id: auth_id,
@@ -263,6 +265,10 @@ class UserAuthController implements IUserAuthController {
             if (tokenEmail) {
                 try {
                     const result: HelperFunctionResponse = await this.UserAuthService.resendOtpNumer(tokenEmail)
+                    console.log(result);
+                    console.log("The result");
+                    
+                    
                     if (result.data) {
                         let token: string = result.data?.token;
                         if (token) {

@@ -59,14 +59,14 @@ class UserAuthController {
                 }
                 else {
                     console.log("Eneted");
-                    console.log(this);
                     const isUserExist = yield this.UserAuthRepo.findUser(null, email_address, Number(phone_number));
+                    console.log(isUserExist);
                     if (isUserExist && isUserExist.account_started) {
                         let response = {
                             status: false,
                             msg: 'Email/Phone already exist',
                         };
-                        res.status(401).json(response);
+                        res.status(400).json(response);
                     }
                     else {
                         this.UserAuthRepo.insertNewUser({
@@ -261,6 +261,8 @@ class UserAuthController {
                 if (tokenEmail) {
                     try {
                         const result = yield this.UserAuthService.resendOtpNumer(tokenEmail);
+                        console.log(result);
+                        console.log("The result");
                         if (result.data) {
                             let token = (_a = result.data) === null || _a === void 0 ? void 0 : _a.token;
                             if (token) {
