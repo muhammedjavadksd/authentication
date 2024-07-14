@@ -264,7 +264,7 @@ class UserAuthServices implements IUserAuthService {
 
         try {
             const getUser: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, email_id, null);
-
+            
             if (getUser) {
                 const otpNumber: number = utilHelper.generateAnOTP(6);
                 const otpExpireTime: number = constant_data.MINIMUM_OTP_TIMER();
