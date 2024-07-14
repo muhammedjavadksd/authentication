@@ -88,6 +88,9 @@ class AdminController implements IAdminController {
             let token: string = req.params.token //utilHelper.getTokenFromHeader(req['headers']['authorization']);
             let password: string = req.body.password;
 
+            // console.log(token, password);
+            
+
             if (password && token) {
                 const resetPassword: HelperFunctionResponse = await this.AdminServices.resetPassword(token, password);
                 res.status(resetPassword.statusCode).json({

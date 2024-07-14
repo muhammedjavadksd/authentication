@@ -27,23 +27,23 @@ let OrganizationAuthModel: mongoose.Schema = new mongoose.Schema({
     },
     organization_type: {
         type: String,
-        required: true,
+        required: false,
     },
     pan_card_photo: {
         type: String,
-        required: true,
+        required: false,
     },
     logo_photo: {
         type: String,
-        required: true,
+        required: false,
     },
     office_photo: {
         type: String,
-        required: true,
+        required: false,
     },
     registration_photo: {
         type: String,
-        required: true,
+        required: false,
     },
     password: {
         type: String,

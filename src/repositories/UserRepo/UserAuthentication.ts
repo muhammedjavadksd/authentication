@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import AuthNotificationProvider from "../../communication/Provider/notification/notification_service";
 import IUserModelDocument from "../../config/Interface/IModel/UserAuthModel/IUserAuthModel";
 import UserModelDocument from "../../config/Interface/IModel/UserAuthModel/IUserAuthModel";
-import IBaseUser from "../../config/Interface/Objects/IBaseUser";
+import {IBaseUser} from "../../config/Interface/Objects/IBaseUser";
 import constant_data from "../../config/const";
 import userAuth from "../../db/models/userAuth";
 import tokenHelper from "../../helper/token/tokenHelper";

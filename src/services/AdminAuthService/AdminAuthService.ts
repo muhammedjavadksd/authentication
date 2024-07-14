@@ -88,6 +88,8 @@ class AdminAuthService implements IAdminAuthService {
                 findAdmin.token = token;
                 await this.AdminAuthRepo.updateAdmin(findAdmin);
 
+                console.log(findAdmin);
+                
                 const authCommunicationProvider = new AuthNotificationProvider(process.env.ADMIN_FORGETPASSWORD_EMAIL as string);
                 await authCommunicationProvider._init_()
                 authCommunicationProvider.adminForgetPasswordEmail({
@@ -126,6 +128,10 @@ class AdminAuthService implements IAdminAuthService {
                 const findAdmin: IAdminAuthModel | null = await this.AdminAuthRepo.findAdmin(email_id) //AdminAuthModel.findOne({ email_address: email_id })
 
                 if (findAdmin && findAdmin.password) {
+                    console.log(token);
+                    console.log(findAdmin.token);
+                    
+                    
                     if (findAdmin.token == token) {
 
                         const newPassword: string = await bcrypt.hash(password, Number(process.env.BCRYPT_SALTROUND));

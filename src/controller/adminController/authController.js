@@ -84,6 +84,7 @@ class AdminController {
             try {
                 let token = req.params.token; //utilHelper.getTokenFromHeader(req['headers']['authorization']);
                 let password = req.body.password;
+                // console.log(token, password);
                 if (password && token) {
                     const resetPassword = yield this.AdminServices.resetPassword(token, password);
                     res.status(resetPassword.statusCode).json({

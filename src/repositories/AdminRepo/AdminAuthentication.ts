@@ -18,7 +18,7 @@ class AdminAuthenticationRepo implements IAdminRepo {
         try {
             await admin.save();
             return true
-        } catch (e) {
+        } catch (e) { 
             return false;
         }
     }

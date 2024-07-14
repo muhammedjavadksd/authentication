@@ -92,6 +92,7 @@ class AdminAuthService {
                 if (findAdmin && token) {
                     findAdmin.token = token;
                     yield this.AdminAuthRepo.updateAdmin(findAdmin);
+                    console.log(findAdmin);
                     const authCommunicationProvider = new notification_service_1.default(process.env.ADMIN_FORGETPASSWORD_EMAIL);
                     yield authCommunicationProvider._init_();
                     authCommunicationProvider.adminForgetPasswordEmail({
@@ -131,6 +132,8 @@ class AdminAuthService {
                     const email_id = isTokenValid.email;
                     const findAdmin = yield this.AdminAuthRepo.findAdmin(email_id); //AdminAuthModel.findOne({ email_address: email_id })
                     if (findAdmin && findAdmin.password) {
+                        console.log(token);
+                        console.log(findAdmin.token);
                         if (findAdmin.token == token) {
                             const newPassword = yield bcrypt_1.default.hash(password, Number(process.env.BCRYPT_SALTROUND));
                             const comparePassword = yield bcrypt_1.default.compare(password, findAdmin.password);
