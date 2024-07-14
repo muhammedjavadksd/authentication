@@ -15,27 +15,32 @@ class ProfileDataConsumer implements ProfielDataConsumerInterface {
     private readonly Queue: string = process.env.AUTH_DATA_UPDATE_QUEUE as string;
 
     async _init_() {
-        this.connection = await amqplib.connect("amqp://localhost");
-        this.channel = await this.connection.createChannel();
+        try {
+            this.connection = await amqplib.connect("amqp://localhost");
+            this.channel = await this.connection.createChannel();
+            this.channel.assertQueue(this.Queue, {durable: true})
+        }catch(e){}
     }
 
 
     authProfileUpdation(): void {
-        this.channel?.consume(this.Queue, async (msg) => {
-            if (msg) {
-
-                const messageContent = JSON.parse(msg.content.toString());
-                console.log(messageContent);
-
-                const profile_id: string = messageContent.profile_id;
-                if (profile_id) {
-                    const userRepo = new UserAuthenticationRepo();
-
-                    await userRepo.updateUserById(new mongoose.Types.ObjectId(profile_id), messageContent.edit_details)
-                    console.log("Authentication data has been updated ");
+        try {
+            this.channel?.consume(this.Queue, async (msg) => {
+                if (msg) {
+    
+                    const messageContent = JSON.parse(msg.content.toString());
+                    console.log(messageContent);
+    
+                    const profile_id: string = messageContent.profile_id;
+                    if (profile_id) {
+                        const userRepo = new UserAuthenticationRepo();
+    
+                        await userRepo.updateUserById(new mongoose.Types.ObjectId(profile_id), messageContent.edit_details)
+                        console.log("Authentication data has been updated ");
+                    }
                 }
-            }
-        }, { noAck: true })
+            }, { noAck: true })
+        }catch(e){}
     }
 }
 

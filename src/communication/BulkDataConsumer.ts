@@ -7,9 +7,12 @@ async function bulkConsumer(): Promise<void> {
 
     const profileDataConsumer = new ProfielDataConsumer()
 
-    await profileDataConsumer._init_();
+    try {
+        await profileDataConsumer._init_();
+        profileDataConsumer.authProfileUpdation()
+    } catch (e) {
 
-    profileDataConsumer.authProfileUpdation()
+    }
 
 }
 

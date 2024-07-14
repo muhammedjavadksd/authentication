@@ -23,24 +23,31 @@ class ProfileDataConsumer {
     }
     _init_() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.connection = yield amqplib_1.default.connect("amqp://localhost");
-            this.channel = yield this.connection.createChannel();
+            try {
+                this.connection = yield amqplib_1.default.connect("amqp://localhost");
+                this.channel = yield this.connection.createChannel();
+                this.channel.assertQueue(this.Queue, { durable: true });
+            }
+            catch (e) { }
         });
     }
     authProfileUpdation() {
         var _a;
-        (_a = this.channel) === null || _a === void 0 ? void 0 : _a.consume(this.Queue, (msg) => __awaiter(this, void 0, void 0, function* () {
-            if (msg) {
-                const messageContent = JSON.parse(msg.content.toString());
-                console.log(messageContent);
-                const profile_id = messageContent.profile_id;
-                if (profile_id) {
-                    const userRepo = new UserAuthentication_1.default();
-                    yield userRepo.updateUserById(new mongoose_1.default.Types.ObjectId(profile_id), messageContent.edit_details);
-                    console.log("Authentication data has been updated ");
+        try {
+            (_a = this.channel) === null || _a === void 0 ? void 0 : _a.consume(this.Queue, (msg) => __awaiter(this, void 0, void 0, function* () {
+                if (msg) {
+                    const messageContent = JSON.parse(msg.content.toString());
+                    console.log(messageContent);
+                    const profile_id = messageContent.profile_id;
+                    if (profile_id) {
+                        const userRepo = new UserAuthentication_1.default();
+                        yield userRepo.updateUserById(new mongoose_1.default.Types.ObjectId(profile_id), messageContent.edit_details);
+                        console.log("Authentication data has been updated ");
+                    }
                 }
-            }
-        }), { noAck: true });
+            }), { noAck: true });
+        }
+        catch (e) { }
     }
 }
 exports.default = ProfileDataConsumer;

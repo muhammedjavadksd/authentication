@@ -17,8 +17,12 @@ const ProfileDataConsumer_1 = __importDefault(require("./Consumer/ProfileDataCon
 function bulkConsumer() {
     return __awaiter(this, void 0, void 0, function* () {
         const profileDataConsumer = new ProfileDataConsumer_1.default();
-        yield profileDataConsumer._init_();
-        profileDataConsumer.authProfileUpdation();
+        try {
+            yield profileDataConsumer._init_();
+            profileDataConsumer.authProfileUpdation();
+        }
+        catch (e) {
+        }
     });
 }
 exports.default = bulkConsumer;
