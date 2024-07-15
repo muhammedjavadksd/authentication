@@ -2,8 +2,8 @@ import { NextFunction, Response, Request } from "express";
 import { ControllerResponseInterFace, CustomRequest } from "../config/Datas/InterFace";
 import const_data from '../config/const'
 import { JwtPayload } from "jsonwebtoken";
-import utilHelper from "../helper/util/utilHelper";
-import TokenHelper from "../helper/token/tokenHelper";
+import utilHelper from "../helper/utilHelper";
+import TokenHelper from "../helper/tokenHelper";
 import IAuthMiddleware from "../config/Interface/Middleware/AuthMiddlewareInterface";
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";

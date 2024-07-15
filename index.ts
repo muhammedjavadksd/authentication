@@ -1,11 +1,11 @@
 import express, { Express } from "express";
 import dotenv from "dotenv";
 import bodyparser from "body-parser";
-import authenticationDbConnection from "./src/db/config/connection";
-import userRouter from "./src/router/userRouter/userRouter";
-import adminRouter from "./src/router/adminRouter/adminRouter";
+import authenticationDbConnection from "./src/db/connection";
+import userRouter from "./src/router/userRouter";
+import adminRouter from "./src/router/adminRouter";
 import logger from "morgan";
-import organizationRouter from "./src/router/organization/organizationRouter";
+import organizationRouter from "./src/router/organizationRouter";
 import BulkDataConsumer from "./src/communication/BulkDataConsumer";
 
 const app: Express = express();

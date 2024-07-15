@@ -1,4 +1,4 @@
-import { locationTypeInterFace } from "../IModel/UserAuthModel/IUserAuthModel"
+import { locationTypeInterFace } from "../IModel/IUserAuthModel"
 
 interface IBaseUser {
     first_name: string

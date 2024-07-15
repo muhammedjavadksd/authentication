@@ -1,5 +1,5 @@
 import amqplib from 'amqplib';
-import UserAuthenticationRepo from '../../repositories/UserRepo/UserAuthentication';
+import UserAuthenticationRepo from '../../repositories/UserAuthentication';
 import mongoose from 'mongoose';
 
 interface ProfielDataConsumerInterface {

@@ -1,8 +1,8 @@
 import mongoose from "mongoose"
-import IUserModelDocument from "../IModel/UserAuthModel/IUserAuthModel"
+import IUserModelDocument from "../IModel/IUserAuthModel"
 import IBaseUser from "../Objects/IBaseUser"
-import IOrganizationAuthModel from "../IModel/OrganizationAuthModel/IOrganizationModel"
-import IAdminAuthModel from "../IModel/AdminAuthModel/IAdminAuthModel"
+import IOrganizationAuthModel from "../IModel/IOrganizationModel"
+import IAdminAuthModel from "../IModel/IAdminAuthModel"
 
 
 interface IUserAuthenticationRepo {

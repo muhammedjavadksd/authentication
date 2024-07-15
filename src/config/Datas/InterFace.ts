@@ -1,6 +1,4 @@
 import { Request, Response, NextFunction } from "express"
-import { string } from "joi";
-import mongoose from "mongoose";
 
 interface ControllerInterFace {
     [key: string]: (req: Request, res: Response, next: NextFunction) => Promise<void> | void
