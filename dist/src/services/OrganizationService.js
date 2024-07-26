@@ -26,6 +26,25 @@ class OrganizationService {
         this.OrganizationRepos = new OrganizationRepo_1.default();
         this.tokenHelpers = new tokenHelper_1.default();
     }
+    organizationPaginationView(limit, skip) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const findOrganization = yield this.OrganizationRepos.organizationPaginatedView(limit, skip);
+            if (findOrganization.length) {
+                return {
+                    msg: "Organization has been fetched",
+                    status: true,
+                    statusCode: Enums_1.StatusCode.OK
+                };
+            }
+            else {
+                return {
+                    msg: "No Organization found",
+                    status: false,
+                    statusCode: Enums_1.StatusCode.NOT_FOUND
+                };
+            }
+        });
+    }
     findSingleOrganization(organization_id) {
         return __awaiter(this, void 0, void 0, function* () {
             const organization = yield this.OrganizationRepos.findOrganizationById(organization_id);

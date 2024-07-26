@@ -14,6 +14,11 @@ class OrganizationRepo implements IOrganizationRepo {
         this.organizationAuth = OrganizationAuth
     }
 
+    async organizationPaginatedView(limit: number, skip: number): Promise<IOrganizationAuthModel[]> {
+        const findOrganizations: IOrganizationAuthModel[] = await this.organizationAuth.find({}).skip(skip).limit(limit);
+        return findOrganizations
+    }
+
     async findOrganizationById(organization_id: ObjectId): Promise<IOrganizationAuthModel | null> {
         const organization: IOrganizationAuthModel | null = await this.organizationAuth.findById(organization_id);
         return organization

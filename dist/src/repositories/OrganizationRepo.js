@@ -19,6 +19,12 @@ class OrganizationRepo {
         this.updateOrganizationByModel = this.updateOrganizationByModel.bind(this);
         this.organizationAuth = organizationAuth_1.default;
     }
+    organizationPaginatedView(limit, skip) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const findOrganizations = yield this.organizationAuth.find({}).skip(skip).limit(limit);
+            return findOrganizations;
+        });
+    }
     findOrganizationById(organization_id) {
         return __awaiter(this, void 0, void 0, function* () {
             const organization = yield this.organizationAuth.findById(organization_id);

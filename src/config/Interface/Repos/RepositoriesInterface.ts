@@ -20,6 +20,7 @@ interface IOrganizationRepo {
     updateOrganizationById(organization_id: ObjectId, data: IOrganizationEditable): Promise<boolean>
     findOrganization(email_address: string): Promise<IOrganizationAuthModel | null>
     findOrganizationById(organization_id: ObjectId): Promise<IOrganizationAuthModel | null>
+    organizationPaginatedView(limit: number, skip: number): Promise<IOrganizationAuthModel[]>
 }
 
 interface IAdminRepo {

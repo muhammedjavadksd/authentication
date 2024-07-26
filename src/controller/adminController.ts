@@ -28,8 +28,13 @@ class AdminController implements IAdminController {
         res.status(findOrganization.statusCode).json({ status: findOrganization.status, msg: findOrganization.msg, data: findOrganization.data })
     }
 
-    organizationPaginationView(req: Request, res: Response, next: NextFunction): Promise<void> {
-        throw new Error("Method not implemented.");
+    async organizationPaginationView(req: Request, res: Response, next: NextFunction): Promise<void> {
+        // :limit/:skip/:per_page
+        const limit: number = +(req.params.limit);
+        const skip: number = +(req.params.skip);
+
+        const findOrganization: HelperFunctionResponse = await this.OrganizationServices.organizationPaginationView(limit, skip);
+        res.status(findOrganization.statusCode).json({ status: findOrganization.status, msg: findOrganization.msg, data: findOrganization.data })
     }
 
     async updateOrganizationStatus(req: Request, res: Response): Promise<void> {

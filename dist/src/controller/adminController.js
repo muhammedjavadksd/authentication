@@ -30,7 +30,13 @@ class AdminController {
         });
     }
     organizationPaginationView(req, res, next) {
-        throw new Error("Method not implemented.");
+        return __awaiter(this, void 0, void 0, function* () {
+            // :limit/:skip/:per_page
+            const limit = +(req.params.limit);
+            const skip = +(req.params.skip);
+            const findOrganization = yield this.OrganizationServices.organizationPaginationView(limit, skip);
+            res.status(findOrganization.statusCode).json({ status: findOrganization.status, msg: findOrganization.msg, data: findOrganization.data });
+        });
     }
     updateOrganizationStatus(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

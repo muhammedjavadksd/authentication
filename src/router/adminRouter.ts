@@ -8,8 +8,8 @@ const adminRouter: express.Router = express.Router();
 const adminController = new AdminController();
 const adminMiddleware = new AuthMiddleware();
 
-adminRouter.post("/organization/view/:limit/:skip/:per_page", adminMiddleware.isAdminLogged, adminController.signInController)
-adminRouter.post("/organization/:organization_id", adminMiddleware.isAdminLogged, adminController.signInController)
+adminRouter.post("/organization/view/:limit/:skip/", adminMiddleware.isAdminLogged, adminController.organizationPaginationView)
+adminRouter.post("/organization/:organization_id", adminMiddleware.isAdminLogged, adminController.organizationSingleView)
 
 adminRouter.post("/sign_in", adminMiddleware.isAdminLogged, adminController.signInController)
 adminRouter.post("/forget_password", adminMiddleware.isAdminLogged, adminController.forgetPasswordController)

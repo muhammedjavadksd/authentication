@@ -26,6 +26,24 @@ class OrganizationService implements IOrganizationAuthService {
     }
 
 
+    async organizationPaginationView(limit: number, skip: number): Promise<HelperFunctionResponse> {
+        const findOrganization = await this.OrganizationRepos.organizationPaginatedView(limit, skip);
+        if (findOrganization.length) {
+            return {
+                msg: "Organization has been fetched",
+                status: true,
+                statusCode: StatusCode.OK
+            }
+        } else {
+            return {
+                msg: "No Organization found",
+                status: false,
+                statusCode: StatusCode.NOT_FOUND
+            }
+        }
+    }
+
+
     async findSingleOrganization(organization_id: ObjectId): Promise<HelperFunctionResponse> {
         const organization: IOrganizationAuthModel | null = await this.OrganizationRepos.findOrganizationById(organization_id);
         return {

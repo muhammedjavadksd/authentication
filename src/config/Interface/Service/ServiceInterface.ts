@@ -24,6 +24,7 @@ interface IOrganizationAuthService {
     resetPassword(token: string, password: string): Promise<HelperFunctionResponse>
     updateOrganizationStatus(organization_id: ObjectId, status: OrganizationStatus): Promise<HelperFunctionResponse>
     findSingleOrganization(organization_id: ObjectId): Promise<HelperFunctionResponse>
+    organizationPaginationView(limit: number, skip: number): Promise<HelperFunctionResponse>
 }
 
 export { IAdminAuthService, IUserAuthService, IOrganizationAuthService }
