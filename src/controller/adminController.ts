@@ -3,18 +3,30 @@ import { AdminJwtInterFace, ControllerResponseInterFace, HelperFunctionResponse 
 import AdminAuthService from "../services/AdminAuthService";
 import utilHelper from "../helper/utilHelper";
 import IAdminController from "../config/Interface/IController/iAdminController";
+import OrganizationService from "../services/OrganizationService";
+import { OrganizationStatus } from "../config/Datas/Enums";
+import { ObjectId } from "mongoose";
 
 
 
 class AdminController implements IAdminController {
 
     private AdminServices;
+    private OrganizationServices;
 
     constructor() {
         this.signInController = this.signInController.bind(this)
         this.forgetPasswordController = this.forgetPasswordController.bind(this)
         this.adminPasswordReset = this.adminPasswordReset.bind(this)
         this.AdminServices = new AdminAuthService();
+        this.OrganizationServices = new OrganizationService();
+    }
+
+    async updateOrganizationStatus(req: Request, res: Response): Promise<void> {
+        const organization_id: ObjectId = req.body.organization_id;
+        const status: OrganizationStatus = req.body.status;
+        const updateOrganization = await this.OrganizationServices.updateOrganizationStatus(organization_id, status);
+        res.status(updateOrganization.statusCode).json({ status: updateOrganization.status, msg: updateOrganization.msg })
     }
 
 
@@ -89,7 +101,7 @@ class AdminController implements IAdminController {
             const password: string = req.body.password;
 
             // console.log(token, password);
-            
+
 
             if (password && token) {
                 const resetPassword: HelperFunctionResponse = await this.AdminServices.resetPassword(token, password);

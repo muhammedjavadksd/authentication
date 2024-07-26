@@ -13,12 +13,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const AdminAuthService_1 = __importDefault(require("../services/AdminAuthService"));
+const OrganizationService_1 = __importDefault(require("../services/OrganizationService"));
 class AdminController {
     constructor() {
         this.signInController = this.signInController.bind(this);
         this.forgetPasswordController = this.forgetPasswordController.bind(this);
         this.adminPasswordReset = this.adminPasswordReset.bind(this);
         this.AdminServices = new AdminAuthService_1.default();
+        this.OrganizationServices = new OrganizationService_1.default();
+    }
+    updateOrganizationStatus(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const organization_id = req.body.organization_id;
+            const status = req.body.status;
+            const updateOrganization = yield this.OrganizationServices.updateOrganizationStatus(organization_id, status);
+            res.status(updateOrganization.statusCode).json({ status: updateOrganization.status, msg: updateOrganization.msg });
+        });
     }
     signInController(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {

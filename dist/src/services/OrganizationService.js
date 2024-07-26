@@ -17,6 +17,7 @@ const const_1 = __importDefault(require("../config/const"));
 const OrganizationRepo_1 = __importDefault(require("../repositories/OrganizationRepo"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const tokenHelper_1 = __importDefault(require("../helper/tokenHelper"));
+const Enums_1 = require("../config/Datas/Enums");
 class OrganizationService {
     constructor() {
         this.signIn = this.signIn.bind(this);
@@ -24,6 +25,35 @@ class OrganizationService {
         this.resetPassword = this.resetPassword.bind(this);
         this.OrganizationRepos = new OrganizationRepo_1.default();
         this.tokenHelpers = new tokenHelper_1.default();
+    }
+    updateOrganizationStatus(organization_id, status) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const findOrganization = yield this.OrganizationRepos.findOrganizationById(organization_id);
+            if (findOrganization) {
+                const update = yield this.OrganizationRepos.updateOrganizationById(organization_id, { status });
+                if (update) {
+                    return {
+                        msg: "Organization status updated",
+                        status: true,
+                        statusCode: Enums_1.StatusCode.OK
+                    };
+                }
+                else {
+                    return {
+                        msg: "Organization update failed",
+                        status: false,
+                        statusCode: Enums_1.StatusCode.BAD_REQUEST
+                    };
+                }
+            }
+            else {
+                return {
+                    status: false,
+                    msg: "We couldn't locate the organization.",
+                    statusCode: Enums_1.StatusCode.NOT_FOUND
+                };
+            }
+        });
     }
     signIn(email, password) {
         return __awaiter(this, void 0, void 0, function* () {

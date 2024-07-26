@@ -1,4 +1,5 @@
-import IOrganizationAuthModel from "../config/Interface/IModel/IOrganizationModel";
+import { ObjectId } from "mongoose";
+import IOrganizationAuthModel, { IOrganizationEditable } from "../config/Interface/IModel/IOrganizationModel";
 import { IOrganizationRepo } from "../config/Interface/Repos/RepositoriesInterface";
 import OrganizationAuth from "../db/model/organizationAuth";
 
@@ -9,11 +10,22 @@ class OrganizationRepo implements IOrganizationRepo {
 
     constructor() {
         this.findOrganization = this.findOrganization.bind(this)
-        this.updateOrganization = this.updateOrganization.bind(this)
+        this.updateOrganizationByModel = this.updateOrganizationByModel.bind(this)
         this.organizationAuth = OrganizationAuth
     }
 
-    async updateOrganization(organization: IOrganizationAuthModel): Promise<boolean> {
+    async findOrganizationById(organization_id: ObjectId): Promise<IOrganizationAuthModel | null> {
+        const organization: IOrganizationAuthModel | null = await this.organizationAuth.findById(organization_id);
+        return organization
+    }
+
+
+    async updateOrganizationById(organization_id: ObjectId, data: IOrganizationEditable): Promise<boolean> {
+        const updateOrganization = await this.organizationAuth.updateOne({ id: organization_id }, { $set: data })
+        return updateOrganization.modifiedCount > 0
+    }
+
+    async updateOrganizationByModel(organization: IOrganizationAuthModel): Promise<boolean> {
         try {
             await organization.save()
             return true

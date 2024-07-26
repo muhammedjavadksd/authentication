@@ -7,6 +7,8 @@ import bcrypt from 'bcrypt'
 import { IOrganizationAuthService } from "../config/Interface/Service/ServiceInterface";
 import IOrganizationAuthModel from "../config/Interface/IModel/IOrganizationModel";
 import TokenHelper from "../helper/tokenHelper";
+import { ObjectId } from "mongoose";
+import { OrganizationStatus, StatusCode } from "../config/Datas/Enums";
 
 
 
@@ -23,6 +25,32 @@ class OrganizationService implements IOrganizationAuthService {
         this.tokenHelpers = new TokenHelper();
     }
 
+
+    async updateOrganizationStatus(organization_id: ObjectId, status: OrganizationStatus): Promise<HelperFunctionResponse> {
+        const findOrganization: IOrganizationAuthModel | null = await this.OrganizationRepos.findOrganizationById(organization_id);
+        if (findOrganization) {
+            const update = await this.OrganizationRepos.updateOrganizationById(organization_id, { status });
+            if (update) {
+                return {
+                    msg: "Organization status updated",
+                    status: true,
+                    statusCode: StatusCode.OK
+                }
+            } else {
+                return {
+                    msg: "Organization update failed",
+                    status: false,
+                    statusCode: StatusCode.BAD_REQUEST
+                }
+            }
+        } else {
+            return {
+                status: false,
+                msg: "We couldn't locate the organization.",
+                statusCode: StatusCode.NOT_FOUND
+            }
+        }
+    }
 
     async signIn(email: string, password: string): Promise<HelperFunctionResponse> {
         try {

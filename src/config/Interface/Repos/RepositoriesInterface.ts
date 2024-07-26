@@ -1,7 +1,7 @@
-import mongoose from "mongoose"
+import mongoose, { ObjectId } from "mongoose"
 import IUserModelDocument from "../IModel/IUserAuthModel"
-import IBaseUser from "../Objects/IBaseUser"
-import IOrganizationAuthModel from "../IModel/IOrganizationModel"
+import { IBaseUser } from "../Objects/IBaseUser"
+import IOrganizationAuthModel, { IOrganizationEditable } from "../IModel/IOrganizationModel"
 import IAdminAuthModel from "../IModel/IAdminAuthModel"
 
 
@@ -16,8 +16,10 @@ interface IUserAuthenticationRepo {
 
 interface IOrganizationRepo {
     findOrganization(email_address: string): Promise<IOrganizationAuthModel | null>
-    updateOrganization(organization: IOrganizationAuthModel): Promise<boolean>
+    updateOrganizationByModel(organization: IOrganizationAuthModel): Promise<boolean>
+    updateOrganizationById(organization_id: ObjectId, data: IOrganizationEditable): Promise<boolean>
     findOrganization(email_address: string): Promise<IOrganizationAuthModel | null>
+    findOrganizationById(organization_id: ObjectId): Promise<IOrganizationAuthModel | null>
 }
 
 interface IAdminRepo {

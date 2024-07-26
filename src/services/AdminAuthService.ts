@@ -7,10 +7,15 @@ import bcrypt from 'bcrypt';
 import IAdminAuthModel from "../config/Interface/IModel/IAdminAuthModel";
 import { IAdminAuthService } from "../config/Interface/Service/ServiceInterface";
 import TokenHelper from "../helper/tokenHelper";
+import { OrganizationStatus, StatusCode } from "../config/Datas/Enums";
+import IOrganizationAuthModel from "../config/Interface/IModel/IOrganizationModel";
+import OrganizationRepo from "../repositories/OrganizationRepo";
+import { ObjectId } from "mongoose";
 
 class AdminAuthService implements IAdminAuthService {
 
     private AdminAuthRepo;
+    private OrganizationRepo;
     private tokenHelpers;
 
     constructor() {
@@ -18,8 +23,11 @@ class AdminAuthService implements IAdminAuthService {
         this.forgetPassword = this.forgetPassword.bind(this)
         this.resetPassword = this.resetPassword.bind(this)
         this.AdminAuthRepo = new AdminAuthenticationRepo();
+        this.OrganizationRepo = new OrganizationRepo();
         this.tokenHelpers = new TokenHelper();
     }
+
+
 
     async signIn(email: string, password: string): Promise<HelperFunctionResponse> {
 
@@ -88,7 +96,7 @@ class AdminAuthService implements IAdminAuthService {
                 await this.AdminAuthRepo.updateAdmin(findAdmin);
 
                 console.log(findAdmin);
-                
+
                 const authCommunicationProvider = new AuthNotificationProvider(process.env.ADMIN_FORGETPASSWORD_EMAIL as string);
                 await authCommunicationProvider._init_()
                 authCommunicationProvider.adminForgetPasswordEmail({
@@ -129,8 +137,8 @@ class AdminAuthService implements IAdminAuthService {
                 if (findAdmin && findAdmin.password) {
                     console.log(token);
                     console.log(findAdmin.token);
-                    
-                    
+
+
                     if (findAdmin.token == token) {
 
                         const newPassword: string = await bcrypt.hash(password, Number(process.env.BCRYPT_SALTROUND));

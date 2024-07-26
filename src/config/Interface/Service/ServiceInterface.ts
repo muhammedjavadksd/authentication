@@ -1,10 +1,13 @@
+import { ObjectId } from "mongoose"
 import { HelperFunctionResponse } from "../../Datas/InterFace"
+import { OrganizationStatus } from "../../Datas/Enums"
 
 
 interface IAdminAuthService {
     signIn(email: string, password: string): Promise<HelperFunctionResponse>
     forgetPassword(email: string): Promise<HelperFunctionResponse>
     resetPassword(token: string, password: string): Promise<HelperFunctionResponse>
+    // updateOrganizationStatus(organization_id: ObjectId, password: string): Promise<HelperFunctionResponse>
 }
 
 interface IUserAuthService {
@@ -19,6 +22,7 @@ interface IOrganizationAuthService {
     signIn(email: string, password: string): Promise<HelperFunctionResponse>
     forgetPasswordHelper(email_address: string): Promise<HelperFunctionResponse>
     resetPassword(token: string, password: string): Promise<HelperFunctionResponse>
+    updateOrganizationStatus(organization_id: ObjectId, status: OrganizationStatus): Promise<HelperFunctionResponse>
 }
 
 export { IAdminAuthService, IUserAuthService, IOrganizationAuthService }

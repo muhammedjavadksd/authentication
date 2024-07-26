@@ -16,10 +16,22 @@ const organizationAuth_1 = __importDefault(require("../db/model/organizationAuth
 class OrganizationRepo {
     constructor() {
         this.findOrganization = this.findOrganization.bind(this);
-        this.updateOrganization = this.updateOrganization.bind(this);
+        this.updateOrganizationByModel = this.updateOrganizationByModel.bind(this);
         this.organizationAuth = organizationAuth_1.default;
     }
-    updateOrganization(organization) {
+    findOrganizationById(organization_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const organization = yield this.organizationAuth.findById(organization_id);
+            return organization;
+        });
+    }
+    updateOrganizationById(organization_id, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const updateOrganization = yield this.organizationAuth.updateOne({ id: organization_id }, { $set: data });
+            return updateOrganization.modifiedCount > 0;
+        });
+    }
+    updateOrganizationByModel(organization) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield organization.save();

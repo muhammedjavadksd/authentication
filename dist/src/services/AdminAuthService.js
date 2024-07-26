@@ -17,12 +17,14 @@ const const_1 = __importDefault(require("../config/const"));
 const AdminAuthentication_1 = __importDefault(require("../repositories/AdminAuthentication"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const tokenHelper_1 = __importDefault(require("../helper/tokenHelper"));
+const OrganizationRepo_1 = __importDefault(require("../repositories/OrganizationRepo"));
 class AdminAuthService {
     constructor() {
         this.signIn = this.signIn.bind(this);
         this.forgetPassword = this.forgetPassword.bind(this);
         this.resetPassword = this.resetPassword.bind(this);
         this.AdminAuthRepo = new AdminAuthentication_1.default();
+        this.OrganizationRepo = new OrganizationRepo_1.default();
         this.tokenHelpers = new tokenHelper_1.default();
     }
     signIn(email, password) {
