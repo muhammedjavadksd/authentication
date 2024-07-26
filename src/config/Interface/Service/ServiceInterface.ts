@@ -23,6 +23,7 @@ interface IOrganizationAuthService {
     forgetPasswordHelper(email_address: string): Promise<HelperFunctionResponse>
     resetPassword(token: string, password: string): Promise<HelperFunctionResponse>
     updateOrganizationStatus(organization_id: ObjectId, status: OrganizationStatus): Promise<HelperFunctionResponse>
+    findSingleOrganization(organization_id: ObjectId): Promise<HelperFunctionResponse>
 }
 
 export { IAdminAuthService, IUserAuthService, IOrganizationAuthService }

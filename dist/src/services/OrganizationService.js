@@ -26,6 +26,17 @@ class OrganizationService {
         this.OrganizationRepos = new OrganizationRepo_1.default();
         this.tokenHelpers = new tokenHelper_1.default();
     }
+    findSingleOrganization(organization_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const organization = yield this.OrganizationRepos.findOrganizationById(organization_id);
+            return {
+                msg: organization ? "Data fetched" : "No data found",
+                status: !!organization,
+                statusCode: organization ? Enums_1.StatusCode.OK : Enums_1.StatusCode.NOT_FOUND,
+                data: { organization }
+            };
+        });
+    }
     updateOrganizationStatus(organization_id, status) {
         return __awaiter(this, void 0, void 0, function* () {
             const findOrganization = yield this.OrganizationRepos.findOrganizationById(organization_id);

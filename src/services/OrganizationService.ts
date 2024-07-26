@@ -26,6 +26,17 @@ class OrganizationService implements IOrganizationAuthService {
     }
 
 
+    async findSingleOrganization(organization_id: ObjectId): Promise<HelperFunctionResponse> {
+        const organization: IOrganizationAuthModel | null = await this.OrganizationRepos.findOrganizationById(organization_id);
+        return {
+            msg: organization ? "Data fetched" : "No data found",
+            status: !!organization,
+            statusCode: organization ? StatusCode.OK : StatusCode.NOT_FOUND,
+            data: { organization }
+        }
+    }
+
+
     async updateOrganizationStatus(organization_id: ObjectId, status: OrganizationStatus): Promise<HelperFunctionResponse> {
         const findOrganization: IOrganizationAuthModel | null = await this.OrganizationRepos.findOrganizationById(organization_id);
         if (findOrganization) {

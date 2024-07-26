@@ -22,6 +22,16 @@ class AdminController {
         this.AdminServices = new AdminAuthService_1.default();
         this.OrganizationServices = new OrganizationService_1.default();
     }
+    organizationSingleView(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const organization_id = req.params.organization_id;
+            const findOrganization = yield this.OrganizationServices.findSingleOrganization(organization_id);
+            res.status(findOrganization.statusCode).json({ status: findOrganization.status, msg: findOrganization.msg, data: findOrganization.data });
+        });
+    }
+    organizationPaginationView(req, res, next) {
+        throw new Error("Method not implemented.");
+    }
     updateOrganizationStatus(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const organization_id = req.body.organization_id;

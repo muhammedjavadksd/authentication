@@ -22,6 +22,16 @@ class AdminController implements IAdminController {
         this.OrganizationServices = new OrganizationService();
     }
 
+    async organizationSingleView(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const organization_id = req.params.organization_id as unknown as ObjectId
+        const findOrganization = await this.OrganizationServices.findSingleOrganization(organization_id);
+        res.status(findOrganization.statusCode).json({ status: findOrganization.status, msg: findOrganization.msg, data: findOrganization.data })
+    }
+
+    organizationPaginationView(req: Request, res: Response, next: NextFunction): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
+
     async updateOrganizationStatus(req: Request, res: Response): Promise<void> {
         const organization_id: ObjectId = req.body.organization_id;
         const status: OrganizationStatus = req.body.status;
