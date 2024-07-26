@@ -71,7 +71,7 @@ class OrganizationService {
                     if (jwtToken) {
                         getData.token = jwtToken;
                         // await getData.save()
-                        yield this.OrganizationRepos.updateOrganization(getData);
+                        yield this.OrganizationRepos.updateOrganizationByModel(getData);
                         if (comparePassword) {
                             return { status: true, data: { token: jwtToken }, msg: "Sign in success", statusCode: 200 };
                         }
@@ -100,7 +100,7 @@ class OrganizationService {
                 const token = yield this.tokenHelpers.generateJWtToken({ email_id: email_address, type: const_1.default.OTP_TYPE.ORGANIZATION_FORGET_PASSWORD }, const_1.default.OTP_EXPIRE_TIME.toString());
                 if (organization && token) {
                     organization.token = token;
-                    this.OrganizationRepos.updateOrganization(organization);
+                    this.OrganizationRepos.updateOrganizationByModel(organization);
                     const authNotificationProvider = new notification_service_1.default(process.env.ORGANIZATION_FORGETPASSWORD_EMAIL);
                     yield authNotificationProvider._init_();
                     authNotificationProvider.organizationForgetPasswordEmail({
@@ -156,7 +156,7 @@ class OrganizationService {
                                 organization.password = newPassword;
                                 organization.token = "";
                                 // await organization.save();
-                                yield this.OrganizationRepos.updateOrganization(organization);
+                                yield this.OrganizationRepos.updateOrganizationByModel(organization);
                                 return {
                                     status: true,
                                     statusCode: 200,

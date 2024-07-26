@@ -71,7 +71,7 @@ class OrganizationService implements IOrganizationAuthService {
                 if (jwtToken) {
                     getData.token = jwtToken
                     // await getData.save()
-                    await this.OrganizationRepos.updateOrganization(getData);
+                    await this.OrganizationRepos.updateOrganizationByModel(getData);
                     if (comparePassword) {
                         return { status: true, data: { token: jwtToken }, msg: "Sign in success", statusCode: 200 }
                     } else {
@@ -98,7 +98,7 @@ class OrganizationService implements IOrganizationAuthService {
 
             if (organization && token) {
                 organization.token = token;
-                this.OrganizationRepos.updateOrganization(organization);
+                this.OrganizationRepos.updateOrganizationByModel(organization);
                 const authNotificationProvider = new AuthNotificationProvider(process.env.ORGANIZATION_FORGETPASSWORD_EMAIL as string);
                 await authNotificationProvider._init_()
                 authNotificationProvider.organizationForgetPasswordEmail({
@@ -154,7 +154,7 @@ class OrganizationService implements IOrganizationAuthService {
                             organization.password = newPassword;
                             organization.token = "";
                             // await organization.save();
-                            await this.OrganizationRepos.updateOrganization(organization)
+                            await this.OrganizationRepos.updateOrganizationByModel(organization)
                             return {
                                 status: true,
                                 statusCode: 200,
