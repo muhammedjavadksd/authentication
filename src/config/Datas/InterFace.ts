@@ -62,6 +62,7 @@ interface UserJwtInterFace {
     phone: number,
     user_id: string,
     profile_id: string
+    blood_token?: string
 }
 
 interface AdminJwtInterFace {

@@ -26,8 +26,49 @@ class UserAuthController {
         this.editAuthPhoneNumber = this.editAuthPhoneNumber.bind(this);
         this.resetOtpNumber = this.resetOtpNumber.bind(this);
         this.updateAuth = this.updateAuth.bind(this);
+        this.signWithToken = this.signWithToken.bind(this);
         this.UserAuthRepo = new UserAuthentication_1.default();
         this.UserAuthService = new UserAuthServices_1.default();
+    }
+    signWithToken(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            const user_id = (_a = req.context) === null || _a === void 0 ? void 0 : _a.user_id;
+            if (user_id) {
+                console.log(user_id);
+                const findUser = yield this.UserAuthRepo.findUser(user_id, null, null);
+                console.log("The user");
+                console.log(findUser);
+                if (findUser) {
+                    const loginData = {
+                        jwt: findUser['jwtToken'],
+                        first_name: findUser['first_name'],
+                        last_name: findUser['last_name'],
+                        email: findUser['email'],
+                        phone: findUser['phone_number'],
+                        user_id: findUser['id'],
+                        profile_id: findUser['user_id'],
+                        blood_token: findUser['blood_token']
+                    };
+                    console.log(loginData);
+                    res.status(Enums_1.StatusCode.OK).json({
+                        status: true, msg: "Login attempt success", data: {
+                            profile: loginData
+                        }
+                    });
+                }
+                else {
+                    res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
+                        status: true, msg: "No user found"
+                    });
+                }
+            }
+            else {
+                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
+                    status: true, msg: "No user found"
+                });
+            }
+        });
     }
     updateAuth(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -190,7 +231,8 @@ class UserAuthController {
                             email: responseData['email'],
                             phone: responseData['phone'],
                             user_id: responseData['user_id'],
-                            profile_id: responseData['profile_id']
+                            profile_id: responseData['profile_id'],
+                            blood_token: responseData['blood_token']
                         };
                         console.log(otpResponse);
                         res.status(200).json({

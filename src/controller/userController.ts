@@ -25,9 +25,56 @@ class UserAuthController implements IUserAuthController {
         this.editAuthPhoneNumber = this.editAuthPhoneNumber.bind(this)
         this.resetOtpNumber = this.resetOtpNumber.bind(this)
         this.updateAuth = this.updateAuth.bind(this)
+        this.signWithToken = this.signWithToken.bind(this)
 
         this.UserAuthRepo = new UserAuthenticationRepo();
         this.UserAuthService = new UserAuthServices();
+    }
+
+
+
+    async signWithToken(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+        const user_id = req.context?.user_id;
+        if (user_id) {
+
+            console.log(user_id);
+
+            const findUser = await this.UserAuthRepo.findUser(user_id, null, null);
+
+            console.log("The user");
+            console.log(findUser);
+
+
+            if (findUser) {
+                const loginData = {
+                    jwt: findUser['jwtToken'],
+                    first_name: findUser['first_name'],
+                    last_name: findUser['last_name'],
+                    email: findUser['email'],
+                    phone: findUser['phone_number'],
+                    user_id: findUser['id'],
+                    profile_id: findUser['user_id'],
+                    blood_token: findUser['blood_token']
+                } as UserJwtInterFace
+
+                console.log(loginData);
+
+
+                res.status(StatusCode.OK).json({
+                    status: true, msg: "Login attempt success", data: {
+                        profile: loginData
+                    }
+                })
+            } else {
+                res.status(StatusCode.UNAUTHORIZED).json({
+                    status: true, msg: "No user found"
+                })
+            }
+        } else {
+            res.status(StatusCode.UNAUTHORIZED).json({
+                status: true, msg: "No user found"
+            })
+        }
     }
 
 
@@ -200,7 +247,8 @@ class UserAuthController implements IUserAuthController {
                         email: responseData['email'],
                         phone: responseData['phone'],
                         user_id: responseData['user_id'],
-                        profile_id: responseData['profile_id']
+                        profile_id: responseData['profile_id'],
+                        blood_token: responseData['blood_token']
                     } as UserJwtInterFace
 
                     console.log(otpResponse);
