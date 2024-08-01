@@ -1,5 +1,6 @@
 
 // const constant_data = require("../../config/const");
+import { string } from "joi";
 import UserModelDocument from "../../config/Interface/IModel/IUserAuthModel";
 import constant_data from "../../config/const";
 // const mongo = require("mongoose");
@@ -52,6 +53,7 @@ const userAuthSchema = {
         type: Boolean,
         default: false
     },
+    blood_token: String,
     location: {
         type: {
             latitude: {

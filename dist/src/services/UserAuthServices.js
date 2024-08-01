@@ -44,7 +44,7 @@ class UserAuthServices {
                     }
                     const otpNumber = utilHelper_1.default.generateAnOTP(6);
                     const otpExpireTime = const_1.default.MINIMUM_OTP_TIMER();
-                    const token = yield this.TokenHelpers.generateJWtToken({ email_id: userAuth['email'], type: const_1.default.OTP_TYPE.SIGN_IN_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
+                    const token = yield this.TokenHelpers.generateJWtToken({ email: userAuth['email'], type: const_1.default.OTP_TYPE.SIGN_IN_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
                     if (token) {
                         userAuth.otp = otpNumber;
                         userAuth.otp_timer = otpExpireTime;
@@ -105,6 +105,8 @@ class UserAuthServices {
                         statusCode: 401
                     };
                 }
+                console.log("Get user");
+                console.log(getUser);
                 const userJwtToken = getUser.jwtToken;
                 if (userJwtToken != token) {
                     return {
@@ -113,6 +115,7 @@ class UserAuthServices {
                         statusCode: 401
                     };
                 }
+                console.log("This also passed");
                 const otpExpireTimer = getUser.otp_timer;
                 const validateOtp = utilHelper_1.default.OTPValidator(otp, getUser.otp, otpExpireTimer);
                 if (!validateOtp.status) {

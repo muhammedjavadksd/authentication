@@ -7,6 +7,7 @@ import TokenHelper from "../helper/tokenHelper";
 import IAuthMiddleware from "../config/Interface/Middleware/AuthMiddlewareInterface";
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
+import { string } from "joi";
 
 const { OTP_TYPE } = const_data;
 
@@ -101,16 +102,20 @@ class AuthMiddleware implements IAuthMiddleware {
             req.context.auth_token = token;
 
             const checkValidity: JwtPayload | string | boolean = await this.tokenHelpers.checkTokenValidity(token);
+            console.log("Validity");
+
             console.log(checkValidity);
 
 
 
             if (checkValidity) {
                 if (typeof checkValidity == "object") {
-                    if (checkValidity.email_id) {
+                    if (checkValidity.email) {
                         if (checkValidity.type == OTP_TYPE.SIGN_UP_OTP || checkValidity.type == OTP_TYPE.SIGN_IN_OTP) {
-                            req.context.email_id = checkValidity?.email_id;
+                            req.context.email_id = checkValidity?.email;
                             req.context.token = token;
+                            console.log("Passed");
+
                             next();
                         } else {
                             res.status(401).json({
@@ -144,8 +149,63 @@ class AuthMiddleware implements IAuthMiddleware {
         }
     }
 
-    isUserLogged(req: Request, res: Response, next: NextFunction): void {
-        next();
+    async isUserLogged(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+
+        const headers: CustomRequest['headers'] = req.headers;
+        const token: string | false = utilHelper.getTokenFromHeader(headers['authorization'])
+        console.log("The token is :" + token);
+
+        if (token) {
+            if (!req.context) {
+                req.context = {}
+            }
+            req.context.auth_token = token;
+
+
+            const checkValidity: JwtPayload | string | boolean = await this.tokenHelpers.checkTokenValidity(token);
+            console.log(checkValidity);
+
+            if (checkValidity) {
+                if (typeof checkValidity == "object") {
+                    const emailAddress: string = checkValidity.email || checkValidity.email_address;
+                    if (emailAddress) {
+                        if (checkValidity) {
+                            req.context.email_id = emailAddress;
+                            req.context.token = token;
+                            req.context.user_id = checkValidity.user_id;
+                            console.log("Passed");
+                            console.log(req.context);
+                            next();
+                        } else {
+                            res.status(401).json({
+                                status: false,
+                                msg: "Authorization is failed"
+                            } as ControllerResponseInterFace);
+                        }
+                    } else {
+                        res.status(401).json({
+                            status: false,
+                            msg: "Authorization is failed"
+                        } as ControllerResponseInterFace);
+                    }
+                } else {
+                    res.status(401).json({
+                        status: false,
+                        msg: "Authorization is failed"
+                    } as ControllerResponseInterFace);
+                }
+            } else {
+                res.status(401).json({
+                    status: false,
+                    msg: "Authorization is failed"
+                } as ControllerResponseInterFace);
+            }
+        } else {
+            res.status(401).json({
+                status: false,
+                msg: "Invalid auth attempt"
+            } as ControllerResponseInterFace);
+        }
     }
 
     isAdminLogged(req: Request, res: Response, next: NextFunction): void {

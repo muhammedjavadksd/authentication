@@ -53,6 +53,7 @@ const userAuthSchema = {
         type: Boolean,
         default: false
     },
+    blood_token: String,
     location: {
         type: {
             latitude: {

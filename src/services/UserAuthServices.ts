@@ -46,7 +46,7 @@ class UserAuthServices implements IUserAuthService {
                 const otpNumber: number = utilHelper.generateAnOTP(6);
                 const otpExpireTime: number = constant_data.MINIMUM_OTP_TIMER();
 
-                const token: string | null = await this.TokenHelpers.generateJWtToken({ email_id: userAuth['email'], type: constant_data.OTP_TYPE.SIGN_IN_OTP }, constant_data.OTP_EXPIRE_TIME.toString())
+                const token: string | null = await this.TokenHelpers.generateJWtToken({ email: userAuth['email'], type: constant_data.OTP_TYPE.SIGN_IN_OTP }, constant_data.OTP_EXPIRE_TIME.toString())
                 if (token) {
                     userAuth.otp = otpNumber;
                     userAuth.otp_timer = otpExpireTime;
@@ -106,6 +106,10 @@ class UserAuthServices implements IUserAuthService {
                 }
             }
 
+            console.log("Get user");
+
+            console.log(getUser);
+
             const userJwtToken: string = getUser.jwtToken;
             if (userJwtToken != token) {
                 return {
@@ -114,6 +118,8 @@ class UserAuthServices implements IUserAuthService {
                     statusCode: 401
                 }
             }
+
+            console.log("This also passed");
 
             const otpExpireTimer: number = getUser.otp_timer;
             const validateOtp = utilHelper.OTPValidator(otp, getUser.otp, otpExpireTimer);
@@ -264,7 +270,7 @@ class UserAuthServices implements IUserAuthService {
 
         try {
             const getUser: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, email_id, null);
-            
+
             if (getUser) {
                 const otpNumber: number = utilHelper.generateAnOTP(6);
                 const otpExpireTime: number = constant_data.MINIMUM_OTP_TIMER();

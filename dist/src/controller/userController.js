@@ -16,6 +16,7 @@ const const_1 = __importDefault(require("../config/const"));
 const validation_1 = __importDefault(require("../config/validation/validation"));
 const UserAuthentication_1 = __importDefault(require("../repositories/UserAuthentication"));
 const UserAuthServices_1 = __importDefault(require("../services/UserAuthServices"));
+const Enums_1 = require("../config/Datas/Enums");
 const { AUTH_PROVIDERS_DATA } = const_1.default;
 class UserAuthController {
     constructor() {
@@ -24,8 +25,33 @@ class UserAuthController {
         this.AuthOTPSubmission = this.AuthOTPSubmission.bind(this);
         this.editAuthPhoneNumber = this.editAuthPhoneNumber.bind(this);
         this.resetOtpNumber = this.resetOtpNumber.bind(this);
+        this.updateAuth = this.updateAuth.bind(this);
         this.UserAuthRepo = new UserAuthentication_1.default();
         this.UserAuthService = new UserAuthServices_1.default();
+    }
+    updateAuth(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            const user_id = (_a = req.context) === null || _a === void 0 ? void 0 : _a.user_id;
+            if (user_id) {
+                const editData = {
+                    blood_token: req.body.blood_token
+                };
+                console.log(user_id);
+                console.log(editData);
+                console.log(req.body);
+                const updateUser = yield this.UserAuthRepo.updateUserById(user_id, editData);
+                if (updateUser) {
+                    res.status(Enums_1.StatusCode.OK).json({ status: true, msg: "Updated success" });
+                }
+                else {
+                    res.status(Enums_1.StatusCode.BAD_REQUEST).json({ status: false, msg: "Updated failed" });
+                }
+            }
+            else {
+                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({ status: false, msg: "Invalid authentication" });
+            }
+        });
     }
     signUpController(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -146,10 +172,13 @@ class UserAuthController {
             const otp = req.body.otp_number;
             const email_id = (_a = req.context) === null || _a === void 0 ? void 0 : _a.email_id;
             const token = (_b = req.context) === null || _b === void 0 ? void 0 : _b.token;
-            // console.log(email_id, token);
+            console.log("Before");
+            console.log(otp);
+            console.log(email_id, token);
             if (email_id && token) {
                 try {
                     const otpVerification = yield this.UserAuthService.authOTPValidate(otp, email_id, token);
+                    console.log("otp");
                     console.log(otpVerification);
                     if (otpVerification.status) {
                         const responseData = otpVerification.data;

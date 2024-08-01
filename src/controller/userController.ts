@@ -7,6 +7,8 @@ import UserAuthenticationRepo from '../repositories/UserAuthentication';
 import { IBaseUser } from '../config/Interface/Objects/IBaseUser';
 import UserAuthServices from '../services/UserAuthServices';
 import IUserModelDocument from '../config/Interface/IModel/IUserAuthModel';
+import mongoose, { ObjectId } from 'mongoose';
+import { StatusCode } from '../config/Datas/Enums';
 
 
 const { AUTH_PROVIDERS_DATA } = const_data;
@@ -22,9 +24,34 @@ class UserAuthController implements IUserAuthController {
         this.AuthOTPSubmission = this.AuthOTPSubmission.bind(this)
         this.editAuthPhoneNumber = this.editAuthPhoneNumber.bind(this)
         this.resetOtpNumber = this.resetOtpNumber.bind(this)
+        this.updateAuth = this.updateAuth.bind(this)
 
         this.UserAuthRepo = new UserAuthenticationRepo();
         this.UserAuthService = new UserAuthServices();
+    }
+
+
+    async updateAuth(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+        const user_id: mongoose.Types.ObjectId = req.context?.user_id;
+        if (user_id) {
+            const editData = {
+                blood_token: req.body.blood_token
+            }
+            console.log(user_id);
+            console.log(editData);
+            console.log(req.body);
+
+
+
+            const updateUser = await this.UserAuthRepo.updateUserById(user_id, editData);
+            if (updateUser) {
+                res.status(StatusCode.OK).json({ status: true, msg: "Updated success" })
+            } else {
+                res.status(StatusCode.BAD_REQUEST).json({ status: false, msg: "Updated failed" })
+            }
+        } else {
+            res.status(StatusCode.UNAUTHORIZED).json({ status: false, msg: "Invalid authentication" })
+        }
     }
 
     async signUpController(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -63,11 +90,11 @@ class UserAuthController implements IUserAuthController {
                 // console.log(error.details[0].message);
             } else {
                 console.log("Eneted");
-                 const isUserExist: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, email_address, Number(phone_number))
+                const isUserExist: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, email_address, Number(phone_number))
                 console.log(isUserExist);
-                
+
                 if (isUserExist && isUserExist.account_started) {
-                    
+
                     const response: ControllerResponseInterFace = {
                         status: false,
                         msg: 'Email/Phone already exist',
@@ -150,10 +177,16 @@ class UserAuthController implements IUserAuthController {
         const email_id: string = req.context?.email_id;
         const token: string = req.context?.token;
 
-        // console.log(email_id, token);
+        console.log("Before");
+        console.log(otp);
+
+
+        console.log(email_id, token);
         if (email_id && token) {
             try {
                 const otpVerification: HelperFunctionResponse = await this.UserAuthService.authOTPValidate(otp, email_id, token)
+                console.log("otp");
+
                 console.log(otpVerification);
 
                 if (otpVerification.status) {
@@ -267,8 +300,8 @@ class UserAuthController implements IUserAuthController {
                     const result: HelperFunctionResponse = await this.UserAuthService.resendOtpNumer(tokenEmail)
                     console.log(result);
                     console.log("The result");
-                    
-                    
+
+
                     if (result.data) {
                         const token: string = result.data?.token;
                         if (token) {

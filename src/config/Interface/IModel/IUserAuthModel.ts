@@ -14,6 +14,7 @@ interface IUserModelDocument extends Document {
     otp_timer: number;
     auth_id?: string | null;
     auth_provider: string;
+    blood_token: string,
     first_name: string;
     last_name: string;
     jwtToken: string;

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import AuthNotificationProvider from "../communication/Provider/notification/notification_service";
 import IUserModelDocument from "../config/Interface/IModel/IUserAuthModel";
 import UserModelDocument from "../config/Interface/IModel/IUserAuthModel";
-import {IBaseUser} from "../config/Interface/Objects/IBaseUser";
+import { IBaseUser } from "../config/Interface/Objects/IBaseUser";
 import constant_data from "../config/const";
 import userAuth from "../db/model/userAuth";
 import tokenHelper from "../helper/tokenHelper";
@@ -71,7 +71,7 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
             const userid = await userService.generateUserID(baseUSER['first_name']);
 
             if (userid) {
-                const jwtToken = await this.tokenHelpers.generateJWtToken({ email_id: baseUSER['email'], type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.USERAUTH_EXPIRE_TIME.toString())
+                const jwtToken = await this.tokenHelpers.generateJWtToken({ email: baseUSER['email'], type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.USERAUTH_EXPIRE_TIME.toString())
                 if (jwtToken) {
 
                     this.UserAuthCollection.updateOne({ email: baseUSER['email'] }, {
@@ -95,7 +95,7 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
                             recipientName: baseUSER['first_name'] + baseUSER['last_name'],
                             recipientEmail: baseUSER['email']
                         }
- 
+
                         const authenticationCommunicationProvider = new AuthNotificationProvider(process.env.USER_SIGN_UP_NOTIFICATION as string);
                         await authenticationCommunicationProvider._init_();
                         authenticationCommunicationProvider.signUpOTPSender(communicationData)

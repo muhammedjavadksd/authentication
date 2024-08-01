@@ -16,4 +16,6 @@ router.post("/auth_otp_submission", UserMiddleware.isValidSignUpAttempt, AuthCon
 router.post("/resend_otp", UserMiddleware.isValidSignUpAttempt, AuthController.resetOtpNumber);
 //PUT METHOD
 router.put("/edit_auth_phone", UserMiddleware.isValidSignUpAttempt, AuthController.editAuthPhoneNumber);
+//PATCH METHOD
+router.patch("/update_auth", UserMiddleware.isUserLogged, AuthController.updateAuth);
 exports.default = router;
