@@ -223,6 +223,8 @@ class UserAuthController {
                     console.log(otpVerification);
                     if (otpVerification.status) {
                         const responseData = otpVerification.data;
+                        console.log("Response data");
+                        console.log(responseData);
                         console.log(otpVerification.data);
                         const otpResponse = {
                             jwt: responseData['jwt'],

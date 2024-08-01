@@ -177,7 +177,8 @@ class UserAuthServices implements IUserAuthService {
                 email: getUser.email,
                 phone: getUser.phone_number,
                 user_id: getUser.id,
-                profile_id: getUser.user_id
+                profile_id: getUser.user_id,
+                blood_token: getUser?.blood_token
             }
 
             return {

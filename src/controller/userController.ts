@@ -46,6 +46,8 @@ class UserAuthController implements IUserAuthController {
 
 
             if (findUser) {
+
+
                 const loginData = {
                     jwt: findUser['jwtToken'],
                     first_name: findUser['first_name'],
@@ -238,6 +240,10 @@ class UserAuthController implements IUserAuthController {
 
                 if (otpVerification.status) {
                     const responseData: UserJwtInterFace = otpVerification.data;
+                    console.log("Response data");
+
+                    console.log(responseData);
+
                     console.log(otpVerification.data);
 
                     const otpResponse = {
