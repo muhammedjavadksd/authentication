@@ -7,7 +7,7 @@ const AuthController = new UserAuthController()
 const UserMiddleware = new AuthMiddleware()
 
 // POST METHOD 
-router.post("/sign_up", UserMiddleware.isUserLogged, AuthController.signWithToken);
+router.post("/sign_up", AuthController.signUpController);
 router.post("/sign_in", AuthController.signInController);
 router.post("/sign_in_with_token", UserMiddleware.isUserLogged, AuthController.signWithToken); //retry login attemo for logged users
 router.post("/auth_otp_submission", UserMiddleware.isValidSignUpAttempt, AuthController.AuthOTPSubmission);
