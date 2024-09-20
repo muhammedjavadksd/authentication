@@ -62,6 +62,50 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
     }
 
 
+    async insertUserWithAuth(baseUSER: IBaseUser, token: string): Promise<boolean> {
+
+        const userService = new UserAuthServices();
+        const userid = await userService.generateUserID(baseUSER['first_name']);
+
+        if (userid) {
+            const jwtToken = await this.tokenHelpers.generateJWtToken({ email: baseUSER['email'], type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.USERAUTH_EXPIRE_TIME.toString())
+            if (jwtToken) {
+
+                const insert = await this.UserAuthCollection.updateOne({ email: baseUSER['email'] }, {
+                    $set: {
+                        first_name: baseUSER['first_name'],
+                        last_name: baseUSER['last_name'],
+                        phone_number: baseUSER['phone_number'],
+                        email: baseUSER['email'],
+                        auth_id: baseUSER['auth_id'],
+                        auth_provider: 'GOOGLE',
+                        jwtToken: jwtToken,
+                        user_id: userid
+                    }
+                }, { upsert: true })
+
+                if (insert) {
+                    const communicationData = {
+                        token,
+                        recipientName: baseUSER['first_name'] + baseUSER['last_name'],
+                        recipientEmail: baseUSER['email']
+                    }
+                    const authenticationCommunicationProvider = new AuthNotificationProvider(process.env.ACCOUNT_SETUP_NOTIFICATION as string);
+                    await authenticationCommunicationProvider._init_();
+                    authenticationCommunicationProvider.dataTransfer(communicationData)
+
+                    return true
+                } else {
+                    return false
+                }
+            } else {
+                return false
+            }
+        } else {
+            return false
+        }
+    }
+
     async insertNewUser(baseUSER: IBaseUser): Promise<{ token: string }> {
         return new Promise(async (resolve, reject) => {
 
@@ -90,17 +134,17 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
                     }, { upsert: true }).then(async (data) => {
                         resolve({ token: jwtToken })
 
+
+
                         const communicationData = {
                             otp: otpNumber,
                             recipientName: baseUSER['first_name'] + baseUSER['last_name'],
                             recipientEmail: baseUSER['email']
                         }
-
                         const authenticationCommunicationProvider = new AuthNotificationProvider(process.env.USER_SIGN_UP_NOTIFICATION as string);
                         await authenticationCommunicationProvider._init_();
                         authenticationCommunicationProvider.signUpOTPSender(communicationData)
 
-                        // COMMUNICATION_PROVIDER.signUpOTPSender(communicationData)
 
                     }).catch((err) => {
                         reject(err)

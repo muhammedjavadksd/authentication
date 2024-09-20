@@ -7,10 +7,13 @@ interface IAdminAuthService {
     signIn(email: string, password: string): Promise<HelperFunctionResponse>
     forgetPassword(email: string): Promise<HelperFunctionResponse>
     resetPassword(token: string, password: string): Promise<HelperFunctionResponse>
+    updatePassword(password: string, email_id: string): Promise<HelperFunctionResponse>
     // updateOrganizationStatus(organization_id: ObjectId, password: string): Promise<HelperFunctionResponse>
 }
 
 interface IUserAuthService {
+    accountCompleteHelper(token: string, phone: number): Promise<HelperFunctionResponse>
+    signUpProvideHelper(token: string, phone: string, auth_id: string): Promise<HelperFunctionResponse>
     signInHelper(email: string): Promise<HelperFunctionResponse>
     authOTPValidate(otp: number, email_id: string, token: string): Promise<HelperFunctionResponse>
     editAuthEmailID(oldEmailId: string, newEmailID: string): Promise<HelperFunctionResponse>

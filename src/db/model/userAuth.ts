@@ -15,7 +15,6 @@ const userAuthSchema = {
     },
     phone_number: {
         type: Number,
-        required: true
     },
     email: {
         type: String,
@@ -23,11 +22,9 @@ const userAuthSchema = {
     },
     otp: {
         type: Number,
-        required: true
     },
     otp_timer: {
         type: Number,
-        required: true
     },
     auth_id: {
         type: String,

@@ -16,7 +16,7 @@ const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, cors_1.default)({
-    origin: [process.env.FRONT_END_DOMAIN]
+    origin: [process.env.FRONT_END_DOMAIN || ""]
 }));
 dotenv_1.default.config({ path: "./.env" });
 (0, BulkDataConsumer_1.default)();

@@ -97,7 +97,7 @@ class AuthMiddleware {
                 console.log(checkValidity);
                 if (checkValidity) {
                     if (typeof checkValidity == "object") {
-                        if (checkValidity.email) {
+                        if (checkValidity.email) { //email id for sign in, may diff for sign up
                             if (checkValidity.type == OTP_TYPE.SIGN_UP_OTP || checkValidity.type == OTP_TYPE.SIGN_IN_OTP) {
                                 req.context.email_id = checkValidity === null || checkValidity === void 0 ? void 0 : checkValidity.email;
                                 req.context.token = token;

@@ -17,6 +17,7 @@ const validation_1 = __importDefault(require("../config/validation/validation"))
 const UserAuthentication_1 = __importDefault(require("../repositories/UserAuthentication"));
 const UserAuthServices_1 = __importDefault(require("../services/UserAuthServices"));
 const Enums_1 = require("../config/Datas/Enums");
+const utilHelper_1 = __importDefault(require("../helper/utilHelper"));
 const { AUTH_PROVIDERS_DATA } = const_1.default;
 class UserAuthController {
     constructor() {
@@ -27,8 +28,38 @@ class UserAuthController {
         this.resetOtpNumber = this.resetOtpNumber.bind(this);
         this.updateAuth = this.updateAuth.bind(this);
         this.signWithToken = this.signWithToken.bind(this);
+        this.completeAccount = this.completeAccount.bind(this);
+        this.signUpWithProvide = this.signUpWithProvide.bind(this);
         this.UserAuthRepo = new UserAuthentication_1.default();
         this.UserAuthService = new UserAuthServices_1.default();
+    }
+    completeAccount(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const phoneNumber = req.body.phone_number;
+            const header = req.headers['authorization'];
+            const token = utilHelper_1.default.getTokenFromHeader(header);
+            if (token) {
+                const complete_account = yield this.UserAuthService.accountCompleteHelper(token, phoneNumber);
+                res.status(complete_account.statusCode).json({ status: complete_account.status, msg: complete_account.msg });
+            }
+            else {
+                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({ status: false, msg: "Invalid sing up attempt" });
+            }
+        });
+    }
+    signUpWithProvide(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const header = req.headers['authorization'];
+            const auth_id = req.body.auth_id;
+            const token = utilHelper_1.default.getTokenFromHeader(header);
+            if (token) {
+                const save = yield this.UserAuthService.signUpProvideHelper(token, auth_id);
+                res.status(save.statusCode).json({ status: save.status, msg: save.msg, data: save.data });
+            }
+            else {
+                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({ status: false, msg: "Invalid sing up attempt" });
+            }
+        });
     }
     signWithToken(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -101,18 +132,14 @@ class UserAuthController {
                 const email_address = req.body.email_address;
                 const first_name = req.body.first_name;
                 const last_name = req.body.last_name;
-                const location = req.body.location;
-                const blood_group = req.body.blood_group;
                 const auth_id = '';
                 const auth_provider = AUTH_PROVIDERS_DATA.CREDENTIAL;
                 const { error, value } = validation_1.default.validate({
                     phone_number,
                     email_address,
-                    blood_group,
                     auth_provider,
                     first_name,
                     last_name,
-                    location,
                 });
                 if (error) {
                     const response = {

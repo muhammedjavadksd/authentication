@@ -64,6 +64,49 @@ class UserAuthenticationRepo {
             }
         });
     }
+    insertUserWithAuth(baseUSER, token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const userService = new UserAuthServices_1.default();
+            const userid = yield userService.generateUserID(baseUSER['first_name']);
+            if (userid) {
+                const jwtToken = yield this.tokenHelpers.generateJWtToken({ email: baseUSER['email'], type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
+                if (jwtToken) {
+                    const insert = yield this.UserAuthCollection.updateOne({ email: baseUSER['email'] }, {
+                        $set: {
+                            first_name: baseUSER['first_name'],
+                            last_name: baseUSER['last_name'],
+                            phone_number: baseUSER['phone_number'],
+                            email: baseUSER['email'],
+                            auth_id: baseUSER['auth_id'],
+                            auth_provider: 'GOOGLE',
+                            jwtToken: jwtToken,
+                            user_id: userid
+                        }
+                    }, { upsert: true });
+                    if (insert) {
+                        const communicationData = {
+                            token,
+                            recipientName: baseUSER['first_name'] + baseUSER['last_name'],
+                            recipientEmail: baseUSER['email']
+                        };
+                        const authenticationCommunicationProvider = new notification_service_1.default(process.env.ACCOUNT_SETUP_NOTIFICATION);
+                        yield authenticationCommunicationProvider._init_();
+                        authenticationCommunicationProvider.dataTransfer(communicationData);
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                return false;
+            }
+        });
+    }
     insertNewUser(baseUSER) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
@@ -97,7 +140,6 @@ class UserAuthenticationRepo {
                             const authenticationCommunicationProvider = new notification_service_1.default(process.env.USER_SIGN_UP_NOTIFICATION);
                             yield authenticationCommunicationProvider._init_();
                             authenticationCommunicationProvider.signUpOTPSender(communicationData);
-                            // COMMUNICATION_PROVIDER.signUpOTPSender(communicationData)
                         })).catch((err) => {
                             reject(err);
                         });

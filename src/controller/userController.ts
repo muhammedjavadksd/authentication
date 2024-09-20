@@ -9,6 +9,7 @@ import UserAuthServices from '../services/UserAuthServices';
 import IUserModelDocument from '../config/Interface/IModel/IUserAuthModel';
 import mongoose, { ObjectId } from 'mongoose';
 import { StatusCode } from '../config/Datas/Enums';
+import utilHelper from '../helper/utilHelper';
 
 
 const { AUTH_PROVIDERS_DATA } = const_data;
@@ -27,8 +28,36 @@ class UserAuthController implements IUserAuthController {
         this.updateAuth = this.updateAuth.bind(this)
         this.signWithToken = this.signWithToken.bind(this)
 
+        this.completeAccount = this.completeAccount.bind(this)
+        this.signUpWithProvide = this.signUpWithProvide.bind(this)
         this.UserAuthRepo = new UserAuthenticationRepo();
         this.UserAuthService = new UserAuthServices();
+    }
+
+    async completeAccount(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const phoneNumber: number = req.body.phone_number;
+        const header = req.headers['authorization'];
+        const token = utilHelper.getTokenFromHeader(header)
+
+        if (token) {
+            const complete_account = await this.UserAuthService.accountCompleteHelper(token, phoneNumber);
+            res.status(complete_account.statusCode).json({ status: complete_account.status, msg: complete_account.msg })
+        } else {
+            res.status(StatusCode.UNAUTHORIZED).json({ status: false, msg: "Invalid sing up attempt" })
+        }
+    }
+
+
+    async signUpWithProvide(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+        const header = req.headers['authorization'];
+        const auth_id: string = req.body.auth_id
+        const token = utilHelper.getTokenFromHeader(header)
+        if (token) {
+            const save = await this.UserAuthService.signUpProvideHelper(token, auth_id);
+            res.status(save.statusCode).json({ status: save.status, msg: save.msg, data: save.data })
+        } else {
+            res.status(StatusCode.UNAUTHORIZED).json({ status: false, msg: "Invalid sing up attempt" })
+        }
     }
 
 
@@ -110,8 +139,7 @@ class UserAuthController implements IUserAuthController {
             const email_address: string = req.body.email_address;
             const first_name: string = req.body.first_name;
             const last_name: string = req.body.last_name;
-            const location: string = req.body.location;
-            const blood_group: string = req.body.blood_group;
+
 
             const auth_id = '';
             const auth_provider: string = AUTH_PROVIDERS_DATA.CREDENTIAL;
@@ -119,11 +147,9 @@ class UserAuthController implements IUserAuthController {
             const { error, value } = signUpUserValidation.validate({
                 phone_number,
                 email_address,
-                blood_group,
                 auth_provider,
                 first_name,
                 last_name,
-                location,
             });
 
             if (error) {

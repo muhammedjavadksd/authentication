@@ -10,6 +10,7 @@ const router = express_1.default.Router();
 const AuthController = new userController_1.default();
 const UserMiddleware = new authMiddleware_1.default();
 // POST METHOD 
+router.post("/sign_up_provider", AuthController.signUpWithProvide);
 router.post("/sign_up", AuthController.signUpController);
 router.post("/sign_in", AuthController.signInController);
 router.post("/sign_in_with_token", UserMiddleware.isUserLogged, AuthController.signWithToken); //retry login attemo for logged users
@@ -19,4 +20,5 @@ router.post("/resend_otp", UserMiddleware.isValidSignUpAttempt, AuthController.r
 router.put("/edit_auth_phone", UserMiddleware.isValidSignUpAttempt, AuthController.editAuthPhoneNumber);
 //PATCH METHOD
 router.patch("/update_auth", UserMiddleware.isUserLogged, AuthController.updateAuth);
+router.patch("/complete_account", AuthController.completeAccount);
 exports.default = router;

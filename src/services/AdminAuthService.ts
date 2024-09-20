@@ -28,6 +28,43 @@ class AdminAuthService implements IAdminAuthService {
     }
 
 
+    async updatePassword(password: string, email_id: string): Promise<HelperFunctionResponse> {
+        const findAdmin = await this.AdminAuthRepo.findAdmin(email_id);
+        if (findAdmin) {
+            const decodePassword = await bcrypt.hash(password, Number(process.env.BCRYPT_SALTROUND));
+            if (decodePassword == findAdmin.password) {
+                return {
+                    status: false,
+                    msg: "Use a diffrent password",
+                    statusCode: StatusCode.BAD_REQUEST
+                }
+            } else {
+                findAdmin.password = decodePassword
+                const updatePassword = await this.AdminAuthRepo.updateAdmin(findAdmin);
+                if (updatePassword) {
+                    return {
+                        status: true,
+                        msg: "Password update success",
+                        statusCode: StatusCode.BAD_REQUEST
+                    }
+                } else {
+                    return {
+                        status: false,
+                        msg: "Password update failed",
+                        statusCode: StatusCode.BAD_REQUEST
+                    }
+                }
+            }
+        } else {
+            return {
+                msg: "We couldn't find the admin",
+                status: false,
+                statusCode: StatusCode.UNAUTHORIZED
+            }
+        }
+    }
+
+
 
     async signIn(email: string, password: string): Promise<HelperFunctionResponse> {
 

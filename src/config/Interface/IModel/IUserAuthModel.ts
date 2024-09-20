@@ -8,7 +8,7 @@ interface locationTypeInterFace {
 
 interface IUserModelDocument extends Document {
     user_id: string;
-    phone_number: number;
+    phone_number?: number;
     email: string;
     otp: number;
     otp_timer: number;

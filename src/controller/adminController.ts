@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import { AdminJwtInterFace, ControllerResponseInterFace, HelperFunctionResponse } from "../config/Datas/InterFace";
+import { AdminJwtInterFace, ControllerResponseInterFace, CustomRequest, HelperFunctionResponse } from "../config/Datas/InterFace";
 import AdminAuthService from "../services/AdminAuthService";
 import utilHelper from "../helper/utilHelper";
 import IAdminController from "../config/Interface/IController/iAdminController";
 import OrganizationService from "../services/OrganizationService";
-import { OrganizationStatus } from "../config/Datas/Enums";
+import { OrganizationStatus, StatusCode } from "../config/Datas/Enums";
 import { ObjectId } from "mongoose";
 
 
@@ -20,6 +20,21 @@ class AdminController implements IAdminController {
         this.adminPasswordReset = this.adminPasswordReset.bind(this)
         this.AdminServices = new AdminAuthService();
         this.OrganizationServices = new OrganizationService();
+    }
+
+
+    async updatePassword(req: CustomRequest, res: Response): Promise<void> {
+        const password = req.body.password;
+        const email_id = req.body.email_id;
+
+        if (email_id && password) {
+            const updatePassword = await this.AdminServices.updatePassword(password, email_id)
+            res.status(updatePassword.statusCode).json({ status: updatePassword.status, msg: updatePassword.msg, data: updatePassword.data })
+        } else {
+            res.status(StatusCode.UNAUTHORIZED).json({ status: false, msg: "Un authraized access" })
+        }
+
+
     }
 
     async organizationSingleView(req: Request, res: Response, next: NextFunction): Promise<void> {

@@ -28,6 +28,16 @@ class AuthNotificationProvider {
     }
 
 
+    dataTransfer(data: any): boolean {
+        try {
+            this.channel?.sendToQueue(this.NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)))
+            return true
+        } catch (e) {
+            console.log(e);
+            return false
+        }
+    }
+
     signInOTPSender(data: any): boolean {
         try {
             this.channel?.sendToQueue(this.NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)))

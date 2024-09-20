@@ -46,6 +46,17 @@ class AuthNotificationProvider {
             this.channel = yield this.connection.createChannel();
         });
     }
+    dataTransfer(data) {
+        var _a;
+        try {
+            (_a = this.channel) === null || _a === void 0 ? void 0 : _a.sendToQueue(this.NOTIFICATION_QUEUE, Buffer.from(JSON.stringify(data)));
+            return true;
+        }
+        catch (e) {
+            console.log(e);
+            return false;
+        }
+    }
     signInOTPSender(data) {
         var _a;
         try {

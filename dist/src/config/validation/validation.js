@@ -35,7 +35,5 @@ const signUpUserValidation = Joi.object({
     first_name: Joi.string().required(),
     auth_provider: Joi.string().valid(...AUTH_PROVIDERS).required(),
     last_name: Joi.string().required(),
-    location: Joi.required(),
-    blood_group: Joi.string().valid(...BLOOD_GROUP)
 });
 exports.default = signUpUserValidation;

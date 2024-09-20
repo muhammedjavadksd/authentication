@@ -16,5 +16,7 @@ adminRouter.post("/forget_password", adminMiddleware.isAdminLogged, adminControl
 adminRouter.post("/reset_password/:token", adminMiddleware.isAdminLogged, adminController.adminPasswordReset)
 adminRouter.post("/update_organization_status", adminMiddleware.isAdminLogged, adminController.updateOrganizationStatus)
 
+adminRouter.post("/update_password", adminMiddleware.isAdminLogged, adminController.updatePassword)
+
 export default adminRouter
 

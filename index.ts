@@ -11,10 +11,11 @@ import cors from 'cors'
 
 const app: Express = express();
 
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: [process.env.FRONT_END_DOMAIN]
+    origin: [process.env.FRONT_END_DOMAIN || ""]
 }))
 
 dotenv.config({ path: "./.env" });

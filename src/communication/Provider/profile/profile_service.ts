@@ -16,6 +16,8 @@ class ProfileCommunicationProvider implements PROFILE_COMMUNICATION_PROVIDER_INT
     private readonly Queue: string = process.env.AUTH_TRANSFER as string;
 
     async _init_() {
+        console.log("Queue : " +  this.Queue);
+        
         this.connection = await amqplib.connect("amqp://localhost");
         this.channel = await this.connection.createChannel();
     }

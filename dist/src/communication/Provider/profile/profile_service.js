@@ -41,6 +41,7 @@ class ProfileCommunicationProvider {
     }
     _init_() {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("Queue : " + this.Queue);
             this.connection = yield amqplib.connect("amqp://localhost");
             this.channel = yield this.connection.createChannel();
         });

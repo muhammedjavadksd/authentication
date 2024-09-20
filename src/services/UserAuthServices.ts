@@ -9,7 +9,9 @@ import UserAuthenticationRepo from "../repositories/UserAuthentication";
 import ProfileCommunicationProvider from "../communication/Provider/profile/profile_service";
 import TokenHelper from "../helper/tokenHelper";
 import { IUserAuthService } from "../config/Interface/Service/ServiceInterface";
-// import { } from 'expres'
+import axios from "axios";
+import { IBaseUser } from "../config/Interface/Objects/IBaseUser";
+import { StatusCode } from "../config/Datas/Enums";
 
 
 class UserAuthServices implements IUserAuthService {
@@ -29,6 +31,122 @@ class UserAuthServices implements IUserAuthService {
         this.UserAuthRepo = new UserAuthenticationRepo()
         this.TokenHelpers = new TokenHelper();
     }
+
+    async accountCompleteHelper(token: string, phone: number): Promise<HelperFunctionResponse> {
+        const endPoint = `https://oauth2.googleapis.com/tokeninfo?id_token=${token}`
+        const { data } = await axios.get(endPoint);
+        if (!data.error && data.email) {
+            const email = data.email
+            const findUser = await this.UserAuthRepo.findUser(null, email, null);
+            if (findUser && !findUser.account_started) {
+                const updateData = {
+                    phone_number: phone,
+                    account_started: true
+                }
+                const updateUser = await this.UserAuthRepo.updateUserById(findUser.id, updateData);
+                if (updateUser) {
+                    return {
+                        status: true,
+                        msg: "Account completion done",
+                        statusCode: StatusCode.OK
+                    }
+                } else {
+                    return {
+                        status: false,
+                        msg: "Account completion failed",
+                        statusCode: StatusCode.BAD_REQUEST
+                    }
+                }
+            } else {
+                return {
+                    status: false,
+                    msg: "Account already verified",
+                    statusCode: StatusCode.BAD_REQUEST
+                }
+            }
+        } else {
+            return {
+                status: false,
+                msg: "Account not found",
+                statusCode: StatusCode.UNAUTHORIZED
+            }
+        }
+    }
+
+
+    async signUpProvideHelper(token: string, auth_id: string): Promise<HelperFunctionResponse> {
+        const endPoint = `https://oauth2.googleapis.com/tokeninfo?id_token=${token}`
+        const { data } = await axios.get(endPoint);
+        if (!data.error && data.email) {
+            const emailId = data.email;
+            const fullName = data.name.split(" ");
+            const firstName = fullName[0]
+            const lastName = fullName[1] ?? "";
+
+            const findUser = await this.UserAuthRepo.findUser(null, emailId, null);
+            if (findUser && findUser.account_started) {
+
+                const jwtToken: string | null = await this.TokenHelpers.generateJWtToken({ email: emailId, first_name: findUser.first_name, last_name: findUser.last_name, phone: findUser.phone_number, profile_id: findUser.user_id, user_id: findUser.id, } as UserJwtInterFace, constant_data.USERAUTH_EXPIRE_TIME.toString())
+
+                if (findUser.phone_number && jwtToken) {
+                    const userJwtData: UserJwtInterFace = {
+                        jwt: jwtToken,
+                        first_name: findUser.first_name,
+                        last_name: findUser.last_name,
+                        email: findUser.email,
+                        phone: findUser.phone_number,
+                        user_id: findUser.id,
+                        profile_id: findUser.user_id,
+                        blood_token: findUser?.blood_token
+                    }
+
+                    return {
+                        status: true,
+                        msg: "OTP Verified Success",
+                        data: userJwtData,
+                        statusCode: 200
+                    }
+                } else {
+                    return {
+                        status: false,
+                        msg: "Account need to be verified",
+                        statusCode: StatusCode.FORBIDDEN
+                    }
+                }
+            } else {
+                const userDetails: IBaseUser = {
+                    auth_id: auth_id,
+                    auth_provider: "google",
+                    email: emailId,
+                    first_name: firstName,
+                    last_name: lastName,
+                }
+                const insertNewUser = await this.UserAuthRepo.insertUserWithAuth(userDetails, token);
+                if (insertNewUser) {
+                    return {
+                        msg: "User created success",
+                        status: true,
+                        statusCode: StatusCode.CREATED
+                    }
+                } else {
+                    return {
+                        msg: "Internal server error",
+                        status: false,
+                        statusCode: StatusCode.SERVER_ERROR
+                    }
+                }
+            }
+        } else {
+            return {
+                msg: "Invalid sign up attempt",
+                status: false,
+                statusCode: StatusCode.BAD_REQUEST
+            }
+        }
+
+    }
+
+
 
     async signInHelper(email: string): Promise<HelperFunctionResponse> {
         try {
@@ -136,7 +254,7 @@ class UserAuthServices implements IUserAuthService {
             const first_name: string = getUser.first_name;
             const last_name: string = getUser.last_name;
             const _id: mongoose.Types.ObjectId = getUser._id;
-            const phone_number: number = getUser.phone_number;
+            const phone_number: number | undefined = getUser.phone_number;
 
             const jwtToken: string | null = await this.TokenHelpers.generateJWtToken({ email: email_id, first_name: first_name, last_name: last_name, phone: phone_number, profile_id: getUser.user_id, user_id: getUser.id, } as UserJwtInterFace, constant_data.USERAUTH_EXPIRE_TIME.toString())
             if (!jwtToken) {
@@ -150,42 +268,50 @@ class UserAuthServices implements IUserAuthService {
             getUser.jwtToken = jwtToken;
 
 
-            if (!getUser.account_started) {
-                getUser.account_started = true
-                const profileCommunicationProvider = new ProfileCommunicationProvider();
-                await profileCommunicationProvider._init_();
-                console.log("Profile data transfer");
+            if (getUser.phone_number) {
+                if (!getUser.account_started) {
+                    getUser.account_started = true
+                    const profileCommunicationProvider = new ProfileCommunicationProvider();
+                    await profileCommunicationProvider._init_();
+                    console.log("Profile data transfer");
 
-                profileCommunicationProvider.authDataTransfer({
-                    email: getUser.email,
+                    profileCommunicationProvider.authDataTransfer({
+                        email: getUser.email,
+                        first_name: getUser.first_name,
+                        last_name: getUser.last_name,
+                        phone_number: getUser.phone_number,
+                        location: getUser.location,
+                        user_id: getUser.id,
+                        profile_id: getUser.user_id
+                    })
+                }
+
+                // await getUser.save();
+                await this.UserAuthRepo.updateUser(getUser)
+
+                const userJwtData: UserJwtInterFace = {
+                    jwt: jwtToken,
                     first_name: getUser.first_name,
                     last_name: getUser.last_name,
-                    phone_number: getUser.phone_number,
-                    location: getUser.location,
+                    email: getUser.email,
+                    phone: getUser.phone_number,
                     user_id: getUser.id,
-                    profile_id: getUser.user_id
-                })
-            }
+                    profile_id: getUser.user_id,
+                    blood_token: getUser?.blood_token
+                }
 
-            // await getUser.save();
-            await this.UserAuthRepo.updateUser(getUser)
-
-            const userJwtData: UserJwtInterFace = {
-                jwt: jwtToken,
-                first_name: getUser.first_name,
-                last_name: getUser.last_name,
-                email: getUser.email,
-                phone: getUser.phone_number,
-                user_id: getUser.id,
-                profile_id: getUser.user_id,
-                blood_token: getUser?.blood_token
-            }
-
-            return {
-                status: true,
-                msg: "OTP Verified Success",
-                data: userJwtData,
-                statusCode: 200
+                return {
+                    status: true,
+                    msg: "OTP Verified Success",
+                    data: userJwtData,
+                    statusCode: 200
+                }
+            } else {
+                return {
+                    status: false,
+                    msg: "Account need verification",
+                    statusCode: StatusCode.FORBIDDEN
+                }
             }
 
         } catch (e) {
@@ -343,7 +469,7 @@ class UserAuthServices implements IUserAuthService {
             let isUserIDValid: boolean;
 
             do {
-                userId = first_name + "@" + randomText + count
+                userId = first_name + "_" + randomText + count
                 isUserIDValid = await this._checkUserIDValidity(userId)
                 count++;
             } while (isUserIDValid);
