@@ -17,6 +17,7 @@ const const_1 = __importDefault(require("../config/const"));
 const AdminAuthentication_1 = __importDefault(require("../repositories/AdminAuthentication"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const tokenHelper_1 = __importDefault(require("../helper/tokenHelper"));
+const Enums_1 = require("../config/Datas/Enums");
 const OrganizationRepo_1 = __importDefault(require("../repositories/OrganizationRepo"));
 class AdminAuthService {
     constructor() {
@@ -26,6 +27,46 @@ class AdminAuthService {
         this.AdminAuthRepo = new AdminAuthentication_1.default();
         this.OrganizationRepo = new OrganizationRepo_1.default();
         this.tokenHelpers = new tokenHelper_1.default();
+    }
+    updatePassword(password, email_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const findAdmin = yield this.AdminAuthRepo.findAdmin(email_id);
+            if (findAdmin) {
+                const decodePassword = yield bcrypt_1.default.hash(password, Number(process.env.BCRYPT_SALTROUND));
+                if (decodePassword == findAdmin.password) {
+                    return {
+                        status: false,
+                        msg: "Use a diffrent password",
+                        statusCode: Enums_1.StatusCode.BAD_REQUEST
+                    };
+                }
+                else {
+                    findAdmin.password = decodePassword;
+                    const updatePassword = yield this.AdminAuthRepo.updateAdmin(findAdmin);
+                    if (updatePassword) {
+                        return {
+                            status: true,
+                            msg: "Password update success",
+                            statusCode: Enums_1.StatusCode.BAD_REQUEST
+                        };
+                    }
+                    else {
+                        return {
+                            status: false,
+                            msg: "Password update failed",
+                            statusCode: Enums_1.StatusCode.BAD_REQUEST
+                        };
+                    }
+                }
+            }
+            else {
+                return {
+                    msg: "We couldn't find the admin",
+                    status: false,
+                    statusCode: Enums_1.StatusCode.UNAUTHORIZED
+                };
+            }
+        });
     }
     signIn(email, password) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const AdminAuthService_1 = __importDefault(require("../services/AdminAuthService"));
 const OrganizationService_1 = __importDefault(require("../services/OrganizationService"));
+const Enums_1 = require("../config/Datas/Enums");
 class AdminController {
     constructor() {
         this.signInController = this.signInController.bind(this);
@@ -21,6 +22,19 @@ class AdminController {
         this.adminPasswordReset = this.adminPasswordReset.bind(this);
         this.AdminServices = new AdminAuthService_1.default();
         this.OrganizationServices = new OrganizationService_1.default();
+    }
+    updatePassword(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const password = req.body.password;
+            const email_id = req.body.email_id;
+            if (email_id && password) {
+                const updatePassword = yield this.AdminServices.updatePassword(password, email_id);
+                res.status(updatePassword.statusCode).json({ status: updatePassword.status, msg: updatePassword.msg, data: updatePassword.data });
+            }
+            else {
+                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({ status: false, msg: "Un authraized access" });
+            }
+        });
     }
     organizationSingleView(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
