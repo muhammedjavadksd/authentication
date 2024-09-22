@@ -315,51 +315,61 @@ class UserAuthServices {
             const otpNumber = utilHelper_1.default.generateAnOTP(6);
             const otpExpireTime = const_1.default.MINIMUM_OTP_TIMER();
             try {
-                const getUser = yield this.UserAuthRepo.findUser(null, oldEmailId, null);
-                if (getUser) {
-                    const newToken = yield this.TokenHelpers.generateJWtToken({ email_id: newEmailID, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
-                    if (newToken) {
-                        getUser.email = newEmailID;
-                        getUser.otp = otpNumber;
-                        getUser.otp_timer = otpExpireTime;
-                        getUser.jwtToken = newToken;
-                        // getUser.save()
-                        yield this.UserAuthRepo.updateUser(getUser);
-                        const authNotificationProvider = new notification_service_1.default(process.env.USER_SIGN_IN_NOTIFICATION);
-                        yield authNotificationProvider._init_();
-                        authNotificationProvider.signInOTPSender({
-                            otp: otpNumber,
-                            email: newEmailID,
-                            full_name: getUser.first_name + getUser.last_name
-                        });
-                        console.log("Edit here");
-                        console.log({
-                            otp: otpNumber,
-                            email: newEmailID,
-                            full_name: getUser.first_name + getUser.last_name
-                        });
-                        return {
-                            status: true,
-                            msg: "Email id has been updated",
-                            statusCode: 200,
-                            data: {
-                                token: newToken
-                            }
-                        };
+                const checkExist = yield this.UserAuthRepo.findUser(null, newEmailID, null);
+                if (!checkExist) {
+                    const getUser = yield this.UserAuthRepo.findUser(null, oldEmailId, null);
+                    if (getUser) {
+                        const newToken = yield this.TokenHelpers.generateJWtToken({ email: newEmailID, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
+                        if (newToken) {
+                            getUser.email = newEmailID;
+                            getUser.otp = otpNumber;
+                            getUser.otp_timer = otpExpireTime;
+                            getUser.jwtToken = newToken;
+                            // getUser.save()
+                            yield this.UserAuthRepo.updateUser(getUser);
+                            const authNotificationProvider = new notification_service_1.default(process.env.USER_SIGN_IN_NOTIFICATION);
+                            yield authNotificationProvider._init_();
+                            authNotificationProvider.signInOTPSender({
+                                otp: otpNumber,
+                                email: newEmailID,
+                                full_name: getUser.first_name + getUser.last_name
+                            });
+                            console.log("Edit here");
+                            console.log({
+                                otp: otpNumber,
+                                email: newEmailID,
+                                full_name: getUser.first_name + getUser.last_name
+                            });
+                            return {
+                                status: true,
+                                msg: "Email id has been updated",
+                                statusCode: 200,
+                                data: {
+                                    token: newToken
+                                }
+                            };
+                        }
+                        else {
+                            return {
+                                status: false,
+                                msg: "Something went wrong",
+                                statusCode: 400,
+                            };
+                        }
                     }
                     else {
                         return {
+                            statusCode: 401,
                             status: false,
-                            msg: "Something went wrong",
-                            statusCode: 400,
+                            msg: "The email address you entered does not exist",
                         };
                     }
                 }
                 else {
                     return {
-                        statusCode: 401,
                         status: false,
-                        msg: "The email address you entered does not exist",
+                        msg: "The email address already exist",
+                        statusCode: Enums_1.StatusCode.CONFLICT
                     };
                 }
             }
@@ -380,7 +390,7 @@ class UserAuthServices {
                 if (getUser) {
                     const otpNumber = utilHelper_1.default.generateAnOTP(6);
                     const otpExpireTime = const_1.default.MINIMUM_OTP_TIMER();
-                    const newToken = yield this.TokenHelpers.generateJWtToken({ email_id: getUser.email, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
+                    const newToken = yield this.TokenHelpers.generateJWtToken({ email: getUser.email, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
                     if (newToken) {
                         getUser.otp = otpNumber;
                         getUser.otp_timer = otpExpireTime;

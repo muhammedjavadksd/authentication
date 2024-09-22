@@ -332,55 +332,65 @@ class UserAuthServices implements IUserAuthService {
 
 
         try {
-            const getUser: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, oldEmailId, null);
 
 
 
-            if (getUser) {
-                const newToken: string | null = await this.TokenHelpers.generateJWtToken({ email_id: newEmailID, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.OTP_EXPIRE_TIME.toString())
-                if (newToken) {
-                    getUser.email = newEmailID;
-                    getUser.otp = otpNumber;
-                    getUser.otp_timer = otpExpireTime;
-                    getUser.jwtToken = newToken
-                    // getUser.save()
-                    await this.UserAuthRepo.updateUser(getUser);
+            const checkExist: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, newEmailID, null);
+            if (!checkExist) {
 
-                    const authNotificationProvider = new AuthNotificationProvider(process.env.USER_SIGN_IN_NOTIFICATION as string);
-                    await authNotificationProvider._init_();
-                    authNotificationProvider.signInOTPSender({
-                        otp: otpNumber,
-                        email: newEmailID,
-                        full_name: getUser.first_name + getUser.last_name
-                    })
-                    console.log("Edit here");
+                const getUser: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, oldEmailId, null);
+                if (getUser) {
+                    const newToken: string | null = await this.TokenHelpers.generateJWtToken({ email: newEmailID, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.OTP_EXPIRE_TIME.toString())
+                    if (newToken) {
+                        getUser.email = newEmailID;
+                        getUser.otp = otpNumber;
+                        getUser.otp_timer = otpExpireTime;
+                        getUser.jwtToken = newToken
+                        // getUser.save()
+                        await this.UserAuthRepo.updateUser(getUser);
 
-                    console.log({
-                        otp: otpNumber,
-                        email: newEmailID,
-                        full_name: getUser.first_name + getUser.last_name
-                    });
+                        const authNotificationProvider = new AuthNotificationProvider(process.env.USER_SIGN_IN_NOTIFICATION as string);
+                        await authNotificationProvider._init_();
+                        authNotificationProvider.signInOTPSender({
+                            otp: otpNumber,
+                            email: newEmailID,
+                            full_name: getUser.first_name + getUser.last_name
+                        })
+                        console.log("Edit here");
 
-                    return {
-                        status: true,
-                        msg: "Email id has been updated",
-                        statusCode: 200,
-                        data: {
-                            token: newToken
+                        console.log({
+                            otp: otpNumber,
+                            email: newEmailID,
+                            full_name: getUser.first_name + getUser.last_name
+                        });
+
+                        return {
+                            status: true,
+                            msg: "Email id has been updated",
+                            statusCode: 200,
+                            data: {
+                                token: newToken
+                            }
+                        }
+                    } else {
+                        return {
+                            status: false,
+                            msg: "Something went wrong",
+                            statusCode: 400,
                         }
                     }
                 } else {
                     return {
+                        statusCode: 401,
                         status: false,
-                        msg: "Something went wrong",
-                        statusCode: 400,
+                        msg: "The email address you entered does not exist",
                     }
                 }
             } else {
                 return {
-                    statusCode: 401,
                     status: false,
-                    msg: "The email address you entered does not exist",
+                    msg: "The email address already exist",
+                    statusCode: StatusCode.CONFLICT
                 }
             }
         } catch (e) {
@@ -401,7 +411,7 @@ class UserAuthServices implements IUserAuthService {
             if (getUser) {
                 const otpNumber: number = utilHelper.generateAnOTP(6);
                 const otpExpireTime: number = constant_data.MINIMUM_OTP_TIMER();
-                const newToken: string | null = await this.TokenHelpers.generateJWtToken({ email_id: getUser.email, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.OTP_EXPIRE_TIME.toString())
+                const newToken: string | null = await this.TokenHelpers.generateJWtToken({ email: getUser.email, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.OTP_EXPIRE_TIME.toString())
                 if (newToken) {
                     getUser.otp = otpNumber;
                     getUser.otp_timer = otpExpireTime;
