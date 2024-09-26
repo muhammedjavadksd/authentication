@@ -1,23 +1,26 @@
 import express, { Express } from "express";
 import dotenv from "dotenv";
 import bodyparser from "body-parser";
-import authenticationDbConnection from "./db/config/connection";
-import userRouter from "./router/userRouter/userRouter";
-import adminRouter from "./router/adminRouter/adminRouter";
+import authenticationDbConnection from "./src/db/connection";
+import userRouter from "./src/router/userRouter";
+import adminRouter from "./src/router/adminRouter";
 import logger from "morgan";
-import BulkConsumer from './communication/BulkDataConsumer'
-import organizationRouter from "./router/organization/organizationRouter";
+import organizationRouter from "./src/router/organizationRouter";
+import BulkDataConsumer from "./src/communication/BulkDataConsumer";
+import cors from 'cors'
 
 const app: Express = express();
 
-app.use(bodyparser.json());
-app.use(bodyparser.urlencoded({ extended: true }));
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+    origin: [process.env.FRONT_END_DOMAIN || ""]
+}))
 
+dotenv.config({ path: "./.env" });
 
-dotenv.config();
-
-BulkConsumer();
+BulkDataConsumer()
 
 app.use(logger("common"));
 
