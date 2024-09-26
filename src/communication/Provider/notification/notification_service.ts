@@ -23,7 +23,7 @@ class AuthNotificationProvider {
     }
 
     async _init_() {
-        this.connection = await amqplib.connect("amqp://localhost");
+        this.connection = await amqplib.connect(process.env.RABBITMQ_URL || "");
         this.channel = await this.connection.createChannel();
     }
 

@@ -24,7 +24,7 @@ class ProfileDataConsumer {
     _init_() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                this.connection = yield amqplib_1.default.connect("amqp://localhost");
+                this.connection = yield amqplib_1.default.connect(process.env.RABBITMQ_URL || "");
                 this.channel = yield this.connection.createChannel();
                 this.channel.assertQueue(this.Queue, { durable: true });
             }

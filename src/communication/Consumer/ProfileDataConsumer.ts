@@ -16,10 +16,10 @@ class ProfileDataConsumer implements ProfielDataConsumerInterface {
 
     async _init_() {
         try {
-            this.connection = await amqplib.connect("amqp://localhost");
+            this.connection = await amqplib.connect(process.env.RABBITMQ_URL || "");
             this.channel = await this.connection.createChannel();
-            this.channel.assertQueue(this.Queue, {durable: true})
-        }catch(e){}
+            this.channel.assertQueue(this.Queue, { durable: true })
+        } catch (e) { }
     }
 
 
@@ -27,20 +27,20 @@ class ProfileDataConsumer implements ProfielDataConsumerInterface {
         try {
             this.channel?.consume(this.Queue, async (msg) => {
                 if (msg) {
-    
+
                     const messageContent = JSON.parse(msg.content.toString());
                     console.log(messageContent);
-    
+
                     const profile_id: string = messageContent.profile_id;
                     if (profile_id) {
                         const userRepo = new UserAuthenticationRepo();
-    
+
                         await userRepo.updateUserById(new mongoose.Types.ObjectId(profile_id), messageContent.edit_details)
                         console.log("Authentication data has been updated ");
                     }
                 }
             }, { noAck: true })
-        }catch(e){}
+        } catch (e) { }
     }
 }
 

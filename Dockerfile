@@ -1,5 +1,7 @@
-FROM node:22.4.1-alpine
-WORKDIR /app
-COPY . /app
+FROM  node:22.4.1-alpine
+WORKDIR /app/Authentication
+COPY package*.json ./
 RUN npm install
-CMD ['npm','start']
+COPY . .
+RUN npx tsc
+CMD ["npm", "start"]

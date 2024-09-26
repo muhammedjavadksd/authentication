@@ -253,7 +253,6 @@ class UserAuthServices implements IUserAuthService {
 
             const first_name: string = getUser.first_name;
             const last_name: string = getUser.last_name;
-            const _id: mongoose.Types.ObjectId = getUser._id;
             const phone_number: number | undefined = getUser.phone_number;
 
             const jwtToken: string | null = await this.TokenHelpers.generateJWtToken({ email: email_id, first_name: first_name, last_name: last_name, phone: phone_number, profile_id: getUser.user_id, user_id: getUser.id, } as UserJwtInterFace, constant_data.USERAUTH_EXPIRE_TIME.toString())
