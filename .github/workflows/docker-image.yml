@@ -31,6 +31,7 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.AWS_HOST }}
+          aws-region: eu-north-1
           username: ec2-user
           key: ${{ secrets.AWS_PRIVATE_KEY }}
           script: |
