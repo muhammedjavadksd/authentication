@@ -31,7 +31,7 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.AWS_HOST }}  # Ensure this is set correctly
-          username: ec2-user
+          username: ubuntu
           key: ${{ secrets.AWS_PRIVATE_KEY }}
           # envs: GITHUB_SHA
           script: |
