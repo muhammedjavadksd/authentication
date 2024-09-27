@@ -1,4 +1,4 @@
-import express, { Router } from "express";
+import express, { Request, Response, Router } from "express";
 import UserAuthController from "../controller/userController";
 import AuthMiddleware from "../middleware/authMiddleware";
 
@@ -7,6 +7,11 @@ const AuthController = new UserAuthController()
 const UserMiddleware = new AuthMiddleware()
 
 // POST METHOD 
+
+router.get("/", (req: Request, res: Response) => {
+    res.status(200).send("Welcome to authentication service");
+})
+
 router.post("/sign_up_provider", AuthController.signUpWithProvide);
 router.post("/sign_up", AuthController.signUpController);
 router.post("/sign_in", AuthController.signInController);
