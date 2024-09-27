@@ -1,0 +1,24 @@
+name: Docker Image CI with AWS EC2
+
+on:
+  push:
+    branches: [ "master"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t javadjazz123/lifelink_authentication:latest .
+          docker push javadjazz123/lifelink_authentication:latest
