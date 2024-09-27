@@ -28,14 +28,14 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Docker pull & run from github
-          uses: appleboy/ssh-action@master
-          with:
-            host: ${{ secrets.AWS_HOST }}  # Ensure this is set correctly
-            username: ec2-user
-            key: ${{ secrets.AWS_PRIVATE_KEY }}
-            envs: GITHUB_SHA
-            script: |
-                # Ensure Docker Compose commands run in the correct region or context
-                sudo docker-compose pull
-                sudo docker-compose up -d --remove-orphans
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AWS_HOST }}  # Ensure this is set correctly
+          username: ec2-user
+          key: ${{ secrets.AWS_PRIVATE_KEY }}
+          envs: GITHUB_SHA
+          script: |
+              # Ensure Docker Compose commands run in the correct region or context
+              sudo docker-compose pull
+              sudo docker-compose up -d --remove-orphans
 
