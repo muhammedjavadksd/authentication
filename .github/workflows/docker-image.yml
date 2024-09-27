@@ -30,12 +30,10 @@ jobs:
       - name: Docker pull & run from github
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.AWS_HOST }}  # Ensure this is set correctly
+          host: ${{ secrets.AWS_HOST }}  
           username: ubuntu
           key: ${{ secrets.AWS_PRIVATE_KEY }}
-          # envs: GITHUB_SHA
           script: |
-              # Ensure Docker Compose commands run in the correct region or context
-              sudo docker-compose pull
-              sudo docker-compose up -d --remove-orphans
+              sudo docker-compose -f /var/www/Docker-Compose.yaml pull
+              sudo docker-compose -f /var/www/Docker-Compose.yaml up -d --remove-orphans
 
