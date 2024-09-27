@@ -34,6 +34,6 @@ jobs:
           username: ubuntu
           key: ${{ secrets.AWS_PRIVATE_KEY }}
           script: |
-              sudo docker-compose -f /var/www/Docker-Compose.yaml pull
-              sudo docker-compose -f /var/www/Docker-Compose.yaml up -d --remove-orphans
+              sudo docker-compose -f /var/www/docker-compose.yaml pull
+              sudo docker-compose -f /var/www/docker-compose.yaml.yaml up -d --remove-orphans
 
