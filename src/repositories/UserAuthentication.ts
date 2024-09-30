@@ -42,7 +42,12 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
 
 
     async updateUserById(user_id: mongoose.Types.ObjectId, data: object): Promise<boolean> {
+        console.log("Update user details");
+
+        console.log(user_id, " ", data);
+
         const findUser = await this.UserAuthCollection.updateOne<UserModelDocument>({ _id: user_id }, { $set: data });
+        console.log(findUser);
         return findUser.modifiedCount > 0
     }
 
