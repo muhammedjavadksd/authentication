@@ -1,6 +1,5 @@
 import express, { Express } from "express";
 import dotenv from "dotenv";
-import bodyparser from "body-parser";
 import authenticationDbConnection from "./src/db/connection";
 import userRouter from "./src/router/userRouter";
 import adminRouter from "./src/router/adminRouter";
@@ -15,7 +14,7 @@ const app: Express = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: [process.env.FRONT_END_DOMAIN || ""]
+    origin: [process.env.FRONT_END_DOMAIN || "https://life-link.online"]
 }))
 
 dotenv.config({ path: "./.env" });
