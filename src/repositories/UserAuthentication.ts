@@ -42,13 +42,8 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
 
 
     async updateUserById(user_id: mongoose.Types.ObjectId, data: object): Promise<boolean> {
-        const findUser = await this.UserAuthCollection.findById<UserModelDocument>(user_id);
-        if (!findUser) {
-            throw new Error('User not found');
-        }
-        Object.assign(findUser, data);
-        await findUser.save();
-        return true
+        const findUser = await this.UserAuthCollection.updateOne<UserModelDocument>({ _id: user_id }, { $set: data });
+        return findUser.modifiedCount > 0
     }
 
     async updateUser(newAuthUser: IUserModelDocument): Promise<boolean> {
