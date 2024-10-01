@@ -1,8 +1,6 @@
 import express, { Express } from "express";
 import dotenv from "dotenv";
-import authenticationDbConnection from "./src/db/connection";
-import userRouter from "./src/router/userRouter";
-import adminRouter from "./src/router/adminRouter";
+
 import logger from "morgan";
 import organizationRouter from "./src/router/organizationRouter";
 import BulkDataConsumer from "./src/communication/BulkDataConsumer";
@@ -17,6 +15,9 @@ app.use(cors({
     origin: ["http://localhost:3000", "https://life-link.online"]
 }))
 
+import authenticationDbConnection from "./src/db/connection";
+import userRouter from "./src/router/userRouter";
+import adminRouter from "./src/router/adminRouter";
 dotenv.config({ path: "./.env" });
 
 BulkDataConsumer()
