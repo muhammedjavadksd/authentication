@@ -27,9 +27,10 @@ class AdminController implements IAdminController {
     async updateSettings(req: CustomRequest, res: Response): Promise<void> {
         const password = req.body.password;
         const email_id = req.body.email_id;
+        const admin_email = req.context?.email_id;
 
         if (email_id || password) {
-            const updatePassword = await this.AdminServices.updatePassword(password, email_id)
+            const updatePassword = await this.AdminServices.updatePassword(password, email_id, admin_email)
             res.status(updatePassword.statusCode).json({ status: updatePassword.status, msg: updatePassword.msg, data: updatePassword.data })
         } else {
             res.status(StatusCode.UNAUTHORIZED).json({ status: false, msg: "Un authraized access" })

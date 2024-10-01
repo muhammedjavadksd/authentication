@@ -26,10 +26,12 @@ class AdminController {
     }
     updateSettings(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const password = req.body.password;
             const email_id = req.body.email_id;
+            const admin_email = (_a = req.context) === null || _a === void 0 ? void 0 : _a.email_id;
             if (email_id || password) {
-                const updatePassword = yield this.AdminServices.updatePassword(password, email_id);
+                const updatePassword = yield this.AdminServices.updatePassword(password, email_id, admin_email);
                 res.status(updatePassword.statusCode).json({ status: updatePassword.status, msg: updatePassword.msg, data: updatePassword.data });
             }
             else {

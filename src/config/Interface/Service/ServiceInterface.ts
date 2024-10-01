@@ -7,7 +7,7 @@ interface IAdminAuthService {
     signIn(email: string, password: string): Promise<HelperFunctionResponse>
     forgetPassword(email: string): Promise<HelperFunctionResponse>
     resetPassword(token: string, password: string): Promise<HelperFunctionResponse>
-    updatePassword(password: string, email_id: string): Promise<HelperFunctionResponse>
+    updatePassword(password: string, email_id: string, admin_email: string): Promise<HelperFunctionResponse>
     // updateOrganizationStatus(organization_id: ObjectId, password: string): Promise<HelperFunctionResponse>
 }
 

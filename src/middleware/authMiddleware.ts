@@ -208,8 +208,62 @@ class AuthMiddleware implements IAuthMiddleware {
         }
     }
 
-    isAdminLogged(req: Request, res: Response, next: NextFunction): void {
-        next();
+    async isAdminLogged(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+        const headers: CustomRequest['headers'] = req.headers;
+        const token: string | false = utilHelper.getTokenFromHeader(headers['authorization'])
+        console.log("The token is :" + token);
+
+        if (token) {
+            if (!req.context) {
+                req.context = {}
+            }
+            req.context.auth_token = token;
+
+
+            const checkValidity: JwtPayload | string | boolean = await this.tokenHelpers.checkTokenValidity(token);
+            console.log(checkValidity);
+
+            if (checkValidity) {
+                if (typeof checkValidity == "object") {
+                    const emailAddress: string = checkValidity.email || checkValidity.email_address;
+                    if (emailAddress) {
+                        if (checkValidity) {
+                            req.context.email_id = emailAddress;
+                            req.context.token = token;
+                            req.context.user_id = checkValidity.user_id;
+                            console.log("Passed");
+                            console.log(req.context);
+                            next();
+                        } else {
+                            res.status(401).json({
+                                status: false,
+                                msg: "Authorization is failed"
+                            } as ControllerResponseInterFace);
+                        }
+                    } else {
+                        res.status(401).json({
+                            status: false,
+                            msg: "Authorization is failed"
+                        } as ControllerResponseInterFace);
+                    }
+                } else {
+                    res.status(401).json({
+                        status: false,
+                        msg: "Authorization is failed"
+                    } as ControllerResponseInterFace);
+                }
+            } else {
+                res.status(401).json({
+                    status: false,
+                    msg: "Authorization is failed"
+                } as ControllerResponseInterFace);
+            }
+        } else {
+            res.status(401).json({
+                status: false,
+                msg: "Invalid auth attempt"
+            } as ControllerResponseInterFace);
+        }
     }
 
     isOrganizationLogged(req: Request, res: Response, next: NextFunction): void {

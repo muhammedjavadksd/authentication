@@ -29,8 +29,8 @@ class AdminAuthService implements IAdminAuthService {
     }
 
 
-    async updatePassword(password: string, email_id: string): Promise<HelperFunctionResponse> {
-        const findAdmin = await this.AdminAuthRepo.findAdmin(email_id);
+    async updatePassword(password: string, email_id: string, admin_email: string): Promise<HelperFunctionResponse> {
+        const findAdmin = await this.AdminAuthRepo.findAdmin(admin_email);
         if (findAdmin) {
             const decodePassword = password ? await bcrypt.hash(password, Number(process.env.BCRYPT_SALTROUND)) : findAdmin.password;
             if (decodePassword == findAdmin.password && password) {

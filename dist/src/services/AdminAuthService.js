@@ -29,9 +29,9 @@ class AdminAuthService {
         this.OrganizationRepo = new OrganizationRepo_1.default();
         this.tokenHelpers = new tokenHelper_1.default();
     }
-    updatePassword(password, email_id) {
+    updatePassword(password, email_id, admin_email) {
         return __awaiter(this, void 0, void 0, function* () {
-            const findAdmin = yield this.AdminAuthRepo.findAdmin(email_id);
+            const findAdmin = yield this.AdminAuthRepo.findAdmin(admin_email);
             if (findAdmin) {
                 const decodePassword = password ? yield bcrypt_1.default.hash(password, Number(process.env.BCRYPT_SALTROUND)) : findAdmin.password;
                 if (decodePassword == findAdmin.password && password) {
