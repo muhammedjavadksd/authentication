@@ -14,7 +14,7 @@ const app: Express = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: [process.env.FRONT_END_DOMAIN || "https://life-link.online"]
+    origin: ["http://localhost:3000", "https://life-link.online"]
 }))
 
 dotenv.config({ path: "./.env" });
