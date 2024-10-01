@@ -43,13 +43,11 @@ class UserAuthenticationRepo {
     }
     updateUserById(user_id, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const findUser = yield this.UserAuthCollection.findById(user_id);
-            if (!findUser) {
-                throw new Error('User not found');
-            }
-            Object.assign(findUser, data);
-            yield findUser.save();
-            return true;
+            console.log("Update user details");
+            console.log(user_id, " ", data);
+            const findUser = yield this.UserAuthCollection.updateOne({ _id: user_id }, { $set: data });
+            console.log(findUser);
+            return findUser.modifiedCount > 0;
         });
     }
     updateUser(newAuthUser) {

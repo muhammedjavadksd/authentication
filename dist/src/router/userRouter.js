@@ -10,6 +10,9 @@ const router = express_1.default.Router();
 const AuthController = new userController_1.default();
 const UserMiddleware = new authMiddleware_1.default();
 // POST METHOD 
+router.get("/", (req, res) => {
+    res.status(200).send("Welcome to authentication service");
+});
 router.post("/sign_up_provider", AuthController.signUpWithProvide);
 router.post("/sign_up", AuthController.signUpController);
 router.post("/sign_in", AuthController.signInController);
@@ -21,4 +24,7 @@ router.put("/edit_auth_phone", UserMiddleware.isValidSignUpAttempt, AuthControll
 //PATCH METHOD
 router.patch("/update_auth", UserMiddleware.isUserLogged, AuthController.updateAuth);
 router.patch("/complete_account", AuthController.completeAccount);
+router.get("*", (req, res) => {
+    res.status(404).send("Page not found");
+});
 exports.default = router;

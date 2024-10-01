@@ -23,7 +23,7 @@ class AdminController implements IAdminController {
     }
 
 
-    async updatePassword(req: CustomRequest, res: Response): Promise<void> {
+    async updateSettings(req: CustomRequest, res: Response): Promise<void> {
         const password = req.body.password;
         const email_id = req.body.email_id;
 
@@ -33,8 +33,6 @@ class AdminController implements IAdminController {
         } else {
             res.status(StatusCode.UNAUTHORIZED).json({ status: false, msg: "Un authraized access" })
         }
-
-
     }
 
     async organizationSingleView(req: Request, res: Response, next: NextFunction): Promise<void> {

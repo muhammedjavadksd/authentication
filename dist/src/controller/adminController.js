@@ -23,7 +23,7 @@ class AdminController {
         this.AdminServices = new AdminAuthService_1.default();
         this.OrganizationServices = new OrganizationService_1.default();
     }
-    updatePassword(req, res) {
+    updateSettings(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const password = req.body.password;
             const email_id = req.body.email_id;
