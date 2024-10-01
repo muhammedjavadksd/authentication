@@ -18,6 +18,7 @@ class AdminController implements IAdminController {
         this.signInController = this.signInController.bind(this)
         this.forgetPasswordController = this.forgetPasswordController.bind(this)
         this.adminPasswordReset = this.adminPasswordReset.bind(this)
+        this.updateSettings = this.updateSettings.bind(this)
         this.AdminServices = new AdminAuthService();
         this.OrganizationServices = new OrganizationService();
     }
