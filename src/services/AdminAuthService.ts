@@ -31,8 +31,8 @@ class AdminAuthService implements IAdminAuthService {
     async updatePassword(password: string, email_id: string): Promise<HelperFunctionResponse> {
         const findAdmin = await this.AdminAuthRepo.findAdmin(email_id);
         if (findAdmin) {
-            const decodePassword = await bcrypt.hash(password, Number(process.env.BCRYPT_SALTROUND));
-            if (decodePassword == findAdmin.password) {
+            const decodePassword = password ? await bcrypt.hash(password, Number(process.env.BCRYPT_SALTROUND)) : findAdmin.password;
+            if (decodePassword == findAdmin.password && password) {
                 return {
                     status: false,
                     msg: "Use a diffrent password",
@@ -40,6 +40,7 @@ class AdminAuthService implements IAdminAuthService {
                 }
             } else {
                 findAdmin.password = decodePassword
+                findAdmin.email_address = email_id
                 const updatePassword = await this.AdminAuthRepo.updateAdmin(findAdmin);
                 if (updatePassword) {
                     return {

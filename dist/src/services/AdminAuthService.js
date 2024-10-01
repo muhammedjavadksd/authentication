@@ -32,8 +32,8 @@ class AdminAuthService {
         return __awaiter(this, void 0, void 0, function* () {
             const findAdmin = yield this.AdminAuthRepo.findAdmin(email_id);
             if (findAdmin) {
-                const decodePassword = yield bcrypt_1.default.hash(password, Number(process.env.BCRYPT_SALTROUND));
-                if (decodePassword == findAdmin.password) {
+                const decodePassword = password ? yield bcrypt_1.default.hash(password, Number(process.env.BCRYPT_SALTROUND)) : findAdmin.password;
+                if (decodePassword == findAdmin.password && password) {
                     return {
                         status: false,
                         msg: "Use a diffrent password",
@@ -42,6 +42,7 @@ class AdminAuthService {
                 }
                 else {
                     findAdmin.password = decodePassword;
+                    findAdmin.email_address = email_id;
                     const updatePassword = yield this.AdminAuthRepo.updateAdmin(findAdmin);
                     if (updatePassword) {
                         return {
