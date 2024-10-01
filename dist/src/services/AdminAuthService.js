@@ -24,6 +24,7 @@ class AdminAuthService {
         this.signIn = this.signIn.bind(this);
         this.forgetPassword = this.forgetPassword.bind(this);
         this.resetPassword = this.resetPassword.bind(this);
+        this.updatePassword = this.updatePassword.bind(this);
         this.AdminAuthRepo = new AdminAuthentication_1.default();
         this.OrganizationRepo = new OrganizationRepo_1.default();
         this.tokenHelpers = new tokenHelper_1.default();

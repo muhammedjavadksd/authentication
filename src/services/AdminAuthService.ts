@@ -22,6 +22,7 @@ class AdminAuthService implements IAdminAuthService {
         this.signIn = this.signIn.bind(this)
         this.forgetPassword = this.forgetPassword.bind(this)
         this.resetPassword = this.resetPassword.bind(this)
+        this.updatePassword = this.updatePassword.bind(this)
         this.AdminAuthRepo = new AdminAuthenticationRepo();
         this.OrganizationRepo = new OrganizationRepo();
         this.tokenHelpers = new TokenHelper();
