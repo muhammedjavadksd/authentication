@@ -47,7 +47,7 @@ class AdminAuthService implements IAdminAuthService {
                     return {
                         status: true,
                         msg: "Password update success",
-                        statusCode: StatusCode.BAD_REQUEST
+                        statusCode: StatusCode.OK
                     }
                 } else {
                     return {

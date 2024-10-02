@@ -49,7 +49,7 @@ class AdminAuthService {
                         return {
                             status: true,
                             msg: "Password update success",
-                            statusCode: Enums_1.StatusCode.BAD_REQUEST
+                            statusCode: Enums_1.StatusCode.OK
                         };
                     }
                     else {
