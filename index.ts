@@ -12,7 +12,7 @@ const app: Express = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: ["http://localhost:3000", "https://life-link.online"]
+    origin: ["http://localhost:3000", "https://life-link.online", "https://www.life-link.online"]
 }))
 
 import authenticationDbConnection from "./src/db/connection";
