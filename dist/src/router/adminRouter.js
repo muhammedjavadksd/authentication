@@ -32,11 +32,8 @@ const authMiddleware_1 = __importDefault(require("../middleware/authMiddleware")
 const adminRouter = express.Router();
 const adminController = new adminController_1.default();
 const adminMiddleware = new authMiddleware_1.default();
-adminRouter.post("/organization/view/:limit/:skip/", adminMiddleware.isAdminLogged, adminController.organizationPaginationView);
-adminRouter.post("/organization/:organization_id", adminMiddleware.isAdminLogged, adminController.organizationSingleView);
-adminRouter.post("/sign_in", adminMiddleware.isAdminLogged, adminController.signInController);
-adminRouter.post("/forget_password", adminMiddleware.isAdminLogged, adminController.forgetPasswordController);
-adminRouter.post("/reset_password/:token", adminMiddleware.isAdminLogged, adminController.adminPasswordReset);
-adminRouter.post("/update_organization_status", adminMiddleware.isAdminLogged, adminController.updateOrganizationStatus);
+adminRouter.post("/sign_in", adminController.signInController);
+adminRouter.post("/forget_password", adminController.forgetPasswordController);
+adminRouter.post("/reset_password/:token", adminController.adminPasswordReset);
 adminRouter.patch("/update-settings", adminMiddleware.isAdminLogged, adminController.updateSettings);
 exports.default = adminRouter;
