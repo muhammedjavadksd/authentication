@@ -78,7 +78,7 @@ class AdminAuthService {
                     const adminPassword = findAdmin.password;
                     if (adminPassword) {
                         const comparePassword = yield bcrypt_1.default.compare(password, adminPassword);
-                        const token = yield this.tokenHelpers.generateJWtToken({ email: findAdmin.email_address, type: const_1.default.JWT_FOR.ADMIN_AUTH, role: "admin" }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
+                        const token = yield this.tokenHelpers.generateJWtToken({ email: findAdmin.email_address, type: const_1.default.JWT_FOR.ADMIN_AUTH, role: "admin", profile_id: "admin_profile", user_id: findAdmin._id }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
                         if (comparePassword && token) {
                             findAdmin.token = token !== null && token !== void 0 ? token : "";
                             yield this.AdminAuthRepo.updateAdmin(findAdmin);

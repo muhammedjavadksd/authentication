@@ -76,7 +76,7 @@ class AdminAuthService implements IAdminAuthService {
                 const adminPassword: string | null = findAdmin.password as string;
                 if (adminPassword) {
                     const comparePassword: boolean = await bcrypt.compare(password, adminPassword);
-                    const token: string | null = await this.tokenHelpers.generateJWtToken({ email: findAdmin.email_address, type: constant_data.JWT_FOR.ADMIN_AUTH, role: "admin" }, constant_data.USERAUTH_EXPIRE_TIME.toString())
+                    const token: string | null = await this.tokenHelpers.generateJWtToken({ email: findAdmin.email_address, type: constant_data.JWT_FOR.ADMIN_AUTH, role: "admin", profile_id: "admin_profile", user_id: findAdmin._id }, constant_data.USERAUTH_EXPIRE_TIME.toString())
                     if (comparePassword && token) {
                         findAdmin.token = token ?? "";
                         await this.AdminAuthRepo.updateAdmin(findAdmin)
