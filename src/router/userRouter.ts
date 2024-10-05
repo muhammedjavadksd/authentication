@@ -18,6 +18,7 @@ router.post("/sign_in", AuthController.signInController);
 router.post("/sign_in_with_token", UserMiddleware.isUserLogged, AuthController.signWithToken); //retry login attemo for logged users
 router.post("/auth_otp_submission", UserMiddleware.isValidSignUpAttempt, AuthController.AuthOTPSubmission);
 router.post("/resend_otp", UserMiddleware.isValidSignUpAttempt, AuthController.resetOtpNumber);
+router.post("/refresh_token", AuthController.refreshToken);
 
 //PUT METHOD
 router.put("/edit_auth_phone", UserMiddleware.isValidSignUpAttempt, AuthController.editAuthPhoneNumber);

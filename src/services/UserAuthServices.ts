@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import AuthNotificationProvider from "../communication/Provider/notification/notification_service";
-import { HelperFunctionResponse, UserJwtInterFace } from "../config/Datas/InterFace";
+import { HelperFunctionResponse, ITokenResponse, IUserJwt, RefershTokenResponse, UserJwtInterFace } from "../config/Datas/InterFace";
 import IUserModelDocument from "../config/Interface/IModel/IUserAuthModel";
 import constant_data from "../config/const";
 import tokenHelper from "../helper/tokenHelper";
@@ -11,7 +11,7 @@ import TokenHelper from "../helper/tokenHelper";
 import { IUserAuthService } from "../config/Interface/Service/ServiceInterface";
 import axios from "axios";
 import { IBaseUser } from "../config/Interface/Objects/IBaseUser";
-import { StatusCode } from "../config/Datas/Enums";
+import { JwtTimer, StatusCode } from "../config/Datas/Enums";
 
 
 class UserAuthServices implements IUserAuthService {
@@ -27,9 +27,59 @@ class UserAuthServices implements IUserAuthService {
         this.resendOtpNumer = this.resendOtpNumer.bind(this)
         this._checkUserIDValidity = this._checkUserIDValidity.bind(this)
         this.generateUserID = this.generateUserID.bind(this)
+        this.refreshToken = this.refreshToken.bind(this)
 
         this.UserAuthRepo = new UserAuthenticationRepo()
         this.TokenHelpers = new TokenHelper();
+    }
+
+
+    async refreshToken(token: string): Promise<RefershTokenResponse> {
+        const tokenVerify = await this.TokenHelpers.checkTokenValidity(token);
+        if (tokenVerify && typeof tokenVerify == "object") {
+            //valid token
+            const checkRefreshToken = tokenVerify.exp;
+            const newAccessToken = await this.TokenHelpers.generateJWtToken(tokenVerify, JwtTimer.AccessTokenExpiresInMinutes);
+
+            if (newAccessToken) {
+                const responseData: ITokenResponse = {
+                    access_token: newAccessToken,
+                    refresh_token: undefined
+                }
+
+                if (checkRefreshToken) {
+                    const currentTime = Date.now();
+                    const maxAge = 1000 * 60 * 60;
+                    const diff = checkRefreshToken - currentTime;
+
+                    if (diff < maxAge) {
+                        const newRefreshToken = await this.TokenHelpers.generateJWtToken(tokenVerify, JwtTimer.RefreshTokenExpiresInDays);
+                        if (newRefreshToken) {
+                            responseData.refresh_token = newRefreshToken;
+                        }
+                    }
+                }
+
+                return {
+                    msg: "New access token created",
+                    status: true,
+                    statusCode: StatusCode.OK,
+                    data: responseData
+                }
+            } else {
+                return {
+                    msg: "Something went wrong",
+                    status: false,
+                    statusCode: StatusCode.SERVER_ERROR,
+                }
+            }
+        } else {
+            return {
+                msg: "Un authraized access",
+                status: false,
+                statusCode: StatusCode.UNAUTHORIZED,
+            }
+        }
     }
 
     async accountCompleteHelper(token: string, phone: number): Promise<HelperFunctionResponse> {
@@ -86,7 +136,7 @@ class UserAuthServices implements IUserAuthService {
             const findUser = await this.UserAuthRepo.findUser(null, emailId, null);
             if (findUser && findUser.account_started) {
 
-                const jwtToken: string | null = await this.TokenHelpers.generateJWtToken({ email: emailId, first_name: findUser.first_name, last_name: findUser.last_name, phone: findUser.phone_number, profile_id: findUser.user_id, user_id: findUser.id, } as UserJwtInterFace, constant_data.USERAUTH_EXPIRE_TIME.toString())
+                const jwtToken: string | null = await this.TokenHelpers.generateJWtToken({ email: emailId, first_name: findUser.first_name, last_name: findUser.last_name, phone: findUser.phone_number, profile_id: findUser.user_id, user_id: findUser.id, } as UserJwtInterFace, JwtTimer.AccessTokenExpiresInMinutes)
 
                 if (findUser.phone_number && jwtToken) {
                     const userJwtData: UserJwtInterFace = {
@@ -164,7 +214,7 @@ class UserAuthServices implements IUserAuthService {
                 const otpNumber: number = utilHelper.generateAnOTP(6);
                 const otpExpireTime: number = constant_data.MINIMUM_OTP_TIMER();
 
-                const token: string | null = await this.TokenHelpers.generateJWtToken({ email: userAuth['email'], type: constant_data.OTP_TYPE.SIGN_IN_OTP }, constant_data.OTP_EXPIRE_TIME.toString())
+                const token: string | null = await this.TokenHelpers.generateJWtToken({ email: userAuth['email'], type: constant_data.OTP_TYPE.SIGN_IN_OTP }, JwtTimer.AccessTokenExpiresInMinutes)
                 if (token) {
                     userAuth.otp = otpNumber;
                     userAuth.otp_timer = otpExpireTime;
@@ -255,12 +305,23 @@ class UserAuthServices implements IUserAuthService {
             const last_name: string = getUser.last_name;
             const phone_number: number | undefined = getUser.phone_number;
 
-            const jwtToken: string | null = await this.TokenHelpers.generateJWtToken({ email: email_id, first_name: first_name, last_name: last_name, phone: phone_number, profile_id: getUser.user_id, user_id: getUser.id, } as UserJwtInterFace, constant_data.USERAUTH_EXPIRE_TIME.toString())
-            if (!jwtToken) {
+
+            const userAuth: IUserJwt = {
+                email: email_id,
+                first_name: first_name,
+                last_name: last_name,
+                phone: phone_number,
+                profile_id: getUser.user_id,
+                user_id: getUser.id,
+            }
+
+            const refreshToken: string | null = await this.TokenHelpers.generateJWtToken(userAuth, JwtTimer.AccessTokenExpiresInMinutes)
+            const jwtToken: string | null = await this.TokenHelpers.generateJWtToken(userAuth, JwtTimer.RefreshTokenExpiresInDays)
+            if (!jwtToken || !refreshToken) {
                 return {
                     status: false,
                     msg: "Internal server error",
-                    statusCode: 500
+                    statusCode: StatusCode.SERVER_ERROR
                 }
             }
 
@@ -296,7 +357,8 @@ class UserAuthServices implements IUserAuthService {
                     phone: getUser.phone_number,
                     user_id: getUser.id,
                     profile_id: getUser.user_id,
-                    blood_token: getUser?.blood_token
+                    blood_token: getUser?.blood_token,
+                    refresh_token: refreshToken
                 }
 
                 return {
@@ -339,7 +401,7 @@ class UserAuthServices implements IUserAuthService {
 
                 const getUser: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, oldEmailId, null);
                 if (getUser) {
-                    const newToken: string | null = await this.TokenHelpers.generateJWtToken({ email: newEmailID, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.OTP_EXPIRE_TIME.toString())
+                    const newToken: string | null = await this.TokenHelpers.generateJWtToken({ email: newEmailID, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, JwtTimer.OtpTimer)
                     if (newToken) {
                         getUser.email = newEmailID;
                         getUser.otp = otpNumber;
@@ -410,7 +472,7 @@ class UserAuthServices implements IUserAuthService {
             if (getUser) {
                 const otpNumber: number = utilHelper.generateAnOTP(6);
                 const otpExpireTime: number = constant_data.MINIMUM_OTP_TIMER();
-                const newToken: string | null = await this.TokenHelpers.generateJWtToken({ email: getUser.email, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.OTP_EXPIRE_TIME.toString())
+                const newToken: string | null = await this.TokenHelpers.generateJWtToken({ email: getUser.email, type: constant_data.OTP_TYPE.SIGN_UP_OTP }, JwtTimer.OtpTimer)
                 if (newToken) {
                     getUser.otp = otpNumber;
                     getUser.otp_timer = otpExpireTime;

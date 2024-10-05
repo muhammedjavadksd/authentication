@@ -21,8 +21,21 @@ class AdminController {
         this.forgetPasswordController = this.forgetPasswordController.bind(this);
         this.adminPasswordReset = this.adminPasswordReset.bind(this);
         this.updateSettings = this.updateSettings.bind(this);
+        this.verifyToken = this.verifyToken.bind(this);
         this.AdminServices = new AdminAuthService_1.default();
         this.OrganizationServices = new OrganizationService_1.default();
+    }
+    verifyToken(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const token = req.headers['authorization'];
+            if (token) {
+                const emailEmail = yield this.AdminServices.verifyToken(token);
+                res.status(emailEmail.statusCode).json({ status: emailEmail.status, msg: emailEmail.msg, data: emailEmail.data });
+            }
+            else {
+                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({ status: false, msg: "Un authraized access" });
+            }
+        });
     }
     updateSettings(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

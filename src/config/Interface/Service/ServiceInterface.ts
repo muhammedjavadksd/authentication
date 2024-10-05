@@ -1,5 +1,5 @@
 import { ObjectId } from "mongoose"
-import { HelperFunctionResponse } from "../../Datas/InterFace"
+import { HelperFunctionResponse, RefershTokenResponse } from "../../Datas/InterFace"
 import { OrganizationStatus } from "../../Datas/Enums"
 
 
@@ -8,10 +8,12 @@ interface IAdminAuthService {
     forgetPassword(email: string): Promise<HelperFunctionResponse>
     resetPassword(token: string, password: string): Promise<HelperFunctionResponse>
     updatePassword(password: string, email_id: string, admin_email: string): Promise<HelperFunctionResponse>
+    verifyToken(token: string): Promise<HelperFunctionResponse>
     // updateOrganizationStatus(organization_id: ObjectId, password: string): Promise<HelperFunctionResponse>
 }
 
 interface IUserAuthService {
+    refreshToken(token: string): Promise<RefershTokenResponse>
     accountCompleteHelper(token: string, phone: number): Promise<HelperFunctionResponse>
     signUpProvideHelper(token: string, phone: string, auth_id: string): Promise<HelperFunctionResponse>
     signInHelper(email: string): Promise<HelperFunctionResponse>

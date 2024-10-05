@@ -22,5 +22,10 @@ interface IBaseProfileData {
     profile_id: string
 }
 
+interface IAdminEmailVerify {
+    email_id: string,
+    admin_email: string
+}
 
-export { IBaseProfileData, IBaseUser }
+
+export { IBaseProfileData, IBaseUser, IAdminEmailVerify }

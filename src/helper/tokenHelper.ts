@@ -1,5 +1,6 @@
 import * as jwt from "jsonwebtoken";
 import ITokenHelper from "../config/Interface/IHelper/iTokenHelper";
+import { JwtTimer } from "../config/Datas/Enums";
 
 class TokenHelper implements ITokenHelper {
 
@@ -9,7 +10,7 @@ class TokenHelper implements ITokenHelper {
         this.generateJWtToken = this.generateJWtToken.bind(this)
     }
 
-    async generateJWtToken(payload: object = {}, timer: string): Promise<string | null> {
+    async generateJWtToken(payload: object = {}, timer: JwtTimer): Promise<string | null> {
         try {
             const jwtToken: string = await jwt.sign(payload, process.env.JWT_SECRET!, { algorithm: "HS256", expiresIn: timer });
             return jwtToken;

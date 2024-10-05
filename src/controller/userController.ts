@@ -27,11 +27,22 @@ class UserAuthController implements IUserAuthController {
         this.resetOtpNumber = this.resetOtpNumber.bind(this)
         this.updateAuth = this.updateAuth.bind(this)
         this.signWithToken = this.signWithToken.bind(this)
-
+        this.refreshToken = this.refreshToken.bind(this);
         this.completeAccount = this.completeAccount.bind(this)
         this.signUpWithProvide = this.signUpWithProvide.bind(this)
         this.UserAuthRepo = new UserAuthenticationRepo();
         this.UserAuthService = new UserAuthServices();
+    }
+
+    async refreshToken(req: Request, res: Response, next: NextFunction): Promise<void> {
+
+        const refreshToken = req.cookies['refresh_token'];
+        if (refreshToken) {
+            const refresh = await this.UserAuthService.refreshToken(refreshToken);
+            res.status(refresh.statusCode).json({ status: refresh.status, msg: refresh.msg, data: refresh.data })
+        } else {
+            res.status(StatusCode.UNAUTHORIZED).json({ status: false, msg: "Un authraized access" })
+        }
     }
 
     async completeAccount(req: Request, res: Response, next: NextFunction): Promise<void> {

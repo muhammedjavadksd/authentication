@@ -19,10 +19,21 @@ class AdminController implements IAdminController {
         this.forgetPasswordController = this.forgetPasswordController.bind(this)
         this.adminPasswordReset = this.adminPasswordReset.bind(this)
         this.updateSettings = this.updateSettings.bind(this)
+        this.verifyToken = this.verifyToken.bind(this)
         this.AdminServices = new AdminAuthService();
         this.OrganizationServices = new OrganizationService();
     }
 
+
+    async verifyToken(req: CustomRequest, res: Response): Promise<void> {
+        const token = req.headers['authorization'];
+        if (token) {
+            const emailEmail = await this.AdminServices.verifyToken(token)
+            res.status(emailEmail.statusCode).json({ status: emailEmail.status, msg: emailEmail.msg, data: emailEmail.data })
+        } else {
+            res.status(StatusCode.UNAUTHORIZED).json({ status: false, msg: "Un authraized access" })
+        }
+    }
 
     async updateSettings(req: CustomRequest, res: Response): Promise<void> {
         const password = req.body.password;

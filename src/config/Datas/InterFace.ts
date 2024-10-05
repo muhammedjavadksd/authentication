@@ -8,6 +8,15 @@ interface BASIC_OBJECT_TYPE {
     [key: string]: string
 }
 
+interface IUserJwt {
+    email: string,
+    first_name: string,
+    last_name: string,
+    profile_id: string,
+    phone: number | undefined,
+    user_id: string,
+}
+
 
 
 interface ConstantData {
@@ -48,6 +57,14 @@ interface HelperFunctionResponse {
     statusCode: number
 }
 
+interface ITokenResponse {
+    access_token: string,
+    refresh_token?: string,
+}
+interface RefershTokenResponse extends HelperFunctionResponse {
+    data?: ITokenResponse
+}
+
 interface ControllerResponseInterFace {
     status: boolean,
     msg: string,
@@ -63,6 +80,7 @@ interface UserJwtInterFace {
     user_id: string,
     profile_id: string
     blood_token?: string
+    refresh_token?: string
 }
 
 interface AdminJwtInterFace {
@@ -93,4 +111,4 @@ interface AdminAuthController {
     adminPasswordReset: (req: Request, res: Response, next: NextFunction) => Promise<void>;
 }
 
-export { MulterFiles, OrganizationJwtInteraFace, AdminAuthController, ControllerInterFace, ConstantData, CustomRequest, AuthData, HelperFunctionResponse, AuthController, ControllerResponseInterFace, UserJwtInterFace, AdminJwtInterFace }
+export { MulterFiles, OrganizationJwtInteraFace, AdminAuthController, ControllerInterFace, ConstantData, CustomRequest, AuthData, HelperFunctionResponse, AuthController, ControllerResponseInterFace, UserJwtInterFace, AdminJwtInterFace, IUserJwt, RefershTokenResponse, ITokenResponse }

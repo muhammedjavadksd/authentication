@@ -28,10 +28,23 @@ class UserAuthController {
         this.resetOtpNumber = this.resetOtpNumber.bind(this);
         this.updateAuth = this.updateAuth.bind(this);
         this.signWithToken = this.signWithToken.bind(this);
+        this.refreshToken = this.refreshToken.bind(this);
         this.completeAccount = this.completeAccount.bind(this);
         this.signUpWithProvide = this.signUpWithProvide.bind(this);
         this.UserAuthRepo = new UserAuthentication_1.default();
         this.UserAuthService = new UserAuthServices_1.default();
+    }
+    refreshToken(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const refreshToken = req.cookies['refresh_token'];
+            if (refreshToken) {
+                const refresh = yield this.UserAuthService.refreshToken(refreshToken);
+                res.status(refresh.statusCode).json({ status: refresh.status, msg: refresh.msg, data: refresh.data });
+            }
+            else {
+                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({ status: false, msg: "Un authraized access" });
+            }
+        });
     }
     completeAccount(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {

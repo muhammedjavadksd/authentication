@@ -3,6 +3,7 @@ import { CustomRequest } from "../../Datas/InterFace"
 
 
 interface IUserAuthController {
+    refreshToken(req: Request, res: Response, next: NextFunction): Promise<void>
     completeAccount(req: Request, res: Response, next: NextFunction): Promise<void>
     signUpWithProvide(req: Request, res: Response, next: NextFunction): Promise<void>
     signUpController(req: Request, res: Response, next: NextFunction): Promise<void>

@@ -25,9 +25,38 @@ class AdminAuthService {
         this.forgetPassword = this.forgetPassword.bind(this);
         this.resetPassword = this.resetPassword.bind(this);
         this.updatePassword = this.updatePassword.bind(this);
+        this.verifyToken = this.verifyToken.bind(this);
         this.AdminAuthRepo = new AdminAuthentication_1.default();
         this.OrganizationRepo = new OrganizationRepo_1.default();
         this.tokenHelpers = new tokenHelper_1.default();
+    }
+    verifyToken(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const decodeToken = yield this.tokenHelpers.decodeJWTToken(token);
+            if (decodeToken && typeof decodeToken == "object") {
+                const email_id = decodeToken['email_id'];
+                const adminEmail = decodeToken['admin_email'];
+                if (email_id) {
+                    const findAdmin = yield this.AdminAuthRepo.findAdmin(adminEmail);
+                    if (findAdmin) {
+                        findAdmin.email_address = email_id;
+                        const updateEmailId = yield this.AdminAuthRepo.updateAdmin(findAdmin);
+                        if (updateEmailId) {
+                            return {
+                                msg: "Email id has been updated",
+                                status: true,
+                                statusCode: Enums_1.StatusCode.OK
+                            };
+                        }
+                    }
+                }
+            }
+            return {
+                msg: "Admin not found",
+                status: false,
+                statusCode: Enums_1.StatusCode.BAD_REQUEST
+            };
+        });
     }
     updatePassword(password, email_id, admin_email) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -42,8 +71,19 @@ class AdminAuthService {
                     };
                 }
                 else {
+                    if (admin_email != email_id) {
+                        const verifyPayload = {
+                            email_id,
+                            admin_email
+                        };
+                        const verifyToken = yield this.tokenHelpers.generateJWtToken(verifyPayload, Enums_1.JwtTimer.OtpTimer);
+                        if (verifyPayload) {
+                            const provider = new notification_service_1.default(process.env.ADMIN_UPDATE_VERIFY || "");
+                            yield provider._init_();
+                            provider.dataTransfer({ token: verifyToken, email_id: admin_email });
+                        }
+                    }
                     findAdmin.password = decodePassword;
-                    findAdmin.email_address = email_id;
                     const updatePassword = yield this.AdminAuthRepo.updateAdmin(findAdmin);
                     if (updatePassword) {
                         return {
@@ -78,7 +118,7 @@ class AdminAuthService {
                     const adminPassword = findAdmin.password;
                     if (adminPassword) {
                         const comparePassword = yield bcrypt_1.default.compare(password, adminPassword);
-                        const token = yield this.tokenHelpers.generateJWtToken({ email: findAdmin.email_address, type: const_1.default.JWT_FOR.ADMIN_AUTH, role: "admin", profile_id: "admin_profile", user_id: findAdmin._id }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
+                        const token = yield this.tokenHelpers.generateJWtToken({ email: findAdmin.email_address, type: const_1.default.JWT_FOR.ADMIN_AUTH, role: "admin", profile_id: "admin_profile", user_id: findAdmin._id }, Enums_1.JwtTimer.AccessTokenExpiresInMinutes);
                         if (comparePassword && token) {
                             findAdmin.token = token !== null && token !== void 0 ? token : "";
                             yield this.AdminAuthRepo.updateAdmin(findAdmin);
@@ -133,7 +173,7 @@ class AdminAuthService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const findAdmin = yield this.AdminAuthRepo.findAdmin(email);
-                const token = yield this.tokenHelpers.generateJWtToken({ email, type: const_1.default.MAIL_TYPE.ADMIN_PASSWORD_REST }, const_1.default.OTP_EXPIRE_TIME.toString());
+                const token = yield this.tokenHelpers.generateJWtToken({ email, type: const_1.default.MAIL_TYPE.ADMIN_PASSWORD_REST }, Enums_1.JwtTimer.OtpTimer);
                 if (findAdmin && token) {
                     findAdmin.token = token;
                     yield this.AdminAuthRepo.updateAdmin(findAdmin);

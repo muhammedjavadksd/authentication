@@ -28,8 +28,56 @@ class UserAuthServices {
         this.resendOtpNumer = this.resendOtpNumer.bind(this);
         this._checkUserIDValidity = this._checkUserIDValidity.bind(this);
         this.generateUserID = this.generateUserID.bind(this);
+        this.refreshToken = this.refreshToken.bind(this);
         this.UserAuthRepo = new UserAuthentication_1.default();
         this.TokenHelpers = new tokenHelper_1.default();
+    }
+    refreshToken(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tokenVerify = yield this.TokenHelpers.checkTokenValidity(token);
+            if (tokenVerify && typeof tokenVerify == "object") {
+                //valid token
+                const checkRefreshToken = tokenVerify.exp;
+                const newAccessToken = yield this.TokenHelpers.generateJWtToken(tokenVerify, Enums_1.JwtTimer.AccessTokenExpiresInMinutes);
+                if (newAccessToken) {
+                    const responseData = {
+                        access_token: newAccessToken,
+                        refresh_token: undefined
+                    };
+                    if (checkRefreshToken) {
+                        const currentTime = Date.now();
+                        const maxAge = 1000 * 60 * 60;
+                        const diff = checkRefreshToken - currentTime;
+                        if (diff < maxAge) {
+                            const newRefreshToken = yield this.TokenHelpers.generateJWtToken(tokenVerify, Enums_1.JwtTimer.RefreshTokenExpiresInDays);
+                            if (newRefreshToken) {
+                                responseData.refresh_token = newRefreshToken;
+                            }
+                        }
+                    }
+                    return {
+                        msg: "New access token created",
+                        status: true,
+                        statusCode: Enums_1.StatusCode.OK,
+                        data: responseData
+                    };
+                }
+                else {
+                    return {
+                        msg: "Something went wrong",
+                        status: false,
+                        statusCode: Enums_1.StatusCode.SERVER_ERROR,
+                    };
+                }
+            }
+            else {
+                return {
+                    msg: "Un authraized access",
+                    status: false,
+                    statusCode: Enums_1.StatusCode.UNAUTHORIZED,
+                };
+            }
+        });
     }
     accountCompleteHelper(token, phone) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -88,7 +136,7 @@ class UserAuthServices {
                 const lastName = (_a = fullName[1]) !== null && _a !== void 0 ? _a : "";
                 const findUser = yield this.UserAuthRepo.findUser(null, emailId, null);
                 if (findUser && findUser.account_started) {
-                    const jwtToken = yield this.TokenHelpers.generateJWtToken({ email: emailId, first_name: findUser.first_name, last_name: findUser.last_name, phone: findUser.phone_number, profile_id: findUser.user_id, user_id: findUser.id, }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
+                    const jwtToken = yield this.TokenHelpers.generateJWtToken({ email: emailId, first_name: findUser.first_name, last_name: findUser.last_name, phone: findUser.phone_number, profile_id: findUser.user_id, user_id: findUser.id, }, Enums_1.JwtTimer.AccessTokenExpiresInMinutes);
                     if (findUser.phone_number && jwtToken) {
                         const userJwtData = {
                             jwt: jwtToken,
@@ -163,7 +211,7 @@ class UserAuthServices {
                     }
                     const otpNumber = utilHelper_1.default.generateAnOTP(6);
                     const otpExpireTime = const_1.default.MINIMUM_OTP_TIMER();
-                    const token = yield this.TokenHelpers.generateJWtToken({ email: userAuth['email'], type: const_1.default.OTP_TYPE.SIGN_IN_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
+                    const token = yield this.TokenHelpers.generateJWtToken({ email: userAuth['email'], type: const_1.default.OTP_TYPE.SIGN_IN_OTP }, Enums_1.JwtTimer.AccessTokenExpiresInMinutes);
                     if (token) {
                         userAuth.otp = otpNumber;
                         userAuth.otp_timer = otpExpireTime;
@@ -247,12 +295,21 @@ class UserAuthServices {
                 const first_name = getUser.first_name;
                 const last_name = getUser.last_name;
                 const phone_number = getUser.phone_number;
-                const jwtToken = yield this.TokenHelpers.generateJWtToken({ email: email_id, first_name: first_name, last_name: last_name, phone: phone_number, profile_id: getUser.user_id, user_id: getUser.id, }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
-                if (!jwtToken) {
+                const userAuth = {
+                    email: email_id,
+                    first_name: first_name,
+                    last_name: last_name,
+                    phone: phone_number,
+                    profile_id: getUser.user_id,
+                    user_id: getUser.id,
+                };
+                const refreshToken = yield this.TokenHelpers.generateJWtToken(userAuth, Enums_1.JwtTimer.AccessTokenExpiresInMinutes);
+                const jwtToken = yield this.TokenHelpers.generateJWtToken(userAuth, Enums_1.JwtTimer.RefreshTokenExpiresInDays);
+                if (!jwtToken || !refreshToken) {
                     return {
                         status: false,
                         msg: "Internal server error",
-                        statusCode: 500
+                        statusCode: Enums_1.StatusCode.SERVER_ERROR
                     };
                 }
                 getUser.jwtToken = jwtToken;
@@ -282,7 +339,8 @@ class UserAuthServices {
                         phone: getUser.phone_number,
                         user_id: getUser.id,
                         profile_id: getUser.user_id,
-                        blood_token: getUser === null || getUser === void 0 ? void 0 : getUser.blood_token
+                        blood_token: getUser === null || getUser === void 0 ? void 0 : getUser.blood_token,
+                        refresh_token: refreshToken
                     };
                     return {
                         status: true,
@@ -318,7 +376,7 @@ class UserAuthServices {
                 if (!checkExist) {
                     const getUser = yield this.UserAuthRepo.findUser(null, oldEmailId, null);
                     if (getUser) {
-                        const newToken = yield this.TokenHelpers.generateJWtToken({ email: newEmailID, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
+                        const newToken = yield this.TokenHelpers.generateJWtToken({ email: newEmailID, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, Enums_1.JwtTimer.OtpTimer);
                         if (newToken) {
                             getUser.email = newEmailID;
                             getUser.otp = otpNumber;
@@ -389,7 +447,7 @@ class UserAuthServices {
                 if (getUser) {
                     const otpNumber = utilHelper_1.default.generateAnOTP(6);
                     const otpExpireTime = const_1.default.MINIMUM_OTP_TIMER();
-                    const newToken = yield this.TokenHelpers.generateJWtToken({ email: getUser.email, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.OTP_EXPIRE_TIME.toString());
+                    const newToken = yield this.TokenHelpers.generateJWtToken({ email: getUser.email, type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, Enums_1.JwtTimer.OtpTimer);
                     if (newToken) {
                         getUser.otp = otpNumber;
                         getUser.otp_timer = otpExpireTime;

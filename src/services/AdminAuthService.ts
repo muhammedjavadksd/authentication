@@ -7,10 +7,11 @@ import bcrypt from 'bcrypt';
 import IAdminAuthModel from "../config/Interface/IModel/IAdminAuthModel";
 import { IAdminAuthService } from "../config/Interface/Service/ServiceInterface";
 import TokenHelper from "../helper/tokenHelper";
-import { OrganizationStatus, StatusCode } from "../config/Datas/Enums";
+import { JwtTimer, OrganizationStatus, StatusCode } from "../config/Datas/Enums";
 import IOrganizationAuthModel from "../config/Interface/IModel/IOrganizationModel";
 import OrganizationRepo from "../repositories/OrganizationRepo";
 import { ObjectId } from "mongoose";
+import { IAdminEmailVerify } from "../config/Interface/Objects/IBaseUser";
 
 class AdminAuthService implements IAdminAuthService {
 
@@ -23,11 +24,40 @@ class AdminAuthService implements IAdminAuthService {
         this.forgetPassword = this.forgetPassword.bind(this)
         this.resetPassword = this.resetPassword.bind(this)
         this.updatePassword = this.updatePassword.bind(this)
+        this.verifyToken = this.verifyToken.bind(this)
         this.AdminAuthRepo = new AdminAuthenticationRepo();
         this.OrganizationRepo = new OrganizationRepo();
         this.tokenHelpers = new TokenHelper();
     }
 
+
+    async verifyToken(token: string): Promise<HelperFunctionResponse> {
+
+        const decodeToken = await this.tokenHelpers.decodeJWTToken(token) as Record<string, any>;
+        if (decodeToken && typeof decodeToken == "object") {
+            const email_id = decodeToken['email_id'];
+            const adminEmail = decodeToken['admin_email'];
+            if (email_id) {
+                const findAdmin = await this.AdminAuthRepo.findAdmin(adminEmail);
+                if (findAdmin) {
+                    findAdmin.email_address = email_id;
+                    const updateEmailId = await this.AdminAuthRepo.updateAdmin(findAdmin);
+                    if (updateEmailId) {
+                        return {
+                            msg: "Email id has been updated",
+                            status: true,
+                            statusCode: StatusCode.OK
+                        }
+                    }
+                }
+            }
+        }
+        return {
+            msg: "Admin not found",
+            status: false,
+            statusCode: StatusCode.BAD_REQUEST
+        }
+    }
 
     async updatePassword(password: string, email_id: string, admin_email: string): Promise<HelperFunctionResponse> {
         const findAdmin = await this.AdminAuthRepo.findAdmin(admin_email);
@@ -40,8 +70,19 @@ class AdminAuthService implements IAdminAuthService {
                     statusCode: StatusCode.BAD_REQUEST
                 }
             } else {
+                if (admin_email != email_id) {
+                    const verifyPayload: IAdminEmailVerify = {
+                        email_id,
+                        admin_email
+                    }
+                    const verifyToken = await this.tokenHelpers.generateJWtToken(verifyPayload, JwtTimer.OtpTimer);
+                    if (verifyPayload) {
+                        const provider = new AuthNotificationProvider(process.env.ADMIN_UPDATE_VERIFY || "");
+                        await provider._init_()
+                        provider.dataTransfer({ token: verifyToken, email_id: admin_email });
+                    }
+                }
                 findAdmin.password = decodePassword
-                findAdmin.email_address = email_id
                 const updatePassword = await this.AdminAuthRepo.updateAdmin(findAdmin);
                 if (updatePassword) {
                     return {
@@ -76,7 +117,7 @@ class AdminAuthService implements IAdminAuthService {
                 const adminPassword: string | null = findAdmin.password as string;
                 if (adminPassword) {
                     const comparePassword: boolean = await bcrypt.compare(password, adminPassword);
-                    const token: string | null = await this.tokenHelpers.generateJWtToken({ email: findAdmin.email_address, type: constant_data.JWT_FOR.ADMIN_AUTH, role: "admin", profile_id: "admin_profile", user_id: findAdmin._id }, constant_data.USERAUTH_EXPIRE_TIME.toString())
+                    const token: string | null = await this.tokenHelpers.generateJWtToken({ email: findAdmin.email_address, type: constant_data.JWT_FOR.ADMIN_AUTH, role: "admin", profile_id: "admin_profile", user_id: findAdmin._id }, JwtTimer.AccessTokenExpiresInMinutes)
                     if (comparePassword && token) {
                         findAdmin.token = token ?? "";
                         await this.AdminAuthRepo.updateAdmin(findAdmin)
@@ -128,7 +169,7 @@ class AdminAuthService implements IAdminAuthService {
 
         try {
             const findAdmin: IAdminAuthModel | null = await this.AdminAuthRepo.findAdmin(email)
-            const token: string | null = await this.tokenHelpers.generateJWtToken({ email, type: constant_data.MAIL_TYPE.ADMIN_PASSWORD_REST }, constant_data.OTP_EXPIRE_TIME.toString())
+            const token: string | null = await this.tokenHelpers.generateJWtToken({ email, type: constant_data.MAIL_TYPE.ADMIN_PASSWORD_REST }, JwtTimer.OtpTimer)
 
             if (findAdmin && token) {
                 findAdmin.token = token;

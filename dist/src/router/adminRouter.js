@@ -35,5 +35,6 @@ const adminMiddleware = new authMiddleware_1.default();
 adminRouter.post("/sign_in", adminController.signInController);
 adminRouter.post("/forget_password", adminController.forgetPasswordController);
 adminRouter.post("/reset_password/:token", adminController.adminPasswordReset);
+adminRouter.patch("/verify-update-token", adminController.updateSettings);
 adminRouter.patch("/update-settings", adminMiddleware.isAdminLogged, adminController.updateSettings);
 exports.default = adminRouter;

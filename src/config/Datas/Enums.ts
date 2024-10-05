@@ -8,6 +8,12 @@ enum OrganizationStatus {
     Pending = "Pending"
 }
 
+enum JwtTimer {
+    AccessTokenExpiresInMinutes = "15m",   // Access token expires in 15 minutes
+    RefreshTokenExpiresInDays = "7d",       // Refresh token expires in 7 days
+    OtpTimer = "15m",       // Refresh token expires in 7 days
+}
+
 enum StatusCode {
     OK = 200,
     CREATED = 201,
@@ -19,4 +25,4 @@ enum StatusCode {
     CONFLICT = 409,
 }
 
-export { OrganizationStatus, StatusCode }
+export { OrganizationStatus, StatusCode, JwtTimer }
