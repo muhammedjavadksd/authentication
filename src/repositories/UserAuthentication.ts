@@ -10,6 +10,7 @@ import utilHelper from "../helper/utilHelper";
 import TokenHelper from "../helper/tokenHelper";
 import UserAuthServices from "../services/UserAuthServices";
 import { IUserAuthenticationRepo } from "../config/Interface/Repos/RepositoriesInterface";
+import { JwtTimer } from "../config/Datas/Enums";
 
 
 
@@ -68,7 +69,7 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
         const userid = await userService.generateUserID(baseUSER['first_name']);
 
         if (userid) {
-            const jwtToken = await this.tokenHelpers.generateJWtToken({ email: baseUSER['email'], type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.USERAUTH_EXPIRE_TIME.toString())
+            const jwtToken = await this.tokenHelpers.generateJWtToken({ email: baseUSER['email'], type: constant_data.OTP_TYPE.SIGN_UP_OTP }, JwtTimer.OtpTimer)
             if (jwtToken) {
 
                 const insert = await this.UserAuthCollection.updateOne({ email: baseUSER['email'] }, {
@@ -115,7 +116,7 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
             const userid = await userService.generateUserID(baseUSER['first_name']);
 
             if (userid) {
-                const jwtToken = await this.tokenHelpers.generateJWtToken({ email: baseUSER['email'], type: constant_data.OTP_TYPE.SIGN_UP_OTP }, constant_data.USERAUTH_EXPIRE_TIME.toString())
+                const jwtToken = await this.tokenHelpers.generateJWtToken({ email: baseUSER['email'], type: constant_data.OTP_TYPE.SIGN_UP_OTP }, JwtTimer.OtpTimer)
                 if (jwtToken) {
 
                     this.UserAuthCollection.updateOne({ email: baseUSER['email'] }, {

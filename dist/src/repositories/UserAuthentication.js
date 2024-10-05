@@ -18,6 +18,7 @@ const userAuth_1 = __importDefault(require("../db/model/userAuth"));
 const utilHelper_1 = __importDefault(require("../helper/utilHelper"));
 const tokenHelper_1 = __importDefault(require("../helper/tokenHelper"));
 const UserAuthServices_1 = __importDefault(require("../services/UserAuthServices"));
+const Enums_1 = require("../config/Datas/Enums");
 class UserAuthenticationRepo {
     constructor() {
         this.findByUserId = this.findByUserId.bind(this);
@@ -67,7 +68,7 @@ class UserAuthenticationRepo {
             const userService = new UserAuthServices_1.default();
             const userid = yield userService.generateUserID(baseUSER['first_name']);
             if (userid) {
-                const jwtToken = yield this.tokenHelpers.generateJWtToken({ email: baseUSER['email'], type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
+                const jwtToken = yield this.tokenHelpers.generateJWtToken({ email: baseUSER['email'], type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, Enums_1.JwtTimer.OtpTimer);
                 if (jwtToken) {
                     const insert = yield this.UserAuthCollection.updateOne({ email: baseUSER['email'] }, {
                         $set: {
@@ -113,7 +114,7 @@ class UserAuthenticationRepo {
                 const userService = new UserAuthServices_1.default();
                 const userid = yield userService.generateUserID(baseUSER['first_name']);
                 if (userid) {
-                    const jwtToken = yield this.tokenHelpers.generateJWtToken({ email: baseUSER['email'], type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, const_1.default.USERAUTH_EXPIRE_TIME.toString());
+                    const jwtToken = yield this.tokenHelpers.generateJWtToken({ email: baseUSER['email'], type: const_1.default.OTP_TYPE.SIGN_UP_OTP }, Enums_1.JwtTimer.OtpTimer);
                     if (jwtToken) {
                         this.UserAuthCollection.updateOne({ email: baseUSER['email'] }, {
                             $set: {

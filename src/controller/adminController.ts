@@ -3,7 +3,6 @@ import { AdminJwtInterFace, ControllerResponseInterFace, CustomRequest, HelperFu
 import AdminAuthService from "../services/AdminAuthService";
 import utilHelper from "../helper/utilHelper";
 import IAdminController from "../config/Interface/IController/iAdminController";
-import OrganizationService from "../services/OrganizationService";
 import { OrganizationStatus, StatusCode } from "../config/Datas/Enums";
 import { ObjectId } from "mongoose";
 
@@ -12,7 +11,6 @@ import { ObjectId } from "mongoose";
 class AdminController implements IAdminController {
 
     private AdminServices;
-    private OrganizationServices;
 
     constructor() {
         this.signInController = this.signInController.bind(this)
@@ -21,7 +19,6 @@ class AdminController implements IAdminController {
         this.updateSettings = this.updateSettings.bind(this)
         this.verifyToken = this.verifyToken.bind(this)
         this.AdminServices = new AdminAuthService();
-        this.OrganizationServices = new OrganizationService();
     }
 
 
@@ -48,27 +45,8 @@ class AdminController implements IAdminController {
         }
     }
 
-    async organizationSingleView(req: Request, res: Response, next: NextFunction): Promise<void> {
-        const organization_id = req.params.organization_id as unknown as ObjectId
-        const findOrganization = await this.OrganizationServices.findSingleOrganization(organization_id);
-        res.status(findOrganization.statusCode).json({ status: findOrganization.status, msg: findOrganization.msg, data: findOrganization.data })
-    }
 
-    async organizationPaginationView(req: Request, res: Response, next: NextFunction): Promise<void> {
-        // :limit/:skip/:per_page
-        const limit: number = +(req.params.limit);
-        const skip: number = +(req.params.skip);
 
-        const findOrganization: HelperFunctionResponse = await this.OrganizationServices.organizationPaginationView(limit, skip);
-        res.status(findOrganization.statusCode).json({ status: findOrganization.status, msg: findOrganization.msg, data: findOrganization.data })
-    }
-
-    async updateOrganizationStatus(req: Request, res: Response): Promise<void> {
-        const organization_id: ObjectId = req.body.organization_id;
-        const status: OrganizationStatus = req.body.status;
-        const updateOrganization = await this.OrganizationServices.updateOrganizationStatus(organization_id, status);
-        res.status(updateOrganization.statusCode).json({ status: updateOrganization.status, msg: updateOrganization.msg })
-    }
 
 
     async signInController(req: Request, res: Response, next: NextFunction): Promise<void> {

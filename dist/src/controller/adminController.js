@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const AdminAuthService_1 = __importDefault(require("../services/AdminAuthService"));
-const OrganizationService_1 = __importDefault(require("../services/OrganizationService"));
 const Enums_1 = require("../config/Datas/Enums");
 class AdminController {
     constructor() {
@@ -23,7 +22,6 @@ class AdminController {
         this.updateSettings = this.updateSettings.bind(this);
         this.verifyToken = this.verifyToken.bind(this);
         this.AdminServices = new AdminAuthService_1.default();
-        this.OrganizationServices = new OrganizationService_1.default();
     }
     verifyToken(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -50,30 +48,6 @@ class AdminController {
             else {
                 res.status(Enums_1.StatusCode.UNAUTHORIZED).json({ status: false, msg: "Un authraized access" });
             }
-        });
-    }
-    organizationSingleView(req, res, next) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const organization_id = req.params.organization_id;
-            const findOrganization = yield this.OrganizationServices.findSingleOrganization(organization_id);
-            res.status(findOrganization.statusCode).json({ status: findOrganization.status, msg: findOrganization.msg, data: findOrganization.data });
-        });
-    }
-    organizationPaginationView(req, res, next) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // :limit/:skip/:per_page
-            const limit = +(req.params.limit);
-            const skip = +(req.params.skip);
-            const findOrganization = yield this.OrganizationServices.organizationPaginationView(limit, skip);
-            res.status(findOrganization.statusCode).json({ status: findOrganization.status, msg: findOrganization.msg, data: findOrganization.data });
-        });
-    }
-    updateOrganizationStatus(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const organization_id = req.body.organization_id;
-            const status = req.body.status;
-            const updateOrganization = yield this.OrganizationServices.updateOrganizationStatus(organization_id, status);
-            res.status(updateOrganization.statusCode).json({ status: updateOrganization.status, msg: updateOrganization.msg });
         });
     }
     signInController(req, res, next) {

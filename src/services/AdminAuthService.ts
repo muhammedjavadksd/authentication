@@ -9,14 +9,12 @@ import { IAdminAuthService } from "../config/Interface/Service/ServiceInterface"
 import TokenHelper from "../helper/tokenHelper";
 import { JwtTimer, OrganizationStatus, StatusCode } from "../config/Datas/Enums";
 import IOrganizationAuthModel from "../config/Interface/IModel/IOrganizationModel";
-import OrganizationRepo from "../repositories/OrganizationRepo";
 import { ObjectId } from "mongoose";
 import { IAdminEmailVerify } from "../config/Interface/Objects/IBaseUser";
 
 class AdminAuthService implements IAdminAuthService {
 
     private AdminAuthRepo;
-    private OrganizationRepo;
     private tokenHelpers;
 
     constructor() {
@@ -26,7 +24,6 @@ class AdminAuthService implements IAdminAuthService {
         this.updatePassword = this.updatePassword.bind(this)
         this.verifyToken = this.verifyToken.bind(this)
         this.AdminAuthRepo = new AdminAuthenticationRepo();
-        this.OrganizationRepo = new OrganizationRepo();
         this.tokenHelpers = new TokenHelper();
     }
 

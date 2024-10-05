@@ -2,7 +2,6 @@ import express, { Express } from "express";
 import dotenv from "dotenv";
 
 import logger from "morgan";
-import organizationRouter from "./src/router/organizationRouter";
 import BulkDataConsumer from "./src/communication/BulkDataConsumer";
 import cors from 'cors'
 

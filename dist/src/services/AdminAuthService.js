@@ -18,7 +18,6 @@ const AdminAuthentication_1 = __importDefault(require("../repositories/AdminAuth
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const tokenHelper_1 = __importDefault(require("../helper/tokenHelper"));
 const Enums_1 = require("../config/Datas/Enums");
-const OrganizationRepo_1 = __importDefault(require("../repositories/OrganizationRepo"));
 class AdminAuthService {
     constructor() {
         this.signIn = this.signIn.bind(this);
@@ -27,7 +26,6 @@ class AdminAuthService {
         this.updatePassword = this.updatePassword.bind(this);
         this.verifyToken = this.verifyToken.bind(this);
         this.AdminAuthRepo = new AdminAuthentication_1.default();
-        this.OrganizationRepo = new OrganizationRepo_1.default();
         this.tokenHelpers = new tokenHelper_1.default();
     }
     verifyToken(token) {
