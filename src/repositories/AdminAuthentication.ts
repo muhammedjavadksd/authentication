@@ -1,5 +1,5 @@
-import IAdminAuthModel from "../config/Interface/IModel/IAdminAuthModel";
-import { IAdminRepo } from "../config/Interface/Repos/RepositoriesInterface";
+import IAdminAuthModel from "../config/Datas/Interface/IModel/IAdminAuthModel";
+import { IAdminRepo } from "../config/Datas/Interface/Repos/RepositoriesInterface";
 import AdminAuthModel from "../db/model/adminAuth";
 
 
@@ -18,7 +18,7 @@ class AdminAuthenticationRepo implements IAdminRepo {
         try {
             await admin.save();
             return true
-        } catch (e) { 
+        } catch (e) {
             return false;
         }
     }

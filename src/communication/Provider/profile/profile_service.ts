@@ -1,6 +1,6 @@
 import * as amqplib from 'amqplib';
 import { AuthData } from '../../../config/Datas/InterFace';
-import { IBaseProfileData, IBaseUser } from '../../../config/Interface/Objects/IBaseUser';
+import { IBaseProfileData, IBaseUser } from '../../../config/Datas/Interface/Objects/IBaseUser';
 
 interface PROFILE_COMMUNICATION_PROVIDER_INTERFACE {
     authDataTransfer(baseUSER: IBaseProfileData): Promise<void>

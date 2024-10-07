@@ -1,6 +1,6 @@
 // const { default: mongoose } = require("mongoose");
 import mongoose from "mongoose";
-import IAdminAuthModel from "../../config/Interface/IModel/IAdminAuthModel";
+import IAdminAuthModel from "../../config/Datas/Interface/IModel/IAdminAuthModel";
 
 const AdminAuth: mongoose.Schema = new mongoose.Schema({
     name: {

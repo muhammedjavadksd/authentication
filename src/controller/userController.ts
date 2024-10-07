@@ -1,15 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import const_data from '../config/const';
-import signUpUserValidation from '../config/validation/validation'
-import { ControllerResponseInterFace, CustomRequest, HelperFunctionResponse, UserJwtInterFace } from '../config/Datas/InterFace';
-import IUserAuthController from '../config/Interface/IController/IUserAuthController';
+import signUpUserValidation from '../config/validation'
+// import { ControllerResponseInterFace, CustomRequest, HelperFunctionResponse, UserJwtInterFace } from '../config/Datas/InterFace';
+// import IUserAuthController from '../config/Datas/Interface/IController/IUserAuthController';
 import UserAuthenticationRepo from '../repositories/UserAuthentication';
-import { IBaseUser } from '../config/Interface/Objects/IBaseUser';
-import UserAuthServices from '../services/UserAuthServices';
-import IUserModelDocument from '../config/Interface/IModel/IUserAuthModel';
+// import { IBaseUser } from '../config/Datas/Interface/Objects/IBaseUser';
+// import UserAuthServices from '../services/UserAuthServices';
+// import IUserModelDocument from '../config/Datas/Interface/IModel/IUserAuthModel';
 import mongoose, { ObjectId } from 'mongoose';
 import { StatusCode } from '../config/Datas/Enums';
 import utilHelper from '../helper/utilHelper';
+import { IUserAuthController } from '../config/Datas/Interface/MethodInterface';
+import UserAuthServices from '../services/UserAuthServices';
+import { ControllerResponseInterFace, CustomRequest, HelperFunctionResponse, IBaseUser, UserJwtInterFace } from '../config/Datas/Interface/UtilInterface';
+import { IUserModelDocument } from '../config/Datas/Interface/DatabaseModel';
 
 
 const { AUTH_PROVIDERS_DATA } = const_data;
@@ -34,9 +38,8 @@ class UserAuthController implements IUserAuthController {
         this.UserAuthService = new UserAuthServices();
     }
 
-    async refreshToken(req: Request, res: Response, next: NextFunction): Promise<void> {
-
-        const refreshToken = req.cookies['refresh_token'];
+    async refreshToken(req: Request, res: Response): Promise<void> {
+        const refreshToken: string | undefined = req.cookies['refresh_token'];
         if (refreshToken) {
             const refresh = await this.UserAuthService.refreshToken(refreshToken);
             res.status(refresh.statusCode).json({ status: refresh.status, msg: refresh.msg, data: refresh.data })
@@ -47,8 +50,8 @@ class UserAuthController implements IUserAuthController {
 
     async completeAccount(req: Request, res: Response, next: NextFunction): Promise<void> {
         const phoneNumber: number = req.body.phone_number;
-        const header = req.headers['authorization'];
-        const token = utilHelper.getTokenFromHeader(header)
+        const header: string | undefined = req.headers['authorization'];
+        const token: string | false = utilHelper.getTokenFromHeader(header)
 
         if (token) {
             const complete_account = await this.UserAuthService.accountCompleteHelper(token, phoneNumber);
@@ -60,9 +63,9 @@ class UserAuthController implements IUserAuthController {
 
 
     async signUpWithProvide(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
-        const header = req.headers['authorization'];
+        const header: string | undefined = req.headers['authorization'];
         const auth_id: string = req.body.auth_id
-        const token = utilHelper.getTokenFromHeader(header)
+        const token: string | false = utilHelper.getTokenFromHeader(header)
         if (token) {
             const save = await this.UserAuthService.signUpProvideHelper(token, auth_id);
             res.status(save.statusCode).json({ status: save.status, msg: save.msg, data: save.data })
@@ -74,20 +77,10 @@ class UserAuthController implements IUserAuthController {
 
 
     async signWithToken(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
-        const user_id = req.context?.user_id;
+        const user_id: string | undefined = req.context?.user_id;
         if (user_id) {
-
-            console.log(user_id);
-
             const findUser = await this.UserAuthRepo.findUser(user_id, null, null);
-
-            console.log("The user");
-            console.log(findUser);
-
-
             if (findUser) {
-
-
                 const loginData = {
                     jwt: findUser['jwtToken'],
                     first_name: findUser['first_name'],
@@ -98,15 +91,7 @@ class UserAuthController implements IUserAuthController {
                     profile_id: findUser['user_id'],
                     blood_token: findUser['blood_token']
                 } as UserJwtInterFace
-
-                console.log(loginData);
-
-
-                res.status(StatusCode.OK).json({
-                    status: true, msg: "Login attempt success", data: {
-                        profile: loginData
-                    }
-                })
+                res.status(StatusCode.OK).json({ status: true, msg: "Login attempt success", data: { profile: loginData } })
             } else {
                 res.status(StatusCode.UNAUTHORIZED).json({
                     status: true, msg: "No user found"
@@ -121,16 +106,11 @@ class UserAuthController implements IUserAuthController {
 
 
     async updateAuth(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
-        const user_id: mongoose.Types.ObjectId = req.context?.user_id;
+        const user_id: mongoose.Types.ObjectId | undefined = req.context?.user_id;
         if (user_id) {
             const editData = {
                 blood_token: req.body.blood_token
             }
-            console.log(user_id);
-            console.log(editData);
-            console.log(req.body);
-
-
 
             const updateUser = await this.UserAuthRepo.updateUserById(user_id, editData);
             if (updateUser) {
@@ -168,24 +148,17 @@ class UserAuthController implements IUserAuthController {
                     status: false,
                     msg: error.details[0].message,
                 }
-                console.log("End");
 
-                console.log(response);
-
-                res.status(500).json({ response });
-                // console.log(error.details[0].message);
+                res.status(StatusCode.SERVER_ERROR).json({ response });
             } else {
-                console.log("Eneted");
                 const isUserExist: IUserModelDocument | false = await this.UserAuthRepo.findUser(null, email_address, Number(phone_number))
-                console.log(isUserExist);
 
                 if (isUserExist && isUserExist.account_started) {
-
                     const response: ControllerResponseInterFace = {
                         status: false,
                         msg: 'Email/Phone already exist',
                     }
-                    res.status(400).json(response);
+                    res.status(StatusCode.CONFLICT).json(response);
                 } else {
                     this.UserAuthRepo.insertNewUser({
                         auth_id: auth_id,
@@ -203,14 +176,14 @@ class UserAuthController implements IUserAuthController {
                                 token: jwtData.token
                             },
                         };
-                        res.status(200).json(successResponse);
+                        res.status(StatusCode.OK).json(successResponse);
                     }).catch((err) => {
                         console.log(err);
                         const response: ControllerResponseInterFace = {
                             status: false,
                             msg: "Something went wrong"
                         }
-                        res.status(500).json(response);
+                        res.status(StatusCode.SERVER_ERROR).json(response);
                     });
                 }
             }
@@ -221,7 +194,7 @@ class UserAuthController implements IUserAuthController {
                 status: false,
                 msg: "Something went wrong"
             }
-            res.status(500).json(response);
+            res.status(StatusCode.SERVER_ERROR).json(response);
         }
     }
 
@@ -253,7 +226,7 @@ class UserAuthController implements IUserAuthController {
                 status: false,
                 msg: 'Something went wrong',
             }
-            res.status(500).json(response);
+            res.status(StatusCode.SERVER_ERROR).json(response);
         }
     }
 
@@ -263,26 +236,11 @@ class UserAuthController implements IUserAuthController {
         const email_id: string = req.context?.email_id;
         const token: string = req.context?.token;
 
-        console.log("Before");
-        console.log(otp);
-
-
-        console.log(email_id, token);
         if (email_id && token) {
             try {
                 const otpVerification: HelperFunctionResponse = await this.UserAuthService.authOTPValidate(otp, email_id, token)
-                console.log("otp");
-
-                console.log(otpVerification);
-
                 if (otpVerification.status) {
                     const responseData: UserJwtInterFace = otpVerification.data;
-                    console.log("Response data");
-
-                    console.log(responseData);
-
-                    console.log(otpVerification.data);
-
                     const otpResponse = {
                         jwt: responseData['jwt'],
                         first_name: responseData['first_name'],
@@ -294,28 +252,26 @@ class UserAuthController implements IUserAuthController {
                         blood_token: responseData['blood_token']
                     } as UserJwtInterFace
 
-                    console.log(otpResponse);
-
-                    res.status(200).json({
+                    res.status(StatusCode.OK).json({
                         status: true,
                         msg: 'OTP Verification success',
                         data: otpResponse
                     } as ControllerResponseInterFace);
 
                 } else {
-                    res.status(401).json({
+                    res.status(StatusCode.UNAUTHORIZED).json({
                         status: false,
                         msg: otpVerification.msg,
                     } as ControllerResponseInterFace);
                 }
             } catch (e) {
-                res.status(500).json({
+                res.status(StatusCode.UNAUTHORIZED).json({
                     status: false,
                     msg: 'Something went wrong',
                 } as ControllerResponseInterFace);
             }
         } else {
-            res.status(401).json({
+            res.status(StatusCode.UNAUTHORIZED).json({
                 status: false,
                 msg: 'Unauthorized access',
             } as ControllerResponseInterFace);
@@ -331,7 +287,7 @@ class UserAuthController implements IUserAuthController {
 
             const oldEmailId: string = requestContext.email_id;
             if (oldEmailId == newEmailID) {
-                res.status(400).json({
+                res.status(StatusCode.BAD_REQUEST).json({
                     status: false,
                     msg: "Please enter diffrent email ID",
                 } as ControllerResponseInterFace);
@@ -339,10 +295,6 @@ class UserAuthController implements IUserAuthController {
 
                 try {
                     const editRequest: HelperFunctionResponse = await this.UserAuthService.editAuthEmailID(oldEmailId, newEmailID);
-                    console.log("Worked here");
-
-                    console.log(editRequest);
-
                     if (editRequest.status) {
                         const { token } = editRequest.data;
                         if (token) {
@@ -354,27 +306,27 @@ class UserAuthController implements IUserAuthController {
                                 msg: editRequest.msg,
                             } as ControllerResponseInterFace);
                         } else {
-                            res.status(500).json({
+                            res.status(StatusCode.SERVER_ERROR).json({
                                 status: false,
                                 msg: "Something went wrong",
                             } as ControllerResponseInterFace);
                         }
                     } else {
-                        res.status(500).json({
+                        res.status(StatusCode.SERVER_ERROR).json({
                             status: false,
                             msg: editRequest.msg,
                         } as ControllerResponseInterFace);
                     }
                 } catch (e) {
                     console.log(e);
-                    res.status(500).json({
+                    res.status(StatusCode.SERVER_ERROR).json({
                         status: false,
                         msg: 'Something went wrong',
                     } as ControllerResponseInterFace);
                 }
             }
         } else {
-            res.status(201).json({
+            res.status(StatusCode.BAD_REQUEST).json({
                 status: false,
                 msg: "Invalid Token"
             } as ControllerResponseInterFace);
@@ -398,25 +350,25 @@ class UserAuthController implements IUserAuthController {
                         if (token) {
                             res.status(result.statusCode).json({ msg: result.msg, status: result.status, token } as ControllerResponseInterFace);
                         } else {
-                            res.status(400).json({ msg: "Email id not found", status: false } as ControllerResponseInterFace);
+                            res.status(StatusCode.BAD_REQUEST).json({ msg: "Email id not found", status: false } as ControllerResponseInterFace);
                         }
                     } else {
-                        res.status(400).json({ msg: "Email id not found", status: false } as ControllerResponseInterFace);
+                        res.status(StatusCode.BAD_REQUEST).json({ msg: "Email id not found", status: false } as ControllerResponseInterFace);
                     }
                 } catch (e) {
-                    res.status(500).json({
+                    res.status(StatusCode.SERVER_ERROR).json({
                         status: false,
                         msg: "Internal server error",
                     } as ControllerResponseInterFace);
                 }
             } else {
-                res.status(401).json({
+                res.status(StatusCode.UNAUTHORIZED).json({
                     status: false,
                     msg: "Authentication failed",
                 } as ControllerResponseInterFace);
             }
         } else {
-            res.status(500).json({
+            res.status(StatusCode.UNAUTHORIZED).json({
                 status: true,
                 msg: 'Unauthorized request',
             } as ControllerResponseInterFace);

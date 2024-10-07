@@ -1,16 +1,15 @@
 import mongoose from "mongoose";
 import AuthNotificationProvider from "../communication/Provider/notification/notification_service";
-import IUserModelDocument from "../config/Interface/IModel/IUserAuthModel";
-import UserModelDocument from "../config/Interface/IModel/IUserAuthModel";
-import { IBaseUser } from "../config/Interface/Objects/IBaseUser";
 import constant_data from "../config/const";
 import userAuth from "../db/model/userAuth";
 import tokenHelper from "../helper/tokenHelper";
 import utilHelper from "../helper/utilHelper";
 import TokenHelper from "../helper/tokenHelper";
 import UserAuthServices from "../services/UserAuthServices";
-import { IUserAuthenticationRepo } from "../config/Interface/Repos/RepositoriesInterface";
 import { JwtTimer } from "../config/Datas/Enums";
+import { IUserAuthenticationRepo } from "../config/Datas/Interface/MethodInterface";
+import { IUserModelDocument } from "../config/Datas/Interface/DatabaseModel";
+import { IBaseUser } from "../config/Datas/Interface/UtilInterface";
 
 
 
@@ -31,9 +30,9 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
         this.tokenHelpers = new TokenHelper()
     }
 
-    async findByUserId(user_id: string): Promise<UserModelDocument | null> {
+    async findByUserId(user_id: string): Promise<IUserModelDocument | null> {
         try {
-            const user = this.UserAuthCollection.findOne<UserModelDocument>({ user_id });
+            const user = this.UserAuthCollection.findOne<IUserModelDocument>({ user_id });
             return user
         } catch (e) {
             console.log(e);
@@ -43,12 +42,7 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
 
 
     async updateUserById(user_id: mongoose.Types.ObjectId, data: object): Promise<boolean> {
-        console.log("Update user details");
-
-        console.log(user_id, " ", data);
-
-        const findUser = await this.UserAuthCollection.updateOne<UserModelDocument>({ _id: user_id }, { $set: data });
-        console.log(findUser);
+        const findUser = await this.UserAuthCollection.updateOne<IUserModelDocument>({ _id: user_id }, { $set: data });
         return findUser.modifiedCount > 0
     }
 
@@ -195,7 +189,7 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
         }
 
         try {
-            const user = await this.UserAuthCollection.findOne({
+            const user: IUserModelDocument | null = await this.UserAuthCollection.findOne({
                 $or: [
                     { email: email },
                     { phone_number: phone },
@@ -212,12 +206,6 @@ class UserAuthenticationRepo implements IUserAuthenticationRepo {
             return false
         }
     }
-
-    // updateUser: ((newAuthUser: IUserModelDocument) => {}) | undefined
-
-
-
-
 }
 
 export default UserAuthenticationRepo

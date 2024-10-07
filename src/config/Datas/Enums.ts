@@ -1,17 +1,8 @@
 
-
-enum OrganizationStatus {
-    Active = "Active",
-    InActive = "In Active",
-    Rejected = "Rejected",
-    Blocked = "Blocked",
-    Pending = "Pending"
-}
-
 enum JwtTimer {
-    AccessTokenExpiresInMinutes = "15m",   // Access token expires in 15 minutes
-    RefreshTokenExpiresInDays = "7d",       // Refresh token expires in 7 days
-    OtpTimer = "15m",       // Refresh token expires in 7 days
+    AccessTokenExpiresInMinutes = "15m",
+    RefreshTokenExpiresInDays = "7d",
+    OtpTimer = "15m",
 }
 
 enum StatusCode {
@@ -25,4 +16,4 @@ enum StatusCode {
     CONFLICT = 409,
 }
 
-export { OrganizationStatus, StatusCode, JwtTimer }
+export { StatusCode, JwtTimer }

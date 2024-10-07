@@ -1,5 +1,5 @@
 import * as Joi from 'joi';
-import const_data from '../const';
+import const_data from './const';
 
 const { AUTH_PROVIDERS, BLOOD_GROUP } = const_data;
 

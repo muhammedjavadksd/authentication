@@ -1,16 +1,13 @@
 import { JwtPayload } from "jsonwebtoken";
 import AuthNotificationProvider from "../communication/Provider/notification/notification_service";
-import { AdminJwtInterFace, HelperFunctionResponse } from "../config/Datas/InterFace";
 import constant_data from "../config/const";
 import AdminAuthenticationRepo from "../repositories/AdminAuthentication";
 import bcrypt from 'bcrypt';
-import IAdminAuthModel from "../config/Interface/IModel/IAdminAuthModel";
-import { IAdminAuthService } from "../config/Interface/Service/ServiceInterface";
 import TokenHelper from "../helper/tokenHelper";
-import { JwtTimer, OrganizationStatus, StatusCode } from "../config/Datas/Enums";
-import IOrganizationAuthModel from "../config/Interface/IModel/IOrganizationModel";
-import { ObjectId } from "mongoose";
-import { IAdminEmailVerify } from "../config/Interface/Objects/IBaseUser";
+import { JwtTimer, StatusCode } from "../config/Datas/Enums";
+import { IAdminAuthService } from "../config/Datas/Interface/MethodInterface";
+import { AdminJwtInterFace, HelperFunctionResponse, IAdminEmailVerify } from "../config/Datas/Interface/UtilInterface";
+import { IAdminAuthModel } from "../config/Datas/Interface/DatabaseModel";
 
 class AdminAuthService implements IAdminAuthService {
 
@@ -31,22 +28,14 @@ class AdminAuthService implements IAdminAuthService {
     async verifyToken(token: string): Promise<HelperFunctionResponse> {
 
         const decodeToken = await this.tokenHelpers.checkTokenValidity(token) as Record<string, any>;
-        console.log(decodeToken);
-        console.log(token);
-
         if (decodeToken && typeof decodeToken == "object") {
-            console.log("Enterd");
-
-
-            const email_id = decodeToken['email_id'];
-            const adminEmail = decodeToken['admin_email'];
-            if (email_id) {
+            const email_id: string | undefined = decodeToken['email_id'];
+            const adminEmail: string | undefined = decodeToken['admin_email'];
+            if (email_id && adminEmail) {
                 const findAdmin = await this.AdminAuthRepo.findAdmin(adminEmail);
                 if (findAdmin) {
                     findAdmin.email_address = email_id;
                     const updateEmailId = await this.AdminAuthRepo.updateAdmin(findAdmin);
-                    console.log(updateEmailId);
-                    console.log(findAdmin);
 
                     if (updateEmailId) {
                         return {
@@ -68,7 +57,7 @@ class AdminAuthService implements IAdminAuthService {
     async updatePassword(password: string, email_id: string, admin_email: string): Promise<HelperFunctionResponse> {
         const findAdmin = await this.AdminAuthRepo.findAdmin(admin_email);
         if (findAdmin) {
-            const decodePassword = password ? await bcrypt.hash(password, Number(process.env.BCRYPT_SALTROUND)) : findAdmin.password;
+            const decodePassword: string = password ? await bcrypt.hash(password, Number(process.env.BCRYPT_SALTROUND)) : findAdmin.password;
             if (decodePassword == findAdmin.password && password) {
                 return {
                     status: false,
@@ -77,21 +66,13 @@ class AdminAuthService implements IAdminAuthService {
                 }
             } else {
                 if (admin_email != email_id) {
-                    console.log("Mail need to change");
-
                     const verifyPayload: IAdminEmailVerify = {
                         email_id,
                         admin_email
                     }
-
                     const verifyToken = await this.tokenHelpers.generateJWtToken(verifyPayload, JwtTimer.OtpTimer);
                     if (verifyPayload) {
-                        console.log("Payload created");
-                        console.log("Queue");
-                        console.log(process.env.ADMIN_UPDATE_VERIFY);
-
                         const provider = new AuthNotificationProvider(process.env.ADMIN_UPDATE_VERIFY || "");
-
                         await provider._init_()
                         provider.dataTransfer({ token: verifyToken, email_id: admin_email });
                     }
@@ -126,7 +107,7 @@ class AdminAuthService implements IAdminAuthService {
     async signIn(email: string, password: string): Promise<HelperFunctionResponse> {
 
         try {
-            const findAdmin: IAdminAuthModel | null = await this.AdminAuthRepo.findAdmin(email) //await AdminAuthModel.findOne({ email_address: email });
+            const findAdmin: IAdminAuthModel | null = await this.AdminAuthRepo.findAdmin(email)
             if (findAdmin) {
                 const adminPassword: string | null = findAdmin.password as string;
                 if (adminPassword) {
@@ -136,7 +117,7 @@ class AdminAuthService implements IAdminAuthService {
                         findAdmin.token = token ?? "";
                         await this.AdminAuthRepo.updateAdmin(findAdmin)
                         return {
-                            statusCode: 200,
+                            statusCode: StatusCode.OK,
                             status: true,
                             msg: "Admin auth success",
                             data: {
@@ -147,23 +128,22 @@ class AdminAuthService implements IAdminAuthService {
                             } as AdminJwtInterFace
                         }
                     } else {
-                        console.log("Creditial is wrong");
                         return {
-                            statusCode: 401,
+                            statusCode: StatusCode.UNAUTHORIZED,
                             status: false,
                             msg: "Incorrect Password",
                         }
                     }
                 } else {
                     return {
-                        statusCode: 400,
+                        statusCode: StatusCode.BAD_REQUEST,
                         status: false,
                         msg: "Please provide valid password",
                     }
                 }
             } else {
                 return {
-                    statusCode: 401,
+                    statusCode: StatusCode.BAD_REQUEST,
                     status: false,
                     msg: "Email id is not found",
                 }
@@ -171,7 +151,7 @@ class AdminAuthService implements IAdminAuthService {
         } catch (e) {
             console.log(e);
             return {
-                statusCode: 500,
+                statusCode: StatusCode.SERVER_ERROR,
                 status: false,
                 msg: "Internal Server Error",
             }
@@ -188,9 +168,6 @@ class AdminAuthService implements IAdminAuthService {
             if (findAdmin && token) {
                 findAdmin.token = token;
                 await this.AdminAuthRepo.updateAdmin(findAdmin);
-
-                console.log(findAdmin);
-
                 const authCommunicationProvider = new AuthNotificationProvider(process.env.ADMIN_FORGETPASSWORD_EMAIL as string);
                 await authCommunicationProvider._init_()
                 authCommunicationProvider.adminForgetPasswordEmail({
@@ -200,21 +177,20 @@ class AdminAuthService implements IAdminAuthService {
                 })
                 return {
                     status: true,
-                    statusCode: 200,
+                    statusCode: StatusCode.OK,
                     msg: "Reset email has been sent"
                 }
             } else {
                 return {
                     status: false,
-                    statusCode: 401,
+                    statusCode: StatusCode.OK,
                     msg: "We couldn't locate the admin you're looking for."
                 }
             }
         } catch (e) {
-            console.log(e);
             return {
                 status: false,
-                statusCode: 500,
+                statusCode: StatusCode.SERVER_ERROR,
                 msg: "Internal Server Error"
             }
         }
@@ -223,25 +199,18 @@ class AdminAuthService implements IAdminAuthService {
     async resetPassword(token: string, password: string): Promise<HelperFunctionResponse> {
         const isTokenValid: string | boolean | JwtPayload = await this.tokenHelpers.checkTokenValidity(token)
 
-        if (isTokenValid) {
-            if (typeof isTokenValid == "object") {
-                const email_id: string = isTokenValid.email
+        if (isTokenValid && typeof isTokenValid == "object") {
+            const email_id: string | undefined = isTokenValid.email
+            if (email_id) {
                 const findAdmin: IAdminAuthModel | null = await this.AdminAuthRepo.findAdmin(email_id) //AdminAuthModel.findOne({ email_address: email_id })
-
                 if (findAdmin && findAdmin.password) {
-                    console.log(token);
-                    console.log(findAdmin.token);
-
-
                     if (findAdmin.token == token) {
-
                         const newPassword: string = await bcrypt.hash(password, Number(process.env.BCRYPT_SALTROUND));
                         const comparePassword: boolean = await bcrypt.compare(password, findAdmin.password as string)
-
                         if (comparePassword) {
                             return {
                                 status: false,
-                                statusCode: 400,
+                                statusCode: StatusCode.BAD_REQUEST,
                                 msg: "New password cannot be the same as the last used password."
                             }
                         }
@@ -249,47 +218,27 @@ class AdminAuthService implements IAdminAuthService {
                         if (newPassword) {
                             findAdmin.password = newPassword;
                             findAdmin.token = "";
-                            // await findAdmin.save();
                             this.AdminAuthRepo.updateAdmin(findAdmin)
                             return {
                                 status: true,
-                                statusCode: 200,
+                                statusCode: StatusCode.OK,
                                 msg: "Password has been updated"
                             }
                         } else {
                             return {
                                 status: false,
-                                statusCode: 500,
+                                statusCode: StatusCode.SERVER_ERROR,
                                 msg: "Internal Server Error"
                             }
                         }
-                    } else {
-                        return {
-                            status: false,
-                            statusCode: 401,
-                            msg: "Invalid Token"
-                        }
-                    }
-                } else {
-                    return {
-                        status: false,
-                        statusCode: 401,
-                        msg: "Invalid Token ID"
                     }
                 }
-            } else {
-                return {
-                    status: false,
-                    statusCode: 401,
-                    msg: "Invalid Token ID"
-                }
             }
-        } else {
-            return {
-                status: false,
-                statusCode: 401,
-                msg: "Token time has been expired"
-            }
+        }
+        return {
+            status: false,
+            statusCode: StatusCode.UNAUTHORIZED,
+            msg: "Invalid Token ID"
         }
     }
 

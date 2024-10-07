@@ -1,4 +1,29 @@
-import { Request, Response, NextFunction } from "express"
+import { NextFunction, Request } from "express"
+
+interface IBaseUser {
+    first_name: string
+    last_name: string
+    phone_number?: number
+    email: string
+    auth_id: string
+    auth_provider: string
+    user_id?: string
+    profile_id?: string
+}
+
+interface IBaseProfileData {
+    first_name: string
+    last_name: string
+    phone_number: number
+    email: string
+    user_id: string
+    profile_id: string
+}
+
+interface IAdminEmailVerify {
+    email_id: string,
+    admin_email: string
+}
 
 interface ControllerInterFace {
     [key: string]: (req: Request, res: Response, next: NextFunction) => Promise<void> | void
@@ -90,25 +115,6 @@ interface AdminJwtInterFace {
 }
 
 
+export { MulterFiles, ControllerInterFace, ConstantData, CustomRequest, AuthData, HelperFunctionResponse, ControllerResponseInterFace, UserJwtInterFace, AdminJwtInterFace, IUserJwt, RefershTokenResponse, ITokenResponse }
 
-interface OrganizationJwtInteraFace {
-    name: string,
-    email: string,
-    id: string
-}
-
-interface AuthController {
-    signUpController: (req: Request, res: Response) => Promise<void>;
-    signInController: (req: Request, res: Response, next: NextFunction) => Promise<void>;
-    AuthOTPSubmission: (req: Request, res: Response, next: NextFunction) => Promise<void>;
-    editAuthPhoneNumber: (req: Request, res: Response) => Promise<void>;
-    resetOtpNumber: (req: Request, res: Response) => Promise<void>;
-}
-
-interface AdminAuthController {
-    signInController: (req: Request, res: Response, next: NextFunction) => Promise<void>;
-    forgetPasswordController: (req: Request, res: Response, next: NextFunction) => Promise<void>;
-    adminPasswordReset: (req: Request, res: Response, next: NextFunction) => Promise<void>;
-}
-
-export { MulterFiles, OrganizationJwtInteraFace, AdminAuthController, ControllerInterFace, ConstantData, CustomRequest, AuthData, HelperFunctionResponse, AuthController, ControllerResponseInterFace, UserJwtInterFace, AdminJwtInterFace, IUserJwt, RefershTokenResponse, ITokenResponse }
+export { IBaseProfileData, IBaseUser, IAdminEmailVerify }

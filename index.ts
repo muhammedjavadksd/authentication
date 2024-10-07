@@ -1,12 +1,10 @@
 import express, { Express } from "express";
 import dotenv from "dotenv";
-
 import logger from "morgan";
 import BulkDataConsumer from "./src/communication/BulkDataConsumer";
 import cors from 'cors'
 
 const app: Express = express();
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

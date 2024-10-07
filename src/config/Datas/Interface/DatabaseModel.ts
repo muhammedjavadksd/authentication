@@ -1,11 +1,5 @@
 import { Document } from "mongoose";
 
-interface locationTypeInterFace {
-    type: object,
-    coordinates: [number, number];
-}
-
-
 interface IUserModelDocument extends Document {
     user_id: string;
     phone_number?: number;
@@ -19,8 +13,14 @@ interface IUserModelDocument extends Document {
     last_name: string;
     jwtToken: string;
     account_started?: boolean;
-    location?: locationTypeInterFace,
 }
 
-export default IUserModelDocument
-export { locationTypeInterFace }
+interface IAdminAuthModel extends Document {
+    name: string
+    email_address: string
+    password: string
+    last_logged: string
+    token: string
+}
+
+export { IUserModelDocument, IAdminAuthModel }

@@ -1,17 +1,14 @@
-import mongoose from "mongoose";
 import AuthNotificationProvider from "../communication/Provider/notification/notification_service";
-import { HelperFunctionResponse, ITokenResponse, IUserJwt, RefershTokenResponse, UserJwtInterFace } from "../config/Datas/InterFace";
-import IUserModelDocument from "../config/Interface/IModel/IUserAuthModel";
 import constant_data from "../config/const";
-import tokenHelper from "../helper/tokenHelper";
 import utilHelper from "../helper/utilHelper";
 import UserAuthenticationRepo from "../repositories/UserAuthentication";
 import ProfileCommunicationProvider from "../communication/Provider/profile/profile_service";
 import TokenHelper from "../helper/tokenHelper";
-import { IUserAuthService } from "../config/Interface/Service/ServiceInterface";
 import axios from "axios";
-import { IBaseUser } from "../config/Interface/Objects/IBaseUser";
 import { JwtTimer, StatusCode } from "../config/Datas/Enums";
+import { IUserAuthService } from "../config/Datas/Interface/MethodInterface";
+import { HelperFunctionResponse, IBaseUser, ITokenResponse, IUserJwt, RefershTokenResponse, UserJwtInterFace } from "../config/Datas/Interface/UtilInterface";
+import { IUserModelDocument } from "../config/Datas/Interface/DatabaseModel";
 
 
 class UserAuthServices implements IUserAuthService {
@@ -37,7 +34,6 @@ class UserAuthServices implements IUserAuthService {
     async refreshToken(token: string): Promise<RefershTokenResponse> {
         const tokenVerify = await this.TokenHelpers.checkTokenValidity(token);
         if (tokenVerify && typeof tokenVerify == "object") {
-            //valid token
             const checkRefreshToken = tokenVerify.exp;
             const newAccessToken = await this.TokenHelpers.generateJWtToken(tokenVerify, JwtTimer.AccessTokenExpiresInMinutes);
 
@@ -205,7 +201,7 @@ class UserAuthServices implements IUserAuthService {
 
                 if (!userAuth.account_started) {
                     return {
-                        statusCode: 400,
+                        statusCode: StatusCode.NOT_FOUND,
                         status: false,
                         msg: "Email id not found",
                     }
@@ -222,7 +218,6 @@ class UserAuthServices implements IUserAuthService {
 
                     await this.UserAuthRepo.updateUser(userAuth);
 
-                    // await userAuth.save()
                     const userAuthProvider = new AuthNotificationProvider(process.env.USER_SIGN_IN_NOTIFICATION as string);
                     await userAuthProvider._init_();
                     userAuthProvider.signInOTPSender({
@@ -231,7 +226,7 @@ class UserAuthServices implements IUserAuthService {
                         full_name: userAuth.first_name + userAuth.last_name
                     })
                     return {
-                        statusCode: 200,
+                        statusCode: StatusCode.OK,
                         status: true,
                         msg: "OTP Has been sent ",
                         data: {
@@ -240,14 +235,14 @@ class UserAuthServices implements IUserAuthService {
                     }
                 } else {
                     return {
-                        statusCode: 401,
+                        statusCode: StatusCode.UNAUTHORIZED,
                         status: false,
                         msg: "Provide valid token"
                     }
                 }
             } else {
                 return {
-                    statusCode: 401,
+                    statusCode: StatusCode.NOT_FOUND,
                     status: false,
                     msg: "User not found"
                 }
@@ -255,7 +250,7 @@ class UserAuthServices implements IUserAuthService {
         } catch (e) {
             console.log(e);
             return {
-                statusCode: 500,
+                statusCode: StatusCode.SERVER_ERROR,
                 status: false,
                 msg: "Something went wrong"
             }
@@ -270,24 +265,18 @@ class UserAuthServices implements IUserAuthService {
                 return {
                     status: false,
                     msg: "Email ID not found",
-                    statusCode: 401
+                    statusCode: StatusCode.NOT_FOUND
                 }
             }
-
-            console.log("Get user");
-
-            console.log(getUser);
 
             const userJwtToken: string = getUser.jwtToken;
             if (userJwtToken != token) {
                 return {
                     status: false,
                     msg: "Invalid Token",
-                    statusCode: 401
+                    statusCode: StatusCode.UNAUTHORIZED
                 }
             }
-
-            console.log("This also passed");
 
             const otpExpireTimer: number = getUser.otp_timer;
             const validateOtp = utilHelper.OTPValidator(otp, getUser.otp, otpExpireTimer);
@@ -297,7 +286,7 @@ class UserAuthServices implements IUserAuthService {
                 return {
                     status: false,
                     msg: validateOtp.msg ?? "Incorrect OTP or OTP has been expired",
-                    statusCode: 400
+                    statusCode: StatusCode.BAD_REQUEST
                 }
             }
 
@@ -340,7 +329,6 @@ class UserAuthServices implements IUserAuthService {
                         first_name: getUser.first_name,
                         last_name: getUser.last_name,
                         phone_number: getUser.phone_number,
-                        location: getUser.location,
                         user_id: getUser.id,
                         profile_id: getUser.user_id
                     })
@@ -365,7 +353,7 @@ class UserAuthServices implements IUserAuthService {
                     status: true,
                     msg: "OTP Verified Success",
                     data: userJwtData,
-                    statusCode: 200
+                    statusCode: StatusCode.OK
                 }
             } else {
                 return {
@@ -379,17 +367,15 @@ class UserAuthServices implements IUserAuthService {
             return {
                 status: false,
                 msg: "Something went wront",
-                statusCode: 500
+                statusCode: StatusCode.UNAUTHORIZED
             }
         }
     }
 
     async editAuthEmailID(oldEmailId: string, newEmailID: string): Promise<HelperFunctionResponse> {
 
-        console.log("Entered here");
         const otpNumber: number = utilHelper.generateAnOTP(6);
         const otpExpireTime: number = constant_data.MINIMUM_OTP_TIMER();
-
 
 
         try {
@@ -417,18 +403,10 @@ class UserAuthServices implements IUserAuthService {
                             email: newEmailID,
                             full_name: getUser.first_name + getUser.last_name
                         })
-                        console.log("Edit here");
-
-                        console.log({
-                            otp: otpNumber,
-                            email: newEmailID,
-                            full_name: getUser.first_name + getUser.last_name
-                        });
-
                         return {
                             status: true,
                             msg: "Email id has been updated",
-                            statusCode: 200,
+                            statusCode: StatusCode.OK,
                             data: {
                                 token: newToken
                             }
@@ -437,12 +415,12 @@ class UserAuthServices implements IUserAuthService {
                         return {
                             status: false,
                             msg: "Something went wrong",
-                            statusCode: 400,
+                            statusCode: StatusCode.BAD_REQUEST,
                         }
                     }
                 } else {
                     return {
-                        statusCode: 401,
+                        statusCode: StatusCode.NOT_FOUND,
                         status: false,
                         msg: "The email address you entered does not exist",
                     }
@@ -457,7 +435,7 @@ class UserAuthServices implements IUserAuthService {
         } catch (e) {
             console.log(e);
             return {
-                statusCode: 500,
+                statusCode: StatusCode.SERVER_ERROR,
                 status: false,
                 msg: "Something went wrong",
             }
@@ -488,7 +466,7 @@ class UserAuthServices implements IUserAuthService {
                         full_name: getUser.first_name + " " + getUser.last_name
                     })
                     return {
-                        statusCode: 200,
+                        statusCode: StatusCode.OK,
                         status: true,
                         data: {
                             token: newToken,
@@ -497,21 +475,21 @@ class UserAuthServices implements IUserAuthService {
                     }
                 } else {
                     return {
-                        statusCode: 500,
+                        statusCode: StatusCode.SERVER_ERROR,
                         status: false,
                         msg: "Something went wrong"
                     }
                 }
             } else {
                 return {
-                    statusCode: 401,
+                    statusCode: StatusCode.UNAUTHORIZED,
                     status: false,
                     msg: "Unauthorized request"
                 }
             }
         } catch (e) {
             return {
-                statusCode: 500,
+                statusCode: StatusCode.SERVER_ERROR,
                 status: false,
                 msg: "Something went wrong"
             }

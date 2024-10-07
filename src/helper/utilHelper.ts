@@ -1,7 +1,5 @@
 import { Request } from "express";
-import { IOTPValidationResponse, IUtilHelper } from "../config/Interface/IHelper/IUtilHelper";
-
-
+import { IOTPValidationResponse, IUtilHelper } from "../config/Datas/Interface/MethodInterface";
 
 const utilHelper: IUtilHelper = {
     generateAnOTP: (length: number): number => {

@@ -1,4 +1,4 @@
-import { ConstantData } from "./Datas/InterFace";
+import { ConstantData } from "./Datas/Interface/UtilInterface"
 
 const constant_data: ConstantData = {
 
