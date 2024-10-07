@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const AdminAuthService_1 = __importDefault(require("../services/AdminAuthService"));
 const Enums_1 = require("../config/Datas/Enums");
+const utilHelper_1 = __importDefault(require("../helper/utilHelper"));
 class AdminController {
     constructor() {
         this.signInController = this.signInController.bind(this);
@@ -25,7 +26,7 @@ class AdminController {
     }
     verifyToken(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const token = req.headers['authorization'];
+            const token = utilHelper_1.default.getTokenFromHeader(req.headers['authorization']);
             if (token) {
                 const emailEmail = yield this.AdminServices.verifyToken(token);
                 res.status(emailEmail.statusCode).json({ status: emailEmail.status, msg: emailEmail.msg, data: emailEmail.data });

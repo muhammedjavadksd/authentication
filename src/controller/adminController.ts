@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { AdminJwtInterFace, ControllerResponseInterFace, CustomRequest, HelperFunctionResponse } from "../config/Datas/InterFace";
 import AdminAuthService from "../services/AdminAuthService";
-import utilHelper from "../helper/utilHelper";
 import IAdminController from "../config/Interface/IController/iAdminController";
 import { OrganizationStatus, StatusCode } from "../config/Datas/Enums";
 import { ObjectId } from "mongoose";
+import utilHelper from "../helper/utilHelper";
 
 
 
@@ -23,7 +23,7 @@ class AdminController implements IAdminController {
 
 
     async verifyToken(req: CustomRequest, res: Response): Promise<void> {
-        const token = req.headers['authorization'];
+        const token = utilHelper.getTokenFromHeader(req.headers['authorization'])
         if (token) {
             const emailEmail = await this.AdminServices.verifyToken(token)
             res.status(emailEmail.statusCode).json({ status: emailEmail.status, msg: emailEmail.msg, data: emailEmail.data })

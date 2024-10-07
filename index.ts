@@ -25,7 +25,6 @@ app.use(logger("common"));
 
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
-// app.use("/organization", organizationRouter);
 
 authenticationDbConnection();
 

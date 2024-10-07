@@ -30,8 +30,14 @@ class AdminAuthService implements IAdminAuthService {
 
     async verifyToken(token: string): Promise<HelperFunctionResponse> {
 
-        const decodeToken = await this.tokenHelpers.decodeJWTToken(token) as Record<string, any>;
+        const decodeToken = await this.tokenHelpers.checkTokenValidity(token) as Record<string, any>;
+        console.log(decodeToken);
+        console.log(token);
+
         if (decodeToken && typeof decodeToken == "object") {
+            console.log("Enterd");
+
+
             const email_id = decodeToken['email_id'];
             const adminEmail = decodeToken['admin_email'];
             if (email_id) {
@@ -39,6 +45,9 @@ class AdminAuthService implements IAdminAuthService {
                 if (findAdmin) {
                     findAdmin.email_address = email_id;
                     const updateEmailId = await this.AdminAuthRepo.updateAdmin(findAdmin);
+                    console.log(updateEmailId);
+                    console.log(findAdmin);
+
                     if (updateEmailId) {
                         return {
                             msg: "Email id has been updated",
@@ -68,13 +77,21 @@ class AdminAuthService implements IAdminAuthService {
                 }
             } else {
                 if (admin_email != email_id) {
+                    console.log("Mail need to change");
+
                     const verifyPayload: IAdminEmailVerify = {
                         email_id,
                         admin_email
                     }
+
                     const verifyToken = await this.tokenHelpers.generateJWtToken(verifyPayload, JwtTimer.OtpTimer);
                     if (verifyPayload) {
+                        console.log("Payload created");
+                        console.log("Queue");
+                        console.log(process.env.ADMIN_UPDATE_VERIFY);
+
                         const provider = new AuthNotificationProvider(process.env.ADMIN_UPDATE_VERIFY || "");
+
                         await provider._init_()
                         provider.dataTransfer({ token: verifyToken, email_id: admin_email });
                     }

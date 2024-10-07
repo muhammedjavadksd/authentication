@@ -22,7 +22,6 @@ dotenv_1.default.config({ path: "./.env" });
 app.use((0, morgan_1.default)("common"));
 app.use("/", userRouter_1.default);
 app.use("/admin", adminRouter_1.default);
-// app.use("/organization", organizationRouter);
 (0, connection_1.default)();
 const PORT = parseInt(process.env.PORT) || 7002;
 app.listen(PORT, () => {

@@ -6,8 +6,6 @@ const router: Router = express.Router();
 const AuthController = new UserAuthController()
 const UserMiddleware = new AuthMiddleware()
 
-// POST METHOD 
-
 router.get("/", (req: Request, res: Response) => {
     res.status(200).send("Welcome to authentication service");
 })
@@ -27,9 +25,6 @@ router.put("/edit_auth_phone", UserMiddleware.isValidSignUpAttempt, AuthControll
 router.patch("/update_auth", UserMiddleware.isUserLogged, AuthController.updateAuth);
 router.patch("/complete_account", AuthController.completeAccount);
 
-router.get("*", (req: Request, res: Response) => {
-    res.status(404).send("Page not found")
-})
 
 export default router;
 

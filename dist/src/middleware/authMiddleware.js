@@ -15,125 +15,63 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const const_1 = __importDefault(require("../config/const"));
 const utilHelper_1 = __importDefault(require("../helper/utilHelper"));
 const tokenHelper_1 = __importDefault(require("../helper/tokenHelper"));
+const Enums_1 = require("../config/Datas/Enums");
 const { OTP_TYPE } = const_1.default;
 class AuthMiddleware {
     constructor() {
         this.isAdminLogged = this.isAdminLogged.bind(this);
-        this.isOrganizationLogged = this.isOrganizationLogged.bind(this);
         this.isUserLogged = this.isUserLogged.bind(this);
         this.isValidSignUpAttempt = this.isValidSignUpAttempt.bind(this);
-        this.isValidResetPasswordForOrganization = this.isValidResetPasswordForOrganization.bind(this);
         this.tokenHelpers = new tokenHelper_1.default();
-    }
-    isValidResetPasswordForOrganization(req, res, next) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // const headers: CustomRequest['headers'] = req.headers;
-            const token = req.params.token; //utilHelper.getTokenFromHeader(headers['authorization'])
-            console.log(token);
-            if (token) {
-                if (!req.context) {
-                    req.context = {};
-                }
-                req.context.auth_token = token;
-                const checkValidity = yield this.tokenHelpers.checkTokenValidity(token);
-                if (checkValidity) {
-                    if (typeof checkValidity == "object") {
-                        if (checkValidity.email_id) {
-                            if (checkValidity.type == OTP_TYPE.ORGANIZATION_FORGET_PASSWORD) {
-                                req.context.email_id = checkValidity === null || checkValidity === void 0 ? void 0 : checkValidity.email_id;
-                                req.context.token = token;
-                                next();
-                            }
-                            else {
-                                res.status(401).json({
-                                    status: false,
-                                    msg: "Authorization is failed"
-                                });
-                            }
-                        }
-                        else {
-                            res.status(401).json({
-                                status: false,
-                                msg: "Authorization is failed"
-                            });
-                        }
-                    }
-                    else {
-                        res.status(401).json({
-                            status: false,
-                            msg: "Authorization is failed"
-                        });
-                    }
-                }
-                else {
-                    res.status(401).json({
-                        status: false,
-                        msg: "Authorization is failed"
-                    });
-                }
-            }
-            else {
-                res.status(401).json({
-                    status: false,
-                    msg: "Invalid auth attempt"
-                });
-            }
-        });
     }
     isValidSignUpAttempt(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             const headers = req.headers;
             const token = utilHelper_1.default.getTokenFromHeader(headers['authorization']);
-            console.log(token);
-            console.log("TOken is");
-            console.log(headers['authorization']);
             if (token) {
                 if (!req.context) {
                     req.context = {};
                 }
                 req.context.auth_token = token;
                 const checkValidity = yield this.tokenHelpers.checkTokenValidity(token);
-                console.log("Validity");
-                console.log(checkValidity);
                 if (checkValidity) {
                     if (typeof checkValidity == "object") {
-                        if (checkValidity.email) { //email id for sign in, may diff for sign up
+                        if (checkValidity.email) {
                             if (checkValidity.type == OTP_TYPE.SIGN_UP_OTP || checkValidity.type == OTP_TYPE.SIGN_IN_OTP) {
                                 req.context.email_id = checkValidity === null || checkValidity === void 0 ? void 0 : checkValidity.email;
                                 req.context.token = token;
-                                console.log("Passed");
                                 next();
                             }
                             else {
-                                res.status(401).json({
+                                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
                                     status: false,
                                     msg: "Authorization is failed"
                                 });
                             }
                         }
                         else {
-                            res.status(401).json({
+                            res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
                                 status: false,
                                 msg: "Authorization is failed"
                             });
                         }
                     }
                     else {
-                        res.status(401).json({
+                        res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
                             status: false,
                             msg: "Authorization is failed"
                         });
                     }
                 }
                 else {
-                    res.status(401).json({
+                    res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
                         status: false,
                         msg: "Authorization is failed"
                     });
                 }
             }
             else {
-                res.status(401).json({
+                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
                     status: false,
                     msg: "Invalid auth attempt"
                 });
@@ -144,14 +82,12 @@ class AuthMiddleware {
         return __awaiter(this, void 0, void 0, function* () {
             const headers = req.headers;
             const token = utilHelper_1.default.getTokenFromHeader(headers['authorization']);
-            console.log("The token is :" + token);
             if (token) {
                 if (!req.context) {
                     req.context = {};
                 }
                 req.context.auth_token = token;
                 const checkValidity = yield this.tokenHelpers.checkTokenValidity(token);
-                console.log(checkValidity);
                 if (checkValidity) {
                     if (typeof checkValidity == "object") {
                         const emailAddress = checkValidity.email || checkValidity.email_address;
@@ -160,26 +96,24 @@ class AuthMiddleware {
                                 req.context.email_id = emailAddress;
                                 req.context.token = token;
                                 req.context.user_id = checkValidity.user_id;
-                                console.log("Passed");
-                                console.log(req.context);
                                 next();
                             }
                             else {
-                                res.status(401).json({
+                                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
                                     status: false,
                                     msg: "Authorization is failed"
                                 });
                             }
                         }
                         else {
-                            res.status(401).json({
+                            res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
                                 status: false,
                                 msg: "Authorization is failed"
                             });
                         }
                     }
                     else {
-                        res.status(401).json({
+                        res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
                             status: false,
                             msg: "Authorization is failed"
                         });
@@ -259,9 +193,6 @@ class AuthMiddleware {
                 });
             }
         });
-    }
-    isOrganizationLogged(req, res, next) {
-        next();
     }
 }
 exports.default = AuthMiddleware;
