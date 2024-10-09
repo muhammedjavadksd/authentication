@@ -1,9 +1,6 @@
-import IAdminAuthModel from "../config/Datas/Interface/IModel/IAdminAuthModel";
-import { IAdminRepo } from "../config/Datas/Interface/Repos/RepositoriesInterface";
+import { IAdminAuthModel } from "../config/Datas/Interface/DatabaseModel";
+import { IAdminRepo } from "../config/Datas/Interface/MethodInterface";
 import AdminAuthModel from "../db/model/adminAuth";
-
-
-
 
 class AdminAuthenticationRepo implements IAdminRepo {
 

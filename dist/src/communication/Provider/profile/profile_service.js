@@ -54,7 +54,6 @@ class ProfileCommunicationProvider {
                     first_name: baseUser['first_name'],
                     last_name: baseUser['last_name'],
                     email: baseUser['email'],
-                    location: baseUser['location'],
                     phone_number: baseUser['phone_number'],
                     user_id: baseUser['user_id'],
                     profile_id: baseUser['profile_id'],

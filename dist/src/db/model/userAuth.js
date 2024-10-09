@@ -3,10 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const const_1 = __importDefault(require("../../config/const"));
-// const mongo = require("mongoose");
 const mongoose_1 = __importDefault(require("mongoose"));
-// const { default: mongoose } = require("mongoose");
+const const_1 = __importDefault(require("../../config/const"));
 const userAuthSchema = {
     user_id: {
         type: String,
