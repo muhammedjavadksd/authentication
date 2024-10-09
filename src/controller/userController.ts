@@ -249,7 +249,8 @@ class UserAuthController implements IUserAuthController {
                         phone: responseData['phone'],
                         user_id: responseData['user_id'],
                         profile_id: responseData['profile_id'],
-                        blood_token: responseData['blood_token']
+                        blood_token: responseData['blood_token'],
+                        refresh_token: responseData['refresh_token']
                     } as UserJwtInterFace
 
                     res.status(StatusCode.OK).json({

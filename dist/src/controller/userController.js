@@ -13,11 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const const_1 = __importDefault(require("../config/const"));
-const validation_1 = __importDefault(require("../config/validation/validation"));
+const validation_1 = __importDefault(require("../config/validation"));
+// import { ControllerResponseInterFace, CustomRequest, HelperFunctionResponse, UserJwtInterFace } from '../config/Datas/InterFace';
+// import IUserAuthController from '../config/Datas/Interface/IController/IUserAuthController';
 const UserAuthentication_1 = __importDefault(require("../repositories/UserAuthentication"));
-const UserAuthServices_1 = __importDefault(require("../services/UserAuthServices"));
 const Enums_1 = require("../config/Datas/Enums");
 const utilHelper_1 = __importDefault(require("../helper/utilHelper"));
+const UserAuthServices_1 = __importDefault(require("../services/UserAuthServices"));
 const { AUTH_PROVIDERS_DATA } = const_1.default;
 class UserAuthController {
     constructor() {
@@ -34,7 +36,7 @@ class UserAuthController {
         this.UserAuthRepo = new UserAuthentication_1.default();
         this.UserAuthService = new UserAuthServices_1.default();
     }
-    refreshToken(req, res, next) {
+    refreshToken(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const refreshToken = req.cookies['refresh_token'];
             if (refreshToken) {
@@ -79,10 +81,7 @@ class UserAuthController {
             var _a;
             const user_id = (_a = req.context) === null || _a === void 0 ? void 0 : _a.user_id;
             if (user_id) {
-                console.log(user_id);
                 const findUser = yield this.UserAuthRepo.findUser(user_id, null, null);
-                console.log("The user");
-                console.log(findUser);
                 if (findUser) {
                     const loginData = {
                         jwt: findUser['jwtToken'],
@@ -94,12 +93,7 @@ class UserAuthController {
                         profile_id: findUser['user_id'],
                         blood_token: findUser['blood_token']
                     };
-                    console.log(loginData);
-                    res.status(Enums_1.StatusCode.OK).json({
-                        status: true, msg: "Login attempt success", data: {
-                            profile: loginData
-                        }
-                    });
+                    res.status(Enums_1.StatusCode.OK).json({ status: true, msg: "Login attempt success", data: { profile: loginData } });
                 }
                 else {
                     res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
@@ -122,9 +116,6 @@ class UserAuthController {
                 const editData = {
                     blood_token: req.body.blood_token
                 };
-                console.log(user_id);
-                console.log(editData);
-                console.log(req.body);
                 const updateUser = yield this.UserAuthRepo.updateUserById(user_id, editData);
                 if (updateUser) {
                     res.status(Enums_1.StatusCode.OK).json({ status: true, msg: "Updated success" });
@@ -159,21 +150,16 @@ class UserAuthController {
                         status: false,
                         msg: error.details[0].message,
                     };
-                    console.log("End");
-                    console.log(response);
-                    res.status(500).json({ response });
-                    // console.log(error.details[0].message);
+                    res.status(Enums_1.StatusCode.SERVER_ERROR).json({ response });
                 }
                 else {
-                    console.log("Eneted");
                     const isUserExist = yield this.UserAuthRepo.findUser(null, email_address, Number(phone_number));
-                    console.log(isUserExist);
                     if (isUserExist && isUserExist.account_started) {
                         const response = {
                             status: false,
                             msg: 'Email/Phone already exist',
                         };
-                        res.status(400).json(response);
+                        res.status(Enums_1.StatusCode.CONFLICT).json(response);
                     }
                     else {
                         this.UserAuthRepo.insertNewUser({
@@ -191,14 +177,14 @@ class UserAuthController {
                                     token: jwtData.token
                                 },
                             };
-                            res.status(200).json(successResponse);
+                            res.status(Enums_1.StatusCode.OK).json(successResponse);
                         }).catch((err) => {
                             console.log(err);
                             const response = {
                                 status: false,
                                 msg: "Something went wrong"
                             };
-                            res.status(500).json(response);
+                            res.status(Enums_1.StatusCode.SERVER_ERROR).json(response);
                         });
                     }
                 }
@@ -209,7 +195,7 @@ class UserAuthController {
                     status: false,
                     msg: "Something went wrong"
                 };
-                res.status(500).json(response);
+                res.status(Enums_1.StatusCode.SERVER_ERROR).json(response);
             }
         });
     }
@@ -243,7 +229,7 @@ class UserAuthController {
                     status: false,
                     msg: 'Something went wrong',
                 };
-                res.status(500).json(response);
+                res.status(Enums_1.StatusCode.SERVER_ERROR).json(response);
             }
         });
     }
@@ -253,19 +239,11 @@ class UserAuthController {
             const otp = req.body.otp_number;
             const email_id = (_a = req.context) === null || _a === void 0 ? void 0 : _a.email_id;
             const token = (_b = req.context) === null || _b === void 0 ? void 0 : _b.token;
-            console.log("Before");
-            console.log(otp);
-            console.log(email_id, token);
             if (email_id && token) {
                 try {
                     const otpVerification = yield this.UserAuthService.authOTPValidate(otp, email_id, token);
-                    console.log("otp");
-                    console.log(otpVerification);
                     if (otpVerification.status) {
                         const responseData = otpVerification.data;
-                        console.log("Response data");
-                        console.log(responseData);
-                        console.log(otpVerification.data);
                         const otpResponse = {
                             jwt: responseData['jwt'],
                             first_name: responseData['first_name'],
@@ -274,31 +252,31 @@ class UserAuthController {
                             phone: responseData['phone'],
                             user_id: responseData['user_id'],
                             profile_id: responseData['profile_id'],
-                            blood_token: responseData['blood_token']
+                            blood_token: responseData['blood_token'],
+                            refresh_token: responseData['refresh_token']
                         };
-                        console.log(otpResponse);
-                        res.status(200).json({
+                        res.status(Enums_1.StatusCode.OK).json({
                             status: true,
                             msg: 'OTP Verification success',
                             data: otpResponse
                         });
                     }
                     else {
-                        res.status(401).json({
+                        res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
                             status: false,
                             msg: otpVerification.msg,
                         });
                     }
                 }
                 catch (e) {
-                    res.status(500).json({
+                    res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
                         status: false,
                         msg: 'Something went wrong',
                     });
                 }
             }
             else {
-                res.status(401).json({
+                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
                     status: false,
                     msg: 'Unauthorized access',
                 });
@@ -313,7 +291,7 @@ class UserAuthController {
             if (requestContext && (requestContext === null || requestContext === void 0 ? void 0 : requestContext.email_id)) {
                 const oldEmailId = requestContext.email_id;
                 if (oldEmailId == newEmailID) {
-                    res.status(400).json({
+                    res.status(Enums_1.StatusCode.BAD_REQUEST).json({
                         status: false,
                         msg: "Please enter diffrent email ID",
                     });
@@ -321,8 +299,6 @@ class UserAuthController {
                 else {
                     try {
                         const editRequest = yield this.UserAuthService.editAuthEmailID(oldEmailId, newEmailID);
-                        console.log("Worked here");
-                        console.log(editRequest);
                         if (editRequest.status) {
                             const { token } = editRequest.data;
                             if (token) {
@@ -335,14 +311,14 @@ class UserAuthController {
                                 });
                             }
                             else {
-                                res.status(500).json({
+                                res.status(Enums_1.StatusCode.SERVER_ERROR).json({
                                     status: false,
                                     msg: "Something went wrong",
                                 });
                             }
                         }
                         else {
-                            res.status(500).json({
+                            res.status(Enums_1.StatusCode.SERVER_ERROR).json({
                                 status: false,
                                 msg: editRequest.msg,
                             });
@@ -350,7 +326,7 @@ class UserAuthController {
                     }
                     catch (e) {
                         console.log(e);
-                        res.status(500).json({
+                        res.status(Enums_1.StatusCode.SERVER_ERROR).json({
                             status: false,
                             msg: 'Something went wrong',
                         });
@@ -358,7 +334,7 @@ class UserAuthController {
                 }
             }
             else {
-                res.status(201).json({
+                res.status(Enums_1.StatusCode.BAD_REQUEST).json({
                     status: false,
                     msg: "Invalid Token"
                 });
@@ -382,29 +358,29 @@ class UserAuthController {
                                 res.status(result.statusCode).json({ msg: result.msg, status: result.status, token });
                             }
                             else {
-                                res.status(400).json({ msg: "Email id not found", status: false });
+                                res.status(Enums_1.StatusCode.BAD_REQUEST).json({ msg: "Email id not found", status: false });
                             }
                         }
                         else {
-                            res.status(400).json({ msg: "Email id not found", status: false });
+                            res.status(Enums_1.StatusCode.BAD_REQUEST).json({ msg: "Email id not found", status: false });
                         }
                     }
                     catch (e) {
-                        res.status(500).json({
+                        res.status(Enums_1.StatusCode.SERVER_ERROR).json({
                             status: false,
                             msg: "Internal server error",
                         });
                     }
                 }
                 else {
-                    res.status(401).json({
+                    res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
                         status: false,
                         msg: "Authentication failed",
                     });
                 }
             }
             else {
-                res.status(500).json({
+                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
                     status: true,
                     msg: 'Unauthorized request',
                 });

@@ -34,41 +34,18 @@ class AuthMiddleware {
                 }
                 req.context.auth_token = token;
                 const checkValidity = yield this.tokenHelpers.checkTokenValidity(token);
-                if (checkValidity) {
-                    if (typeof checkValidity == "object") {
-                        if (checkValidity.email) {
-                            if (checkValidity.type == OTP_TYPE.SIGN_UP_OTP || checkValidity.type == OTP_TYPE.SIGN_IN_OTP) {
-                                req.context.email_id = checkValidity === null || checkValidity === void 0 ? void 0 : checkValidity.email;
-                                req.context.token = token;
-                                next();
-                            }
-                            else {
-                                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
-                                    status: false,
-                                    msg: "Authorization is failed"
-                                });
-                            }
-                        }
-                        else {
-                            res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
-                                status: false,
-                                msg: "Authorization is failed"
-                            });
-                        }
-                    }
-                    else {
-                        res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
-                            status: false,
-                            msg: "Authorization is failed"
-                        });
+                if (checkValidity && typeof checkValidity == "object") {
+                    if (checkValidity.email && checkValidity.type == OTP_TYPE.SIGN_UP_OTP || checkValidity.type == OTP_TYPE.SIGN_IN_OTP) {
+                        req.context.email_id = checkValidity === null || checkValidity === void 0 ? void 0 : checkValidity.email;
+                        req.context.token = token;
+                        next();
+                        return;
                     }
                 }
-                else {
-                    res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
-                        status: false,
-                        msg: "Authorization is failed"
-                    });
-                }
+                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
+                    status: false,
+                    msg: "Authorization is failed"
+                });
             }
             else {
                 res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
@@ -88,43 +65,20 @@ class AuthMiddleware {
                 }
                 req.context.auth_token = token;
                 const checkValidity = yield this.tokenHelpers.checkTokenValidity(token);
-                if (checkValidity) {
-                    if (typeof checkValidity == "object") {
-                        const emailAddress = checkValidity.email || checkValidity.email_address;
-                        if (emailAddress) {
-                            if (checkValidity) {
-                                req.context.email_id = emailAddress;
-                                req.context.token = token;
-                                req.context.user_id = checkValidity.user_id;
-                                next();
-                            }
-                            else {
-                                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
-                                    status: false,
-                                    msg: "Authorization is failed"
-                                });
-                            }
-                        }
-                        else {
-                            res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
-                                status: false,
-                                msg: "Authorization is failed"
-                            });
-                        }
-                    }
-                    else {
-                        res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
-                            status: false,
-                            msg: "Authorization is failed"
-                        });
+                if (checkValidity && typeof checkValidity == "object") {
+                    const emailAddress = checkValidity.email || checkValidity.email_address;
+                    if (emailAddress && checkValidity) {
+                        req.context.email_id = emailAddress;
+                        req.context.token = token;
+                        req.context.user_id = checkValidity.user_id;
+                        next();
+                        return;
                     }
                 }
-                else {
-                    res.status(401).json({
-                        status: false,
-                        msg: "Authorization is failed"
-                    });
-                }
+                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
+                    status: false,
+                    msg: "Authorization is failed"
+                });
             }
             else {
                 res.status(401).json({
@@ -138,7 +92,6 @@ class AuthMiddleware {
         return __awaiter(this, void 0, void 0, function* () {
             const headers = req.headers;
             const token = utilHelper_1.default.getTokenFromHeader(headers['authorization']);
-            console.log("The token is :" + token);
             if (token) {
                 if (!req.context) {
                     req.context = {};
@@ -146,50 +99,27 @@ class AuthMiddleware {
                 req.context.auth_token = token;
                 const checkValidity = yield this.tokenHelpers.checkTokenValidity(token);
                 console.log(checkValidity);
-                if (checkValidity) {
-                    if (typeof checkValidity == "object") {
-                        const emailAddress = checkValidity.email || checkValidity.email_address;
-                        if (emailAddress) {
-                            if (checkValidity) {
-                                req.context.email_id = emailAddress;
-                                req.context.token = token;
-                                req.context.user_id = checkValidity.user_id;
-                                console.log("Passed");
-                                console.log(req.context);
-                                next();
-                            }
-                            else {
-                                res.status(401).json({
-                                    status: false,
-                                    msg: "Authorization is failed"
-                                });
-                            }
-                        }
-                        else {
-                            res.status(401).json({
-                                status: false,
-                                msg: "Authorization is failed"
-                            });
-                        }
-                    }
-                    else {
-                        res.status(401).json({
-                            status: false,
-                            msg: "Authorization is failed"
-                        });
+                if (checkValidity && typeof checkValidity == "object") {
+                    const emailAddress = checkValidity.email || checkValidity.email_address;
+                    if (emailAddress && checkValidity) {
+                        req.context.email_id = emailAddress;
+                        req.context.token = token;
+                        req.context.user_id = checkValidity.user_id;
+                        console.log("Passed");
+                        console.log(req.context);
+                        next();
+                        return;
                     }
                 }
-                else {
-                    res.status(401).json({
-                        status: false,
-                        msg: "Authorization is failed"
-                    });
-                }
+                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
+                    status: false,
+                    msg: "Authorization is failed"
+                });
             }
             else {
-                res.status(401).json({
+                res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
                     status: false,
-                    msg: "Invalid auth attempt"
+                    msg: "Authorization is failed"
                 });
             }
         });

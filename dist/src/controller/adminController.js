@@ -26,7 +26,8 @@ class AdminController {
     }
     verifyToken(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const token = utilHelper_1.default.getTokenFromHeader(req.headers['authorization']);
+            const authToken = req.headers['authorization'];
+            const token = utilHelper_1.default.getTokenFromHeader(authToken);
             if (token) {
                 const emailEmail = yield this.AdminServices.verifyToken(token);
                 res.status(emailEmail.statusCode).json({ status: emailEmail.status, msg: emailEmail.msg, data: emailEmail.data });
@@ -93,7 +94,7 @@ class AdminController {
                     status: false,
                     msg: "Internal server error",
                 };
-                res.status(500).json(response);
+                res.status(Enums_1.StatusCode.SERVER_ERROR).json(response);
             }
         });
     }
@@ -105,17 +106,15 @@ class AdminController {
                 res.status(adminResetRequest.statusCode).json({ status: true, msg: adminResetRequest.msg });
             }
             catch (e) {
-                console.log(e);
-                res.status(500).json({ status: false, msg: "Internal Server Error" });
+                res.status(Enums_1.StatusCode.SERVER_ERROR).json({ status: false, msg: "Internal Server Error" });
             }
         });
     }
     adminPasswordReset(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const token = req.params.token; //utilHelper.getTokenFromHeader(req['headers']['authorization']);
+                const token = req.params.token;
                 const password = req.body.password;
-                // console.log(token, password);
                 if (password && token) {
                     const resetPassword = yield this.AdminServices.resetPassword(token, password);
                     res.status(resetPassword.statusCode).json({
@@ -124,7 +123,7 @@ class AdminController {
                     });
                 }
                 else {
-                    res.status(401).json({
+                    res.status(Enums_1.StatusCode.UNAUTHORIZED).json({
                         status: false,
                         msg: "Please provide a password",
                     });
@@ -132,7 +131,7 @@ class AdminController {
             }
             catch (e) {
                 console.log(e);
-                res.status(500).json({
+                res.status(Enums_1.StatusCode.SERVER_ERROR).json({
                     status: false,
                     msg: "Internal Servor Error",
                 });

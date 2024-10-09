@@ -36,7 +36,6 @@ class UserAuthServices {
         return __awaiter(this, void 0, void 0, function* () {
             const tokenVerify = yield this.TokenHelpers.checkTokenValidity(token);
             if (tokenVerify && typeof tokenVerify == "object") {
-                //valid token
                 const checkRefreshToken = tokenVerify.exp;
                 const newAccessToken = yield this.TokenHelpers.generateJWtToken(tokenVerify, Enums_1.JwtTimer.AccessTokenExpiresInMinutes);
                 if (newAccessToken) {
@@ -204,7 +203,7 @@ class UserAuthServices {
                 if (userAuth) {
                     if (!userAuth.account_started) {
                         return {
-                            statusCode: 400,
+                            statusCode: Enums_1.StatusCode.NOT_FOUND,
                             status: false,
                             msg: "Email id not found",
                         };
@@ -217,7 +216,6 @@ class UserAuthServices {
                         userAuth.otp_timer = otpExpireTime;
                         userAuth.jwtToken = token;
                         yield this.UserAuthRepo.updateUser(userAuth);
-                        // await userAuth.save()
                         const userAuthProvider = new notification_service_1.default(process.env.USER_SIGN_IN_NOTIFICATION);
                         yield userAuthProvider._init_();
                         userAuthProvider.signInOTPSender({
@@ -226,7 +224,7 @@ class UserAuthServices {
                             full_name: userAuth.first_name + userAuth.last_name
                         });
                         return {
-                            statusCode: 200,
+                            statusCode: Enums_1.StatusCode.OK,
                             status: true,
                             msg: "OTP Has been sent ",
                             data: {
@@ -236,7 +234,7 @@ class UserAuthServices {
                     }
                     else {
                         return {
-                            statusCode: 401,
+                            statusCode: Enums_1.StatusCode.UNAUTHORIZED,
                             status: false,
                             msg: "Provide valid token"
                         };
@@ -244,7 +242,7 @@ class UserAuthServices {
                 }
                 else {
                     return {
-                        statusCode: 401,
+                        statusCode: Enums_1.StatusCode.NOT_FOUND,
                         status: false,
                         msg: "User not found"
                     };
@@ -253,7 +251,7 @@ class UserAuthServices {
             catch (e) {
                 console.log(e);
                 return {
-                    statusCode: 500,
+                    statusCode: Enums_1.StatusCode.SERVER_ERROR,
                     status: false,
                     msg: "Something went wrong"
                 };
@@ -269,27 +267,24 @@ class UserAuthServices {
                     return {
                         status: false,
                         msg: "Email ID not found",
-                        statusCode: 401
+                        statusCode: Enums_1.StatusCode.NOT_FOUND
                     };
                 }
-                console.log("Get user");
-                console.log(getUser);
                 const userJwtToken = getUser.jwtToken;
                 if (userJwtToken != token) {
                     return {
                         status: false,
                         msg: "Invalid Token",
-                        statusCode: 401
+                        statusCode: Enums_1.StatusCode.UNAUTHORIZED
                     };
                 }
-                console.log("This also passed");
                 const otpExpireTimer = getUser.otp_timer;
                 const validateOtp = utilHelper_1.default.OTPValidator(otp, getUser.otp, otpExpireTimer);
                 if (!validateOtp.status) {
                     return {
                         status: false,
                         msg: (_a = validateOtp.msg) !== null && _a !== void 0 ? _a : "Incorrect OTP or OTP has been expired",
-                        statusCode: 400
+                        statusCode: Enums_1.StatusCode.BAD_REQUEST
                     };
                 }
                 const first_name = getUser.first_name;
@@ -324,7 +319,6 @@ class UserAuthServices {
                             first_name: getUser.first_name,
                             last_name: getUser.last_name,
                             phone_number: getUser.phone_number,
-                            location: getUser.location,
                             user_id: getUser.id,
                             profile_id: getUser.user_id
                         });
@@ -346,7 +340,7 @@ class UserAuthServices {
                         status: true,
                         msg: "OTP Verified Success",
                         data: userJwtData,
-                        statusCode: 200
+                        statusCode: Enums_1.StatusCode.OK
                     };
                 }
                 else {
@@ -361,14 +355,13 @@ class UserAuthServices {
                 return {
                     status: false,
                     msg: "Something went wront",
-                    statusCode: 500
+                    statusCode: Enums_1.StatusCode.UNAUTHORIZED
                 };
             }
         });
     }
     editAuthEmailID(oldEmailId, newEmailID) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("Entered here");
             const otpNumber = utilHelper_1.default.generateAnOTP(6);
             const otpExpireTime = const_1.default.MINIMUM_OTP_TIMER();
             try {
@@ -391,16 +384,10 @@ class UserAuthServices {
                                 email: newEmailID,
                                 full_name: getUser.first_name + getUser.last_name
                             });
-                            console.log("Edit here");
-                            console.log({
-                                otp: otpNumber,
-                                email: newEmailID,
-                                full_name: getUser.first_name + getUser.last_name
-                            });
                             return {
                                 status: true,
                                 msg: "Email id has been updated",
-                                statusCode: 200,
+                                statusCode: Enums_1.StatusCode.OK,
                                 data: {
                                     token: newToken
                                 }
@@ -410,13 +397,13 @@ class UserAuthServices {
                             return {
                                 status: false,
                                 msg: "Something went wrong",
-                                statusCode: 400,
+                                statusCode: Enums_1.StatusCode.BAD_REQUEST,
                             };
                         }
                     }
                     else {
                         return {
-                            statusCode: 401,
+                            statusCode: Enums_1.StatusCode.NOT_FOUND,
                             status: false,
                             msg: "The email address you entered does not exist",
                         };
@@ -433,7 +420,7 @@ class UserAuthServices {
             catch (e) {
                 console.log(e);
                 return {
-                    statusCode: 500,
+                    statusCode: Enums_1.StatusCode.SERVER_ERROR,
                     status: false,
                     msg: "Something went wrong",
                 };
@@ -461,7 +448,7 @@ class UserAuthServices {
                             full_name: getUser.first_name + " " + getUser.last_name
                         });
                         return {
-                            statusCode: 200,
+                            statusCode: Enums_1.StatusCode.OK,
                             status: true,
                             data: {
                                 token: newToken,
@@ -471,7 +458,7 @@ class UserAuthServices {
                     }
                     else {
                         return {
-                            statusCode: 500,
+                            statusCode: Enums_1.StatusCode.SERVER_ERROR,
                             status: false,
                             msg: "Something went wrong"
                         };
@@ -479,7 +466,7 @@ class UserAuthServices {
                 }
                 else {
                     return {
-                        statusCode: 401,
+                        statusCode: Enums_1.StatusCode.UNAUTHORIZED,
                         status: false,
                         msg: "Unauthorized request"
                     };
@@ -487,7 +474,7 @@ class UserAuthServices {
             }
             catch (e) {
                 return {
-                    statusCode: 500,
+                    statusCode: Enums_1.StatusCode.SERVER_ERROR,
                     status: false,
                     msg: "Something went wrong"
                 };

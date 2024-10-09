@@ -44,10 +44,7 @@ class UserAuthenticationRepo {
     }
     updateUserById(user_id, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("Update user details");
-            console.log(user_id, " ", data);
             const findUser = yield this.UserAuthCollection.updateOne({ _id: user_id }, { $set: data });
-            console.log(findUser);
             return findUser.modifiedCount > 0;
         });
     }

@@ -9,9 +9,6 @@ const authMiddleware_1 = __importDefault(require("../middleware/authMiddleware")
 const router = express_1.default.Router();
 const AuthController = new userController_1.default();
 const UserMiddleware = new authMiddleware_1.default();
-router.get("/", (req, res) => {
-    res.status(200).send("Welcome to authentication service");
-});
 router.post("/sign_up_provider", AuthController.signUpWithProvide);
 router.post("/sign_up", AuthController.signUpController);
 router.post("/sign_in", AuthController.signInController);

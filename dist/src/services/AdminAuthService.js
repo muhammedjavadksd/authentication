@@ -31,19 +31,14 @@ class AdminAuthService {
     verifyToken(token) {
         return __awaiter(this, void 0, void 0, function* () {
             const decodeToken = yield this.tokenHelpers.checkTokenValidity(token);
-            console.log(decodeToken);
-            console.log(token);
             if (decodeToken && typeof decodeToken == "object") {
-                console.log("Enterd");
                 const email_id = decodeToken['email_id'];
                 const adminEmail = decodeToken['admin_email'];
-                if (email_id) {
+                if (email_id && adminEmail) {
                     const findAdmin = yield this.AdminAuthRepo.findAdmin(adminEmail);
                     if (findAdmin) {
                         findAdmin.email_address = email_id;
                         const updateEmailId = yield this.AdminAuthRepo.updateAdmin(findAdmin);
-                        console.log(updateEmailId);
-                        console.log(findAdmin);
                         if (updateEmailId) {
                             return {
                                 msg: "Email id has been updated",
@@ -75,16 +70,12 @@ class AdminAuthService {
                 }
                 else {
                     if (admin_email != email_id) {
-                        console.log("Mail need to change");
                         const verifyPayload = {
                             email_id,
                             admin_email
                         };
                         const verifyToken = yield this.tokenHelpers.generateJWtToken(verifyPayload, Enums_1.JwtTimer.OtpTimer);
                         if (verifyPayload) {
-                            console.log("Payload created");
-                            console.log("Queue");
-                            console.log(process.env.ADMIN_UPDATE_VERIFY);
                             const provider = new notification_service_1.default(process.env.ADMIN_UPDATE_VERIFY || "");
                             yield provider._init_();
                             provider.dataTransfer({ token: verifyToken, email_id: admin_email });
@@ -120,17 +111,17 @@ class AdminAuthService {
     signIn(email, password) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const findAdmin = yield this.AdminAuthRepo.findAdmin(email); //await AdminAuthModel.findOne({ email_address: email });
+                const findAdmin = yield this.AdminAuthRepo.findAdmin(email);
                 if (findAdmin) {
                     const adminPassword = findAdmin.password;
                     if (adminPassword) {
                         const comparePassword = yield bcrypt_1.default.compare(password, adminPassword);
-                        const token = yield this.tokenHelpers.generateJWtToken({ email: findAdmin.email_address, type: const_1.default.JWT_FOR.ADMIN_AUTH, role: "admin", profile_id: "admin_profile", user_id: findAdmin._id }, Enums_1.JwtTimer.AccessTokenExpiresInMinutes);
+                        const token = yield this.tokenHelpers.generateJWtToken({ email: findAdmin.email_address, type: const_1.default.JWT_FOR.ADMIN_AUTH, role: "admin", profile_id: "admin_profile", user_id: findAdmin._id }, Enums_1.JwtTimer.RefreshTokenExpiresInDays);
                         if (comparePassword && token) {
                             findAdmin.token = token !== null && token !== void 0 ? token : "";
                             yield this.AdminAuthRepo.updateAdmin(findAdmin);
                             return {
-                                statusCode: 200,
+                                statusCode: Enums_1.StatusCode.OK,
                                 status: true,
                                 msg: "Admin auth success",
                                 data: {
@@ -142,9 +133,8 @@ class AdminAuthService {
                             };
                         }
                         else {
-                            console.log("Creditial is wrong");
                             return {
-                                statusCode: 401,
+                                statusCode: Enums_1.StatusCode.UNAUTHORIZED,
                                 status: false,
                                 msg: "Incorrect Password",
                             };
@@ -152,7 +142,7 @@ class AdminAuthService {
                     }
                     else {
                         return {
-                            statusCode: 400,
+                            statusCode: Enums_1.StatusCode.BAD_REQUEST,
                             status: false,
                             msg: "Please provide valid password",
                         };
@@ -160,7 +150,7 @@ class AdminAuthService {
                 }
                 else {
                     return {
-                        statusCode: 401,
+                        statusCode: Enums_1.StatusCode.BAD_REQUEST,
                         status: false,
                         msg: "Email id is not found",
                     };
@@ -169,7 +159,7 @@ class AdminAuthService {
             catch (e) {
                 console.log(e);
                 return {
-                    statusCode: 500,
+                    statusCode: Enums_1.StatusCode.SERVER_ERROR,
                     status: false,
                     msg: "Internal Server Error",
                 };
@@ -184,7 +174,6 @@ class AdminAuthService {
                 if (findAdmin && token) {
                     findAdmin.token = token;
                     yield this.AdminAuthRepo.updateAdmin(findAdmin);
-                    console.log(findAdmin);
                     const authCommunicationProvider = new notification_service_1.default(process.env.ADMIN_FORGETPASSWORD_EMAIL);
                     yield authCommunicationProvider._init_();
                     authCommunicationProvider.adminForgetPasswordEmail({
@@ -194,23 +183,22 @@ class AdminAuthService {
                     });
                     return {
                         status: true,
-                        statusCode: 200,
+                        statusCode: Enums_1.StatusCode.OK,
                         msg: "Reset email has been sent"
                     };
                 }
                 else {
                     return {
                         status: false,
-                        statusCode: 401,
+                        statusCode: Enums_1.StatusCode.OK,
                         msg: "We couldn't locate the admin you're looking for."
                     };
                 }
             }
             catch (e) {
-                console.log(e);
                 return {
                     status: false,
-                    statusCode: 500,
+                    statusCode: Enums_1.StatusCode.SERVER_ERROR,
                     msg: "Internal Server Error"
                 };
             }
@@ -219,73 +207,47 @@ class AdminAuthService {
     resetPassword(token, password) {
         return __awaiter(this, void 0, void 0, function* () {
             const isTokenValid = yield this.tokenHelpers.checkTokenValidity(token);
-            if (isTokenValid) {
-                if (typeof isTokenValid == "object") {
-                    const email_id = isTokenValid.email;
+            if (isTokenValid && typeof isTokenValid == "object") {
+                const email_id = isTokenValid.email;
+                if (email_id) {
                     const findAdmin = yield this.AdminAuthRepo.findAdmin(email_id); //AdminAuthModel.findOne({ email_address: email_id })
                     if (findAdmin && findAdmin.password) {
-                        console.log(token);
-                        console.log(findAdmin.token);
                         if (findAdmin.token == token) {
                             const newPassword = yield bcrypt_1.default.hash(password, Number(process.env.BCRYPT_SALTROUND));
                             const comparePassword = yield bcrypt_1.default.compare(password, findAdmin.password);
                             if (comparePassword) {
                                 return {
                                     status: false,
-                                    statusCode: 400,
+                                    statusCode: Enums_1.StatusCode.BAD_REQUEST,
                                     msg: "New password cannot be the same as the last used password."
                                 };
                             }
                             if (newPassword) {
                                 findAdmin.password = newPassword;
                                 findAdmin.token = "";
-                                // await findAdmin.save();
                                 this.AdminAuthRepo.updateAdmin(findAdmin);
                                 return {
                                     status: true,
-                                    statusCode: 200,
+                                    statusCode: Enums_1.StatusCode.OK,
                                     msg: "Password has been updated"
                                 };
                             }
                             else {
                                 return {
                                     status: false,
-                                    statusCode: 500,
+                                    statusCode: Enums_1.StatusCode.SERVER_ERROR,
                                     msg: "Internal Server Error"
                                 };
                             }
                         }
-                        else {
-                            return {
-                                status: false,
-                                statusCode: 401,
-                                msg: "Invalid Token"
-                            };
-                        }
-                    }
-                    else {
-                        return {
-                            status: false,
-                            statusCode: 401,
-                            msg: "Invalid Token ID"
-                        };
                     }
                 }
-                else {
-                    return {
-                        status: false,
-                        statusCode: 401,
-                        msg: "Invalid Token ID"
-                    };
-                }
             }
-            else {
-                return {
-                    status: false,
-                    statusCode: 401,
-                    msg: "Token time has been expired"
-                };
-            }
+            return {
+                status: false,
+                statusCode: Enums_1.StatusCode.UNAUTHORIZED,
+                msg: "Invalid Token ID"
+            };
         });
     }
 }

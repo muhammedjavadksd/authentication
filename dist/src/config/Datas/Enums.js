@@ -1,14 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.JwtTimer = exports.StatusCode = exports.OrganizationStatus = void 0;
-var OrganizationStatus;
-(function (OrganizationStatus) {
-    OrganizationStatus["Active"] = "Active";
-    OrganizationStatus["InActive"] = "In Active";
-    OrganizationStatus["Rejected"] = "Rejected";
-    OrganizationStatus["Blocked"] = "Blocked";
-    OrganizationStatus["Pending"] = "Pending";
-})(OrganizationStatus || (exports.OrganizationStatus = OrganizationStatus = {}));
+exports.JwtTimer = exports.StatusCode = void 0;
 var JwtTimer;
 (function (JwtTimer) {
     JwtTimer["AccessTokenExpiresInMinutes"] = "15m";
