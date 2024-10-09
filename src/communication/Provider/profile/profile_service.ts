@@ -1,6 +1,5 @@
 import * as amqplib from 'amqplib';
-import { AuthData } from '../../../config/Datas/InterFace';
-import { IBaseProfileData, IBaseUser } from '../../../config/Datas/Interface/Objects/IBaseUser';
+import { IBaseProfileData } from '../../../config/Datas/Interface/UtilInterface';
 
 interface PROFILE_COMMUNICATION_PROVIDER_INTERFACE {
     authDataTransfer(baseUSER: IBaseProfileData): Promise<void>
@@ -29,7 +28,6 @@ class ProfileCommunicationProvider implements PROFILE_COMMUNICATION_PROVIDER_INT
                 first_name: baseUser['first_name'],
                 last_name: baseUser['last_name'],
                 email: baseUser['email'],
-                location: baseUser['location'],
                 phone_number: baseUser['phone_number'],
                 user_id: baseUser['user_id'],
                 profile_id: baseUser['profile_id'],
